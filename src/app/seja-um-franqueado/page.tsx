@@ -5,7 +5,13 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Hexagon, Photo, SectionTag, Shell } from "@/components/wireframe";
+import {
+  Hexagon,
+  ImagePlaceholder,
+  Photo,
+  SectionTag,
+  Shell,
+} from "@/components/wireframe";
 import { LeadForm } from "@/components/lead-form";
 import { Faq } from "@/components/faq";
 import {
@@ -16,8 +22,11 @@ import {
   IA_OPERACAO,
   INCLUSO,
   INSTAGRAM_HANDLE,
+  INVESTIMENTO,
+  INVESTIMENTO_VALOR,
   LOCAIS,
   MERCADO,
+  MODELOS,
   PILARES,
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
@@ -37,6 +46,57 @@ function AnchorCta({ children }: { children: React.ReactNode }) {
     >
       {children}
     </a>
+  );
+}
+
+// Seção de CTA horizontal para um modelo de loja (imagem alterna de lado).
+function ModeloSection({
+  m,
+  i,
+}: {
+  m: (typeof MODELOS)[number];
+  i: number;
+}) {
+  const reverse = i % 2 === 1;
+  return (
+    <section
+      className={`border-t border-wire-line/50 ${i % 2 === 1 ? "bg-surface/40" : ""}`}
+    >
+      <Shell className="grid items-center gap-10 py-16 lg:grid-cols-2 lg:gap-16">
+        <div className={reverse ? "lg:order-2" : ""}>
+          {m.img ? (
+            <Photo
+              src={m.img}
+              alt={m.nome}
+              fit={m.fit === "contain" ? "contain" : "cover"}
+              className="h-64 w-full rounded-3xl lg:h-80"
+            />
+          ) : (
+            <ImagePlaceholder label={m.placeholder} className="h-64 lg:h-80" />
+          )}
+        </div>
+        <div className={reverse ? "lg:order-1" : ""}>
+          <span className="inline-block rounded-full bg-brand/15 px-3 py-1 text-xs font-medium uppercase tracking-wide text-brand">
+            {m.tag}
+          </span>
+          <h3 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+            {m.nome}
+          </h3>
+          <p className="mt-4 max-w-md text-muted">{m.desc}</p>
+          <ul className="mt-6 space-y-2">
+            {m.destaques.map((d) => (
+              <li key={d} className="flex items-center gap-3 text-sm text-foreground">
+                <span className="text-brand">✓</span>
+                {d}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8">
+            <AnchorCta>Quero este modelo</AnchorCta>
+          </div>
+        </div>
+      </Shell>
+    </section>
   );
 }
 
@@ -131,6 +191,25 @@ export default function SejaUmFranqueado() {
         </Shell>
       </section>
 
+      {/* 3b. MODELOS DE LOJA — 3 tipos, cada um em CTA horizontal --------- */}
+      <section className="border-b border-wire-line/50">
+        <Shell className="pt-20 pb-4 text-center">
+          <SectionTag>
+            <span className="mx-auto">Modelos de franquia</span>
+          </SectionTag>
+          <h2 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            Escolha o modelo ideal para a sua região.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted">
+            Três formatos pensados para diferentes pontos e perfis de
+            investimento. Encontre o seu.
+          </p>
+        </Shell>
+      </section>
+      {MODELOS.map((m, i) => (
+        <ModeloSection key={m.nome} m={m} i={i} />
+      ))}
+
       {/* 4. COMO SE TORNAR FRANQUEADO — imagem sangra à esquerda ---------- */}
       <section id="como-funciona" className="scroll-mt-24 border-b border-wire-line/50 bg-surface/40">
         <div className="grid items-stretch gap-y-10 lg:grid-cols-2">
@@ -183,19 +262,13 @@ export default function SejaUmFranqueado() {
             ))}
           </div>
 
-          {/* Gancho: o valor vem no contato → vira lead */}
-          <div className="mt-12 flex flex-col items-start gap-6 rounded-3xl bg-surface p-8 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-xl">
-              <h3 className="text-2xl font-semibold">
-                Quer saber quanto é o investimento?
-              </h3>
-              <p className="mt-2 text-muted">
-                Cada região tem uma proposta. Fale com um consultor e receba a
-                apresentação completa, com todos os valores e a projeção de
-                retorno.
-              </p>
-            </div>
-            <AnchorCta>Receber apresentação</AnchorCta>
+          <div className="mt-10">
+            <a
+              href="#investimento"
+              className="inline-flex items-center gap-2 text-sm font-medium text-brand hover:underline"
+            >
+              Ver o investimento completo ↓
+            </a>
           </div>
         </Shell>
       </section>
@@ -242,6 +315,41 @@ export default function SejaUmFranqueado() {
                 <p className="text-lg text-foreground">{item}</p>
               </div>
             ))}
+          </div>
+        </Shell>
+      </section>
+
+      {/* 7b. INVESTIMENTO DETALHADO (valores da apresentação) ------------ */}
+      <section
+        id="investimento"
+        className="scroll-mt-20 border-b border-wire-line/50 bg-surface"
+      >
+        <Shell className="py-24">
+          <div className="flex flex-wrap items-end justify-between gap-6 border-b border-wire-line/60 pb-8">
+            <div>
+              <SectionTag>Detalhamento da franquia</SectionTag>
+              <h2 className="text-3xl font-semibold uppercase tracking-wide sm:text-4xl">
+                Investimento inicial
+              </h2>
+            </div>
+            <p className="text-5xl font-bold text-foreground sm:text-6xl">
+              {INVESTIMENTO_VALOR.replace(",00", "")}
+              <span className="text-2xl text-muted">,00</span>
+            </p>
+          </div>
+          <div className="grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
+            {INVESTIMENTO.map((item) => (
+              <div key={item.t} className="border-b border-wire-line/60 py-6">
+                <h3 className="text-lg font-semibold">{item.t}</h3>
+                <p className="mt-1 text-muted">{item.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-brand">
+              Sem surpresas: estoque inicial e taxa de franqueado já inclusos.
+            </p>
+            <AnchorCta>Quero ser franqueado</AnchorCta>
           </div>
         </Shell>
       </section>
@@ -355,16 +463,6 @@ export default function SejaUmFranqueado() {
           <LeadForm variant="full" />
         </Shell>
       </section>
-
-      {/* WhatsApp sticky no mobile */}
-      <a
-        href={WHATSAPP_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-black shadow-lg md:hidden"
-      >
-        ✆ Falar no WhatsApp
-      </a>
 
       <p className="border-t border-wire-line/50 py-6 text-center text-xs text-muted">
         <Link href="/" className="hover:text-brand">

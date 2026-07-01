@@ -12,6 +12,14 @@ export const WHATSAPP_LINK =
 export const INSTAGRAM_HANDLE = "@gravaaioficial"; // [REAL]
 export const INSTAGRAM_LINK = "https://instagram.com/gravaaioficial";
 
+// Redes sociais (icon = chave mapeada em icons). [PLACEHOLDER] onde href = "#".
+export const SOCIALS = [
+  { name: "Instagram", href: INSTAGRAM_LINK, icon: "instagram" },
+  { name: "WhatsApp", href: WHATSAPP_LINK, icon: "whatsapp" },
+  { name: "Facebook", href: "#", icon: "facebook" }, // [substituir por: URL real]
+  { name: "TikTok", href: "#", icon: "tiktok" }, // [substituir por: URL real]
+] as const;
+
 // Faixa de destaques (sem valores/percentuais — geram desejo, não tabela preço)
 export const DESTAQUES = [
   { t: "Personalização com IA", d: "Um produto único, criado e gravado na hora." },
@@ -74,7 +82,7 @@ export const COMO_SER_FRANQUEADO = [
   { t: "Inauguração", d: "Sua unidade GRAVA.AI pronta para operar e vender." },
 ];
 
-// O que o franqueado recebe (sem valores — os números vêm na apresentação/contato)
+// O que o franqueado recebe (qualitativo — fica no topo/meio da página)
 export const INCLUSO = [
   { t: "Totem com IA", d: "O equipamento completo para operar a sua unidade." },
   { t: "Estoque inicial", d: "Você já começa pronto para vender no primeiro dia." },
@@ -82,6 +90,61 @@ export const INCLUSO = [
   { t: "Marketing e tecnologia", d: "Plataforma, CRM e apoio de divulgação da matriz." },
   { t: "Distribuição garantida", d: "Produtos e matéria-prima direto da matriz." },
   { t: "Suporte contínuo", d: "Acompanhamento em tempo real, sempre ao seu lado." },
+];
+
+// Detalhamento financeiro (valores da apresentação em PDF) — vai MAIS ABAIXO,
+// numa seção de detalhamento da franquia (nunca no hero/header).
+export const INVESTIMENTO_VALOR = "R$ 99.900,00"; // investimento inicial
+export const INVESTIMENTO = [
+  { t: "Taxa do franqueado", d: "R$ 35.000,00 já inclusa no valor." },
+  { t: "Taxa de royalties", d: "2,5% sobre o faturamento bruto." },
+  { t: "Taxa de marketing", d: "1% sobre o faturamento bruto." },
+  { t: "Payback estimado", d: "De 6 a 12 meses para retorno." },
+  { t: "Ticket médio", d: "Aproximadamente R$ 60,00 a R$ 100,00." },
+  { t: "Estoque e equipamentos", d: "Em média R$ 15.000,00 (estoque inicial incluso)." },
+];
+
+// [FRANQUIA] Modelos de loja esperados (fictícios — inspirados na Kopenhagen)
+export const MODELOS = [
+  {
+    nome: "GRAVA.AI Quiosque",
+    tag: "O mais procurado",
+    desc: "O formato compacto e versátil para corredores de shoppings e supermercados de grande porte. Baixo custo de operação e presença em alto fluxo.",
+    destaques: [
+      "Ideal para shoppings e supermercados",
+      "Operação enxuta e rápida de montar",
+      "Menor investimento de entrada",
+    ],
+    img: "/kiosk.png",
+    fit: "contain",
+    placeholder: "",
+  },
+  {
+    nome: "GRAVA.AI Store",
+    tag: "Experiência completa",
+    desc: "A loja completa, com mais espaço para produtos, personalização e uma experiência de marca imersiva — um verdadeiro ponto de destino.",
+    destaques: [
+      "Maior mix de produtos",
+      "Vitrine e experiência de marca",
+      "Ponto de destino dentro do shopping",
+    ],
+    img: "/shopping.jpg",
+    fit: "cover",
+    placeholder: "",
+  },
+  {
+    nome: "GRAVA.AI Express",
+    tag: "Alto fluxo",
+    desc: "O formato enxuto e ágil para aeroportos, eventos e locais de altíssimo fluxo, com foco na compra rápida e no impulso.",
+    destaques: [
+      "Perfeito para aeroportos e eventos",
+      "Ocupa o mínimo de espaço",
+      "Venda rápida, por impulso",
+    ],
+    img: "",
+    fit: "cover",
+    placeholder: "Modelo GRAVA.AI Express",
+  },
 ];
 
 export const DISTRIBUICAO = [
@@ -130,11 +193,11 @@ export const MERCADO = [
 export const FAQ = [
   {
     q: "Quanto preciso investir?",
-    a: "O investimento varia conforme o modelo e a região. Preencha o formulário e um consultor apresenta a proposta completa, com todos os valores, para o seu caso.",
+    a: "O investimento inicial é de R$ 99.900,00, já com a taxa de franqueado (R$ 35.000) e o estoque inicial inclusos. Veja o detalhamento completo na seção de investimento.",
   },
   {
-    q: "A GRAVA.AI dá retorno rápido?",
-    a: "Sim — o modelo foi desenhado para uma operação enxuta e lucrativa. Fale com um consultor para conhecer a projeção completa de retorno.",
+    q: "Em quanto tempo recupero o investimento?",
+    a: "O payback estimado é de 6 a 12 meses, dependendo do ponto e da operação.",
   },
   {
     q: "Preciso entender de tecnologia?",

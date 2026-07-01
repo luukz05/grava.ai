@@ -1,11 +1,47 @@
 import Link from "next/link";
 import { BrandMark } from "./wireframe";
 import {
+  FacebookIcon,
+  InstagramIcon,
+  TikTokIcon,
+  WhatsAppIcon,
+} from "./icons";
+import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_LINK,
+  SOCIALS,
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
 } from "@/lib/site";
+
+const ICONS = {
+  instagram: InstagramIcon,
+  whatsapp: WhatsAppIcon,
+  facebook: FacebookIcon,
+  tiktok: TikTokIcon,
+} as const;
+
+function SocialRow() {
+  return (
+    <div className="mt-4 flex gap-2.5">
+      {SOCIALS.map((s) => {
+        const Icon = ICONS[s.icon];
+        return (
+          <a
+            key={s.name}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={s.name}
+            className="grid h-10 w-10 place-items-center rounded-full text-muted ring-1 ring-wire-line transition-colors hover:bg-brand hover:text-black hover:ring-brand"
+          >
+            <Icon className="h-5 w-5" />
+          </a>
+        );
+      })}
+    </div>
+  );
+}
 
 export function SiteFooter() {
   return (
@@ -50,7 +86,9 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h3 className="text-xs uppercase tracking-widest text-muted">Contato</h3>
+          <h3 className="text-xs uppercase tracking-widest text-muted">
+            Redes sociais
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-foreground">
             <li>
               <a
@@ -59,7 +97,7 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 className="hover:text-brand"
               >
-                ✆ {WHATSAPP_NUMBER}
+                {WHATSAPP_NUMBER}
               </a>
             </li>
             <li>
@@ -69,10 +107,11 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 className="hover:text-brand"
               >
-                ◎ {INSTAGRAM_HANDLE}
+                {INSTAGRAM_HANDLE}
               </a>
             </li>
           </ul>
+          <SocialRow />
         </div>
       </div>
 
