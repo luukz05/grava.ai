@@ -136,10 +136,15 @@ export default function SejaUmFranqueado() {
               rel="noopener noreferrer"
               className="mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-brand ring-1 ring-brand"
             >
-              ✆ Falar no WhatsApp agora
+              ✆ Receba a apresentação no WhatsApp
             </a>
           </div>
-          <LeadForm variant="short" />
+          <LeadForm
+            variant="short"
+            title="Fale com um especialista"
+            subtitle="Descubra se o seu perfil combina com a franquia da GRAVA.AI."
+            cta="Quero falar com um especialista"
+          />
         </Shell>
       </section>
 
@@ -172,7 +177,7 @@ export default function SejaUmFranqueado() {
               <span className="text-foreground">{LOCAIS.join(" · ")}.</span>
             </p>
             <div className="mt-8">
-              <AnchorCta>Quero ser franqueado</AnchorCta>
+              <AnchorCta>Agende uma conversa sem compromisso</AnchorCta>
             </div>
           </div>
           <div className="divide-y divide-wire-line/60">
@@ -273,6 +278,36 @@ export default function SejaUmFranqueado() {
         </Shell>
       </section>
 
+      {/* 5b. LEAD MAGNET — guia gratuito --------------------------------- */}
+      <section className="border-b border-wire-line/50 bg-surface">
+        <Shell className="flex flex-col items-start gap-8 py-14 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start gap-5">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/15 text-2xl text-brand">
+              ⬇
+            </span>
+            <div className="max-w-xl">
+              <span className="text-xs uppercase tracking-widest text-brand">
+                Material gratuito
+              </span>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+                Baixe o guia gratuito: Como funciona a franquia de personalização
+                com IA da GRAVA.AI
+              </h2>
+              <p className="mt-2 text-muted">
+                Entenda o modelo, a operação e a oportunidade — enviamos no seu
+                WhatsApp, sem compromisso.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#formulario"
+            className="shrink-0 rounded-full bg-brand px-7 py-3.5 text-sm font-semibold text-black"
+          >
+            Baixar guia gratuito
+          </a>
+        </Shell>
+      </section>
+
       {/* 6. DISTRIBUIÇÃO PRÓPRIA — faixa com brilho ----------------------- */}
       <section className="brand-glow-left relative overflow-hidden border-b border-wire-line/50 bg-surface">
         <Hexagon className="pointer-events-none absolute -bottom-24 right-0 h-96 w-96 text-brand/10" />
@@ -349,7 +384,7 @@ export default function SejaUmFranqueado() {
             <p className="text-brand">
               Sem surpresas: estoque inicial e taxa de franqueado já inclusos.
             </p>
-            <AnchorCta>Quero ser franqueado</AnchorCta>
+            <AnchorCta>Receba a apresentação completa</AnchorCta>
           </div>
         </Shell>
       </section>
@@ -434,11 +469,11 @@ export default function SejaUmFranqueado() {
         <Shell className="grid gap-12 py-24 lg:grid-cols-2">
           <div>
             <h2 className="text-4xl font-bold uppercase leading-tight sm:text-5xl">
-              Seja um franqueado.
+              Agende uma conversa sem compromisso.
             </h2>
             <p className="mt-6 max-w-sm text-lg text-muted">
-              Leve esta experiência para sua região e participe da próxima{" "}
-              <span className="text-brand">evolução da personalização.</span>
+              Tire todas as suas dúvidas com um especialista e descubra se seu
+              perfil combina com a franquia.
             </p>
             <div className="mt-10 space-y-4">
               <a
@@ -450,7 +485,12 @@ export default function SejaUmFranqueado() {
                 <span className="grid h-10 w-10 place-items-center rounded-full ring-1 ring-brand text-brand">
                   ✆
                 </span>
-                <span className="text-lg">{WHATSAPP_NUMBER}</span>
+                <span>
+                  <span className="block text-lg">{WHATSAPP_NUMBER}</span>
+                  <span className="block text-xs text-muted">
+                    Receba a apresentação completa no seu WhatsApp
+                  </span>
+                </span>
               </a>
               <div className="flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-full ring-1 ring-brand text-brand">
@@ -460,7 +500,12 @@ export default function SejaUmFranqueado() {
               </div>
             </div>
           </div>
-          <LeadForm variant="full" />
+          <LeadForm
+            variant="full"
+            title="Agende uma conversa sem compromisso"
+            subtitle="Tire todas as suas dúvidas com um especialista."
+            cta="Quero conversar sem compromisso"
+          />
         </Shell>
       </section>
 

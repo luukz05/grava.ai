@@ -18,9 +18,15 @@ const inputClass =
 export function LeadForm({
   variant = "short",
   id,
+  title = "Quero ser franqueado",
+  subtitle = "Fale com um especialista e descubra se seu perfil combina com a franquia.",
+  cta = "Quero ser franqueado",
 }: {
   variant?: "short" | "full";
   id?: string;
+  title?: string;
+  subtitle?: string;
+  cta?: string;
 }) {
   const [sent, setSent] = useState(false);
 
@@ -49,11 +55,9 @@ export function LeadForm({
       className="rounded-2xl border border-wire-line bg-surface-2 p-6"
     >
       <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-brand">
-        Quero ser franqueado
+        {title}
       </p>
-      <p className="mb-4 text-xs text-muted">
-        Preencha e fale com um especialista.
-      </p>
+      <p className="mb-4 text-xs text-muted">{subtitle}</p>
 
       <div className="space-y-3">
         <input className={inputClass} placeholder="Nome completo" required />
@@ -128,7 +132,7 @@ export function LeadForm({
         type="submit"
         className="mt-4 w-full rounded-full bg-brand px-6 py-3 text-sm font-semibold text-black"
       >
-        Quero ser franqueado
+        {cta}
       </button>
     </form>
   );
