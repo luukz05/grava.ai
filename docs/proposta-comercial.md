@@ -363,7 +363,123 @@ mais rápido e mais caro, porque você já tem case, processo e templates.
 
 ---
 
-## 8. Resumo executivo
+## 8. Playbook de negociação (uso interno)
+
+Onde ceder, o que proteger e como estruturar pagamento/descontos. **Regra-mãe:
+todo desconto tem contrapartida** — você nunca abaixa preço "de graça", troca por
+algo (prazo, antecipação, indicação, case).
+
+### Princípios
+
+- **Ancore alto:** apresente o preço cheio primeiro; o desconto vira "presente".
+- **Proteja a recorrência:** prefira ceder no **setup** (pontual) do que na
+  **mensalidade** (é onde está o dinheiro do ano).
+- **Ceda escopo, não só preço:** se pedirem mais barato, **tire item** em vez de
+  simplesmente descontar — mantém a percepção de valor.
+- **Conheça seu piso:** abaixo do walk-around, não vale — melhor não fechar.
+
+### Modelos de cobrança da gestão (fee vs % vs performance)
+
+Três formas de cobrar a gestão de tráfego — e quando usar cada uma:
+
+| Modelo | Como funciona | Melhor quando |
+|---|---|---|
+| **Fee fixo** | Mensalidade fixa (ex: R$ 1.800) | Verba pequena — **padrão para franquia no início** |
+| **% da verba** | 10–20% do que o cliente investe em anúncio | Verba **alta** (só compensa acima do ponto de virada) |
+| **Performance** | R$ por lead ou % por franquia vendida | Há histórico/confiança e volume |
+
+**Ponto de virada (fee fixo × % da verba):** `ponto = fee ÷ %`. Com fee de
+R$ 1.800 e 15%, o % só supera o fixo **acima de ~R$ 12.000/mês de verba**:
+
+| Verba/mês | 15% da verba | Fee R$ 1.800 | Vence |
+|---|---|---|---|
+| R$ 2.000 | R$ 300 | R$ 1.800 | **Fixo** |
+| R$ 5.000 | R$ 750 | R$ 1.800 | **Fixo** |
+| R$ 12.000 | R$ 1.800 | R$ 1.800 | Empata |
+| R$ 20.000 | R$ 3.000 | R$ 1.800 | **%** |
+
+**Recomendação — "o maior entre":**
+
+> Cobre **o maior entre o fee fixo e X% da verba**. Piso garantido com verba
+> baixa; upside automático quando o cliente escalar, sem renegociar nada.
+
+**⚠️ Cuidado com o % puro da verba:** tem incentivo perverso (parece que você
+quer inflar o gasto do cliente). Use % da verba só como **teto de upside**, nunca
+como base. Para escalar ganho de forma **alinhada**, prefira **% por franquia
+vendida** (performance) — a franqueadora paga por resultado, não por gasto.
+
+### O que dá para ceder (por plano)
+
+| Alavanca | Plano A | Plano B |
+|---|---|---|
+| Desconto no **setup** | até ~30% (R$ 4.000 → ~2.800) | até ~25% (R$ 5.500 → ~4.100) |
+| **Parcelar** o setup | 3x em vez de 2x | 3x–6x |
+| **Diluir** setup na mensalidade | setup menor + mensal um pouco maior | idem |
+| Reduzir **escopo** (baixa o preço) | menos horas/mês; alterações só sob demanda | **1 plataforma só** (Meta *ou* Google); menos criativos; relatório trimestral; cliente fornece criativo; verba menor |
+| **Mês 1 cortesia / 50%** | — | já é a condição de lançamento |
+
+> No Plano B, **reduzir para uma única plataforma** é a forma mais limpa de baixar
+> a mensalidade sem se queimar — menos trabalho seu, menos custo pra ele.
+
+### Linha vermelha (NÃO ceda)
+
+- **Rastreamento/medição** — sem isso o tráfego não funciona. Inegociável.
+- **Propriedade das contas e domínio** — sempre do cliente.
+- **Verba de mídia** — sempre paga pelo cliente, nunca sai da sua mensalidade.
+- **Atendimento/venda dos leads** — é do comercial deles, não seu.
+- **Escopo aberto/ilimitado por preço fixo** — sempre com teto de horas.
+- **Trabalhar 100% grátis sem contrapartida** (além do Mês 1 já previsto).
+
+### Moedas de troca (peça isto em troca do desconto)
+
+- **Contrato mais longo** (12 meses em vez de 6).
+- **Pagamento antecipado** (à vista ou trimestral/anual).
+- **Depoimento + autorização de case/portfólio** (vale ouro no 1º cliente).
+- **Indicação** de outros franqueadores/empresas.
+- **Compromisso de verba mínima** de mídia (garante resultado e sua operação).
+
+### Formas de pagamento
+
+- **Setup:** padrão 50% assinatura + 50% entrega. Pode ir a **3x–6x** para
+  reduzir a barreira de entrada.
+- **Setup diluído:** setup R$ 0 + mensalidade maior por X meses (entra fácil,
+  você recupera na recorrência).
+- **Mensalidade:** antecipada. **Trimestral/semestral antecipado** com desconto.
+- **Anual à vista:** 12 meses pagos de uma vez = **1 a 2 meses de cortesia**.
+- Meios: Pix, boleto, cartão (repasse a taxa do cartão se parcelar).
+
+### Estrutura de descontos (com contrapartida)
+
+| Desconto | Você concede | Em troca de |
+|---|---|---|
+| **10% no total** | mensalidade | contrato de **12 meses** |
+| **5–8% no setup** | setup | **pagamento à vista** |
+| **1–2 meses grátis** | mensalidade | **pagamento anual antecipado** |
+| **Mês 1 cortesia** (ou 50%) | gestão do Plano B | contrato de 6+ meses |
+| **Desconto por indicação** | mensalidade | cada novo cliente fechado |
+
+### Piso (walk-away) — não desça daqui
+
+| | Plano A | Plano B |
+|---|---|---|
+| Setup mínimo | ~R$ 2.500 | ~R$ 3.500 |
+| Mensal mínimo | ~R$ 200 | ~R$ 1.200 |
+
+Abaixo disso o trabalho não paga o seu tempo — prefira **reduzir escopo** a furar
+o piso.
+
+### Táticas rápidas
+
+- **Ofereça 3 opções** (ex: A / B / B+módulo). A do meio vira a escolha natural.
+- **"Desconto de lançamento" com prazo** (validade de 15 dias) cria urgência.
+- Se insistirem em baixar, responda com **"consigo esse valor tirando X do
+  escopo"** — devolve a decisão pro cliente.
+- **Bundle** (A+B ou B+módulo) com pequena vantagem fecha mais fácil que descontos
+  soltos.
+
+---
+
+## 9. Resumo executivo
 
 - **Plano A** paga suas contas e cria recorrência básica.
 - **Plano B** é o negócio de verdade — recorrência alta + performance.
