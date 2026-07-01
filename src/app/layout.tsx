@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
+import { SiteFooter } from "@/components/site-footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GRAVA.AI — Seja um Franqueado",
+  title: "GRAVA.AI — Transformando ideias em produtos personalizados",
   description:
-    "Transformando ideias em produtos personalizados. Seja um franqueado GRAVA.AI.",
+    "Personalização de produtos com Inteligência Artificial em totens automatizados. Conheça a GRAVA.AI e seja um franqueado.",
 };
 
 export default function RootLayout({
@@ -28,7 +30,15 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Aviso global de protótipo */}
+        <p className="bg-surface px-4 py-1.5 text-center text-[11px] text-muted">
+          🧩 Wireframe de baixa-média fidelidade — estrutura e hierarquia.
+        </p>
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

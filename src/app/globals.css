@@ -39,6 +39,38 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/*
+  Container do site — mais largo para aproveitar o espaço lateral.
+  Usado dentro de faixas full-bleed (a faixa ocupa 100%, o conteúdo respira).
+*/
+.shell {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .shell {
+    padding-inline: 4rem;
+  }
+}
+
+/* Brilho de marca para fundos integrados (sem bordas/caixas) */
+.brand-glow {
+  background-image: radial-gradient(
+    55% 75% at 78% 18%,
+    rgba(59, 165, 232, 0.14),
+    transparent 70%
+  );
+}
+.brand-glow-left {
+  background-image: radial-gradient(
+    50% 70% at 12% 30%,
+    rgba(59, 165, 232, 0.1),
+    transparent 70%
+  );
+}
+
 /* Caixa de placeholder estilo wireframe (imagem ausente) */
 .wire-box {
   border: 1px dashed var(--wire-line);
