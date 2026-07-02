@@ -33,8 +33,8 @@ módulos abaixo.
 
 | Item | Valor |
 |---|---|
-| **Setup (entrega)** | **R$ 3.000 – R$ 5.000** |
-| **Mensalidade** | **R$ 200 – R$ 500/mês** |
+| **Setup (entrega)** | **R$ 4.500** |
+| **Mensalidade** | **R$ 800/mês** |
 
 **Setup inclui:**
 - Finalização do site e do formulário (envio para WhatsApp/e-mail)
@@ -42,12 +42,25 @@ módulos abaixo.
 - Domínio próprio + deploy + SSL
 
 **Mensalidade inclui:**
-- Hospedagem (Vercel), domínio, SSL e monitoramento de uptime
-- Até ~2h/mês de **alterações pontuais** (textos, imagens, ajustes)
-- **Atualização de dependências** e correções de segurança
-- Backup e suporte por canal definido
+- Hospedagem, SSL e monitoramento de uptime geridos + **configuração e gestão do
+  domínio** (o domínio é do cliente — registro e pagamento por conta dele, ver §6)
+- Monitoramento de uptime e **proteção contra vulnerabilidades de dependências**
+- **Atualização contínua de dependências** e correções de segurança
+- **Alterações de conteúdo** (textos/imagens) sob demanda — resposta em até
+  24h úteis (sem limite de quantidade; execução conforme fila)
+- Até **5 alterações estruturais** OU **1 página nova** por mês (conteúdo
+  fornecido pelo cliente)
+- **Suporte prioritário:** 24h para indisponibilidade (site fora do ar),
+  48h úteis para demais solicitações
+- Backup e migrações de infraestrutura quando necessário
 
-**Não inclui:** marketing, novas páginas grandes, integrações complexas.
+> **Definições (evitam ruído):** *alteração estrutural* = reestruturar uma seção
+> existente (layout, novos blocos). *Página nova* = uma rota adicional com
+> conteúdo fornecido pelo cliente. Migração de hospedagem por escolha do cliente
+> (não por necessidade técnica) é **projeto à parte**, não entra na mensalidade.
+
+**Não inclui:** marketing, integrações complexas, produção de conteúdo,
+migrações de host por capricho (fora as por necessidade técnica).
 **Contrato sugerido:** 12 meses.
 
 ---
@@ -59,19 +72,32 @@ módulos abaixo.
 
 | Item | Valor |
 |---|---|
-| **Setup (entrega)** | **R$ 4.000 – R$ 7.000** |
-| **Mensalidade (gestão)** | **R$ 1.200 – R$ 2.500/mês** |
+| **Setup (entrega)** | **R$ 5.500** |
+| **Mensalidade (gestão)** | **R$ 1.500/mês** |
 | **Verba de anúncio** | **À parte** (paga pelo cliente às plataformas) — sugestão inicial R$ 1.500 – R$ 5.000/mês |
 
+> Clientes maiores / verba alta podem ir a R$ 2.000–2.500/mês. R$ 1.500 é o
+> ponto de entrada com **4 criativos de anúncio/mês** inclusos.
+
 **Setup inclui** (tudo do Plano A **+**):
-- **Rastreamento**: Meta Pixel + GA4 + evento de lead
+- **Rastreamento server-side**: Meta Pixel + **Conversions API (CAPI)** + GA4 +
+  evento de lead — disparado via **Server Actions do próprio Next** (garante o
+  dado mesmo com bloqueio de cookie/iOS; sem servidor separado)
 - **Integração dos leads**: CRM / planilha / WhatsApp automático
 - Configuração de campanhas + otimização de conversão da LP
 
 **Mensalidade inclui:**
 - Manutenção do site (tudo do Plano A)
-- **Gestão de tráfego pago** (Meta/Google Ads) + criativos + otimização
+- **Gestão de tráfego pago** (Meta/Google Ads) + **produção de até 4 criativos de
+  anúncio estáticos/mês** (imagem, sobre template da marca) + otimização
 - **Relatório mensal** de leads e custo por lead (CPL)
+
+> **Criativo de anúncio ≠ postagem orgânica.** Os 4 criativos são artes
+> **estáticas** que rodam *dentro das campanhas*, feitas a partir de fotos/base
+> fornecidas pelo cliente. Postagens no perfil (feed/stories) são **social media
+> orgânico** — módulo à parte (ver §3). **Vídeo/Reel não está incluído** por
+> ora; se o cliente pedir, vira escopo separado. Se ele fornecer os próprios
+> criativos, a mensalidade cai (ver playbook).
 
 **Regra de ouro:** a verba de mídia **nunca** sai da sua mensalidade — é um custo
 do cliente, pago direto às plataformas.
@@ -153,8 +179,8 @@ Franqueadora adora — paga por resultado, e seu teto de ganho sobe muito.
 | | Plano A | Plano B |
 |---|---|---|
 | Foco | Presença / manutenção | **Resultado (leads)** |
-| Setup | R$ 3–5k | R$ 4–7k |
-| Mensal | R$ 200–500 | R$ 1,2–2,5k + verba |
+| Setup | R$ 4.500 | R$ 5.500 |
+| Mensal | R$ 800 | R$ 1.500 + verba |
 | Recorrência | Baixa | **Alta** |
 | Onde está o lucro | Cobre custos | **O negócio de verdade** |
 
@@ -174,6 +200,11 @@ upsell recorrente e para aumentar o ticket sem recomeçar do zero.
 | **Landing pages por campanha/região** | LP dedicada por anúncio/cidade (message match) | R$ 600 – 1.500 cada | — |
 | **Automação de WhatsApp / chatbot** | Atendimento e qualificação 24/7 do lead | R$ 1.500 – 4.000 | R$ 200 – 600 |
 | **E-mail / nutrição de leads** | Sequência automática para leads frios | R$ 800 – 2.000 | R$ 300 – 800 |
+| **Social media orgânico** | Postagens no perfil (feed/stories): calendário, design, copy e agendamento | R$ 500 – 1.500 | R$ 800 – 2.500 |
+
+> **Social media orgânico é serviço distinto do tráfego pago** — skills, entrega
+> e ritmo diferentes. Nunca vai "de brinde" junto do Plano B: é trabalho
+> recorrente pesado e o oposto do plano de desmame (§6). Vendido só como módulo.
 
 ### Conteúdo & SEO
 | Módulo | O que entrega | Setup | Mensal |
@@ -269,23 +300,36 @@ Desde o **dia 1**, tudo no nome/posse do **cliente**, com você como
 - Feito certo, o desmame é só **remover seu acesso**. Feito errado, você fica
   algemado ao cliente.
 
-**Domínio (fora da sua mensalidade):** registrado no **nome/CNPJ do cliente**,
-não no seu. A renovação é paga pelo cliente; você só configura o DNS — assim o
-custo não sai do seu bolso. **O valor depende da extensão** (verificado em 2026):
+**Domínio (pago pelo cliente, fora da sua mensalidade):** registrado no
+**nome/CNPJ do cliente** e pago **direto por ele** (cartão/Pix). Você entra só
+como **admin/DNS** — configura e gerencia, sem desembolsar nem colocar no seu
+nome. Assim ninguém fica refém e o custo não vira seu prejuízo.
 
-| Domínio | Custo | Observação |
-|---|---|---|
-| `.com.br` (Registro.br) | **R$ 40/ano fixo** | Barato e previsível; recomendado como principal |
-| `.com` | ~R$ 50–90/ano | Prefira Cloudflare Registrar (a custo); evite GoDaddy (renovação dispara) |
-| **`.ai`** (ex: `grava.ai`) | **~US$ 75–112/ano (~R$ 450–600)** | ⚠️ **Mínimo 2 anos**; casa com a marca mas é caro |
+> **Passo zero — confirme antes de comprar:** a marca GRAVA.AI **provavelmente já
+> tem** `gravaai.com` e `gravaai.com.br` registrados (checagem de jul/2026:
+> ambos ativos, com cara de serem do próprio cliente). Pergunte *"vocês já têm
+> domínio? qual usam?"* — se sim, **não registre nada**, só peça acesso e aponte
+> o DNS. Custo zero.
 
-> **Atenção:** como a marca é GRAVA.AI, o cliente pode querer o `grava.ai` — que
-> **não é R$ 40, e sim ~R$ 450+/ano com 2 anos mínimos**. Deixe a escolha da
-> extensão (e do custo) explícita com o cliente. Combo comum: `.ai` principal +
-> `.com.br` barato redirecionando.
+Se precisar registrar, preços reais (verificados em jul/2026):
 
-*A hospedagem (Vercel) fica no plano gratuito neste volume — sua mensalidade
-cobre gestão, não infraestrutura.*
+| Domínio | Custo real (jul/2026) | Onde registrar | Observação |
+|---|---|---|---|
+| `.com.br` (Registro.br) | **R$ 40/ano fixo** | Registro.br direto | Pix, BRL, sem IOF; principal recomendado |
+| `.com` | **~R$ 54/ano** | Cloudflare (a custo) / Porkbun | Evite GoDaddy (renova ~R$ 830) |
+| **`.ai`** (ex: `grava.ai`) | **~R$ 358/ano** (US$ 68,98) | **Spaceship** | ⚠️ **Mínimo 2 anos** (~R$ 716 na entrada); casa com a marca |
+
+> **Atenção ao `.ai`:** como a marca é GRAVA.AI, o cliente vai querer o `grava.ai`
+> — que **não é R$ 40, e sim ~R$ 358/ano com 2 anos mínimos** (~R$ 716 na
+> entrada). Duas ressalvas **para o cliente**: **(1) cashflow** — ele paga os 2
+> anos à vista; **(2) posse** — o `.ai` é registrado por conta de registrador (não
+> por CNPJ como o Registro.br), então quem cria a conta a segura. **O cliente cria
+> a conta (na Spaceship) e paga; você entra como colaborador/DNS.** Combo comum:
+> `.com.br` barato como principal + `.ai` só se ele fizer questão.
+
+*A hospedagem (Vercel) fica no plano gratuito neste volume — sua mensalidade de
+R$ 800 cobre **gestão, não infraestrutura**. O domínio é pago à parte pelo
+cliente, então sua margem fica cheia, sem custo de domínio saindo do seu bolso.*
 
 ### Plano de desmame (handoff) — entrega paga
 
@@ -316,19 +360,21 @@ Quando o cliente for assumir a operação (interno, novo contratado ou agência)
 > real.** A **verba de anúncio do cliente (~R$ 2.000/mês) é passthrough — NÃO
 > entra na sua receita** (é paga direto às plataformas).
 >
-> Premissas: Plano A → setup R$ 4.000 + R$ 350/mês · Plano B → setup R$ 5.500 +
-> R$ 1.800/mês (gestão), com Mês 1 como cortesia de lançamento.
+> Premissas: Plano A → setup R$ 4.500 + R$ 800/mês · Plano B → setup R$ 5.500 +
+> R$ 1.500/mês (gestão), com Mês 1 como cortesia de lançamento.
 
 ### Plano A vs Plano B (sua receita)
 
 | Período | Plano A | Plano B (Mês 1 cortesia) |
 |---|---|---|
-| **6 meses** | R$ 6.100 | **R$ 14.500** |
-| **12 meses** | R$ 8.200 | **R$ 25.300** |
-| Recorrente/ano (sem setup) | R$ 4.200 | **R$ 21.600** |
+| **6 meses** | R$ 9.300 | **R$ 13.000** |
+| **12 meses** | R$ 14.100 | **R$ 22.000** |
+| Recorrente/ano (sem setup) | R$ 9.600 | **R$ 18.000** |
 
-O Plano B rende **~3x** o Plano A no primeiro ano — a diferença está na
-recorrência da gestão de tráfego.
+O Plano B ainda rende **~1,6x** o Plano A no primeiro ano — a diferença está na
+recorrência da gestão de tráfego (e o Plano B carrega verba de mídia à parte,
+paga pelo cliente). Com o Plano A mais robusto, o salto encolheu: o argumento
+do B é **resultado (leads)**, não preço.
 
 ### Fluxo mês a mês — Plano B (Mês 1 cortesia)
 
@@ -336,29 +382,29 @@ recorrência da gestão de tráfego.
 |---|---|---|
 | Assinatura (setup) | +R$ 5.500 | R$ 5.500 |
 | Mês 1 (cortesia) | +R$ 0 | R$ 5.500 |
-| Mês 2 | +R$ 1.800 | R$ 7.300 |
-| Mês 3 | +R$ 1.800 | R$ 9.100 |
-| Mês 6 | +R$ 1.800 | R$ 14.500 |
-| Mês 12 | +R$ 1.800 | **R$ 25.300** |
+| Mês 2 | +R$ 1.500 | R$ 7.000 |
+| Mês 3 | +R$ 1.500 | R$ 8.500 |
+| Mês 6 | +R$ 1.500 | R$ 13.000 |
+| Mês 12 | +R$ 1.500 | **R$ 22.000** |
 
-Média de **~R$ 2.100/mês** no primeiro ano (setup amortizado). Note o "degrau"
-do Mês 1: a cortesia custa **1 mensalidade** (R$ 1.800) — o preço do seu case.
-Com a **alternativa de 50%** no Mês 1, o total de 12 meses sobe para R$ 26.200.
+Média de **~R$ 1.830/mês** no primeiro ano (setup amortizado). Note o "degrau"
+do Mês 1: a cortesia custa **1 mensalidade** (R$ 1.500) — o preço do seu case.
+Com a **alternativa de 50%** no Mês 1, o total de 12 meses sobe para R$ 22.750.
 
 ### Cenário otimista (Plano B + módulos + performance, 12 meses)
 
 | Item | Receita |
 |---|---|
-| Base Plano B (12m) | R$ 25.300 |
+| Base Plano B (12m) | R$ 22.000 |
 | + Chatbot WhatsApp (setup + 10 meses) | R$ 6.500 |
 | + Landing por região (1x) | R$ 1.000 |
 | + Performance (~R$ 500/mês × 10) | R$ 5.000 |
-| **Total** | **R$ 37.800** |
+| **Total** | **R$ 34.500** |
 
 ### Escala (o pulo do gato)
 
 Com **3 clientes no Plano B**, a recorrência sozinha (sem contar setups) já é
-**R$ 64.800/ano**. O modelo se paga quando você repete: cada novo cliente entra
+**R$ 54.000/ano**. O modelo se paga quando você repete: cada novo cliente entra
 mais rápido e mais caro, porque você já tem case, processo e templates.
 
 ---
@@ -384,19 +430,19 @@ Três formas de cobrar a gestão de tráfego — e quando usar cada uma:
 
 | Modelo | Como funciona | Melhor quando |
 |---|---|---|
-| **Fee fixo** | Mensalidade fixa (ex: R$ 1.800) | Verba pequena — **padrão para franquia no início** |
+| **Fee fixo** | Mensalidade fixa (ex: R$ 1.500) | Verba pequena — **padrão para franquia no início** |
 | **% da verba** | 10–20% do que o cliente investe em anúncio | Verba **alta** (só compensa acima do ponto de virada) |
 | **Performance** | R$ por lead ou % por franquia vendida | Há histórico/confiança e volume |
 
 **Ponto de virada (fee fixo × % da verba):** `ponto = fee ÷ %`. Com fee de
-R$ 1.800 e 15%, o % só supera o fixo **acima de ~R$ 12.000/mês de verba**:
+R$ 1.500 e 15%, o % só supera o fixo **acima de ~R$ 10.000/mês de verba**:
 
-| Verba/mês | 15% da verba | Fee R$ 1.800 | Vence |
+| Verba/mês | 15% da verba | Fee R$ 1.500 | Vence |
 |---|---|---|---|
-| R$ 2.000 | R$ 300 | R$ 1.800 | **Fixo** |
-| R$ 5.000 | R$ 750 | R$ 1.800 | **Fixo** |
-| R$ 12.000 | R$ 1.800 | R$ 1.800 | Empata |
-| R$ 20.000 | R$ 3.000 | R$ 1.800 | **%** |
+| R$ 2.000 | R$ 300 | R$ 1.500 | **Fixo** |
+| R$ 5.000 | R$ 750 | R$ 1.500 | **Fixo** |
+| R$ 10.000 | R$ 1.500 | R$ 1.500 | Empata |
+| R$ 20.000 | R$ 3.000 | R$ 1.500 | **%** |
 
 **Recomendação — "o maior entre":**
 
@@ -412,7 +458,7 @@ vendida** (performance) — a franqueadora paga por resultado, não por gasto.
 
 | Alavanca | Plano A | Plano B |
 |---|---|---|
-| Desconto no **setup** | até ~30% (R$ 4.000 → ~2.800) | até ~25% (R$ 5.500 → ~4.100) |
+| Desconto no **setup** | até ~30% (R$ 4.500 → ~3.150) | até ~25% (R$ 5.500 → ~4.100) |
 | **Parcelar** o setup | 3x em vez de 2x | 3x–6x |
 | **Diluir** setup na mensalidade | setup menor + mensal um pouco maior | idem |
 | Reduzir **escopo** (baixa o preço) | menos horas/mês; alterações só sob demanda | **1 plataforma só** (Meta *ou* Google); menos criativos; relatório trimestral; cliente fornece criativo; verba menor |
@@ -462,8 +508,8 @@ vendida** (performance) — a franqueadora paga por resultado, não por gasto.
 
 | | Plano A | Plano B |
 |---|---|---|
-| Setup mínimo | ~R$ 2.500 | ~R$ 3.500 |
-| Mensal mínimo | ~R$ 200 | ~R$ 1.200 |
+| Setup mínimo | ~R$ 3.000 | ~R$ 3.500 |
+| Mensal mínimo | ~R$ 500 | ~R$ 1.200 |
 
 Abaixo disso o trabalho não paga o seu tempo — prefira **reduzir escopo** a furar
 o piso.
@@ -479,13 +525,56 @@ o piso.
 
 ---
 
-## 9. Resumo executivo
+## 9. Resumo para apresentar ao cliente
 
-- **Plano A** paga suas contas e cria recorrência básica.
-- **Plano B** é o negócio de verdade — recorrência alta + performance.
-- **Módulos** aumentam o ticket sem recomeçar e criam um relacionamento de
-  longo prazo (você vira o "time de tecnologia e marketing" da franqueadora).
-- **O maior valor não é o código — é o funil de captação de franqueado.**
+> Versão limpa, voltada ao cliente (sem detalhes internos de negociação). Base
+> para o documento que vai à GRAVA.AI.
 
-> Estes números são referência. Ajuste ao porte do cliente, à sua estrutura de
-> custos e ao valor que você entrega. Cobre pelo **resultado**, não pelas horas.
+A GRAVA.AI ganha um **sistema completo de captação de franqueados**: um site
+profissional no ar e uma máquina previsível de geração de leads. Dois caminhos,
+conforme o momento da rede — comece pelo A e evolua para o B, ou entre direto no B.
+
+### 🅰️ Plano A — Presença Digital
+
+**R$ 4.500 (implantação) + R$ 800/mês**
+
+> *Seu site sempre no ar, seguro e atualizado — sem dor de cabeça técnica.*
+
+- Site e formulário finalizados, com **leads chegando no WhatsApp/e-mail**
+- Domínio, hospedagem, SSL e **monitoramento de uptime** — tudo gerido
+- **Atualização contínua** e proteção de segurança
+- **Alterações de conteúdo sob demanda** (resposta em até 24h úteis)
+- Até **5 alterações estruturais** ou **1 página nova** por mês
+- **Suporte prioritário** (24h para site fora do ar)
+
+### 🅱️ Plano B — Aquisição de Franqueados
+
+**R$ 5.500 (implantação) + R$ 1.500/mês + verba de anúncio (à parte)**
+
+> *Não é só um site — é uma máquina de gerar franqueados. O site capta; nós
+> geramos e otimizamos os leads.*
+
+Tudo do Plano A, **mais**:
+
+- **Rastreamento completo** dos leads (Pixel + Conversions API + GA4) — dado
+  confiável para as campanhas performarem
+- **Gestão de tráfego pago** (Meta/Google Ads) + **4 criativos de anúncio/mês** +
+  otimização contínua
+- **Relatório mensal** de leads e custo por lead (CPL)
+- Verba de anúncio paga **direto às plataformas** pela GRAVA.AI (transparência total)
+- **Condição de lançamento:** 1º mês de gestão como **cortesia** (mediante
+  contrato de 6+ meses)
+
+### Como o sistema evolui
+
+1. **Lançar** — site profissional no ar, capturando contatos.
+2. **Gerar demanda** — tráfego pago trazendo leads de forma previsível.
+3. **Automatizar** — atendimento por WhatsApp/chatbot e nutrição dos leads.
+4. **Escalar** — dashboard de leads, portal do franqueado, páginas por região.
+
+Cada etapa entra quando fizer sentido — o sistema cresce junto com a rede.
+
+### Próximo passo
+
+Escolher o plano de entrada e agendar a implantação. **O maior valor não é o
+site em si — é o funil que transforma investimento em anúncio em franqueados.**

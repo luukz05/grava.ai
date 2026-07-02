@@ -36,15 +36,17 @@ Seu site no ar, atualizado e sempre ajustável.
 **Inclui:**
 
 - Publicação do site com domínio próprio e certificado de segurança (SSL)
-- Hospedagem e monitoramento
-- Alterações pontuais de conteúdo (textos e imagens)
-- Atualizações técnicas e de segurança
-- Suporte
+- Hospedagem, domínio e **monitoramento de disponibilidade** — tudo gerido
+- **Atualização contínua** da tecnologia e proteção de segurança
+- **Alterações de conteúdo sob demanda** (textos e imagens), com resposta em até
+  24h úteis
+- Até **5 alterações estruturais** ou **1 página nova** por mês
+- **Suporte prioritário** (24h para site fora do ar)
 
 | Investimento | Valor |
 |---|---|
-| Implantação (única) | R$ 4.000 |
-| Mensalidade | R$ 350/mês |
+| Implantação (única) | R$ 4.500 |
+| Mensalidade | R$ 800/mês |
 
 ---
 
@@ -55,16 +57,17 @@ Tudo do Plano A, somado à operação completa de geração de leads com tráfeg
 **Inclui:**
 
 - Tudo do Plano A
-- Instalação de rastreamento e mensuração de resultados
+- Instalação de **rastreamento avançado e confiável** dos leads — a medição
+  continua precisa mesmo com bloqueadores e restrições de privacidade
 - Criação e gestão de campanhas de anúncios (Instagram, Facebook e Google)
-- Produção dos anúncios e otimização contínua
+- **Produção de 4 criativos de anúncio (estáticos) por mês** e otimização contínua
 - Integração dos contatos (leads) e envio ao seu time
 - Relatório mensal de desempenho (leads e custo por contato)
 
 | Investimento | Valor |
 |---|---|
 | Implantação (única) | R$ 5.500 |
-| Mensalidade (gestão) | R$ 1.800/mês |
+| Mensalidade (gestão) | R$ 1.500/mês |
 | Verba de anúncios | A partir de R$ 1.500/mês* |
 
 \* A verba de anúncios é paga diretamente às plataformas (Meta/Google) e definida
@@ -91,15 +94,12 @@ Para o resultado acontecer, cada parte cuida do que faz melhor:
 dados, públicos e o **domínio do site** são de propriedade de vocês — nós atuamos
 apenas com acesso de gestão. Vocês nunca ficam reféns de ninguém.
 
-O domínio é registrado em nome da GRAVA.AI e pago diretamente por vocês; nós
-cuidamos de toda a configuração técnica. O custo anual depende da extensão
-escolhida:
-
-- **`.com.br`** — cerca de **R$ 40/ano** (fixo).
-- **`.ai`** (ex: `grava.ai`, alinhado à marca) — cerca de **R$ 450 a R$ 600/ano**,
-  com registro mínimo de 2 anos.
-
-Recomendamos alinhar essa escolha no início — é uma decisão de marca de vocês.
+O **domínio fica no nome de vocês** (é um ativo de marca da GRAVA.AI) — nós
+cuidamos de todo o registro, configuração e renovação; o custo é pago
+**diretamente por vocês**, sem intermediário. Valores de referência: `.com.br`
+cerca de **R$ 40/ano**; o `grava.ai`, alinhado à marca, cerca de **R$ 360/ano**
+(registro mínimo de 2 anos). **Se vocês já possuem um domínio, aproveitamos o
+que já existe** — basta nos dar acesso.
 
 ---
 
@@ -121,6 +121,7 @@ Conforme a operação amadurece, é possível adicionar:
 - Landing pages dedicadas por campanha ou região
 - Painel de acompanhamento de leads
 - Blog e conteúdo para busca orgânica (SEO)
+- Gestão de redes sociais (postagens no perfil — feed e stories)
 
 Escopo e valores sob demanda.
 
@@ -130,14 +131,14 @@ Escopo e valores sob demanda.
 
 | | Plano A | Plano B |
 |---|---|---|
-| Implantação | R$ 4.000 | R$ 5.500 |
-| Mensalidade | R$ 350 | R$ 1.800 (1º mês cortesia) |
+| Implantação | R$ 4.500 | R$ 5.500 |
+| Mensalidade | R$ 800 | R$ 1.500 (1º mês cortesia) |
 | Verba de anúncios | — | A partir de R$ 1.500/mês |
 
 **Condições:** implantação em 2 parcelas (50% na assinatura, 50% na entrega);
-mensalidade antecipada; contrato sugerido de 6 meses para o Plano B. O domínio é
-registrado em nome da GRAVA.AI e pago diretamente por vocês (valor conforme a
-extensão — ver seção anterior).
+mensalidade antecipada; contrato sugerido de 6 meses para o Plano B. O **domínio
+é registrado no nome da GRAVA.AI e pago diretamente por vocês** (nós cuidamos da
+configuração); se já tiverem um domínio, usamos o existente.
 
 ---
 
