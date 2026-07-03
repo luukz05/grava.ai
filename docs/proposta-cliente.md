@@ -35,7 +35,9 @@ Seu site no ar, atualizado e sempre ajustável.
 
 **Inclui:**
 
-- Publicação do site com domínio próprio e certificado de segurança (SSL)
+- **Site premium sob medida** — alta fidelidade, animações e acabamento de marca
+  (código bespoke, não template pronto)
+- Publicação com domínio próprio e certificado de segurança (SSL)
 - Hospedagem, domínio e **monitoramento de disponibilidade** — tudo gerido
 - **Atualização contínua** da tecnologia e proteção de segurança
 - **Alterações de conteúdo sob demanda** (textos e imagens), com resposta em até
@@ -45,7 +47,7 @@ Seu site no ar, atualizado e sempre ajustável.
 
 | Investimento | Valor |
 |---|---|
-| Implantação (única) | R$ 4.500 |
+| Implantação (única) | R$ 6.500 |
 | Mensalidade | R$ 800/mês |
 
 ---
@@ -66,7 +68,7 @@ Tudo do Plano A, somado à operação completa de geração de leads com tráfeg
 
 | Investimento | Valor |
 |---|---|
-| Implantação (única) | R$ 5.500 |
+| Implantação (única) | R$ 8.500 |
 | Mensalidade (gestão) | R$ 1.500/mês |
 | Verba de anúncios | A partir de R$ 1.500/mês* |
 
@@ -131,7 +133,7 @@ Escopo e valores sob demanda.
 
 | | Plano A | Plano B |
 |---|---|---|
-| Implantação | R$ 4.500 | R$ 5.500 |
+| Implantação | R$ 6.500 | R$ 8.500 |
 | Mensalidade | R$ 800 | R$ 1.500 (1º mês cortesia) |
 | Verba de anúncios | — | A partir de R$ 1.500/mês |
 

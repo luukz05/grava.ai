@@ -33,13 +33,19 @@ módulos abaixo.
 
 | Item | Valor |
 |---|---|
-| **Setup (entrega)** | **R$ 4.500** |
+| **Setup (entrega)** | **R$ 6.500** |
 | **Mensalidade** | **R$ 800/mês** |
 
 **Setup inclui:**
+- **Redesign premium (nível fsk):** alta fidelidade, motion e componentes sob
+  medida — código bespoke em Next.js (não template)
 - Finalização do site e do formulário (envio para WhatsApp/e-mail)
-- Substituição dos placeholders por conteúdo real
+- Copy e substituição de todo placeholder por conteúdo real
 - Domínio próprio + deploy + SSL
+
+> **Preço de lançamento / primeiro case.** O redesign premium isolado valeria
+> R$ 14–22k (faixa bespoke do mercado). Está embutido a este valor como condição
+> de primeiro cliente — em troca de case/depoimento. Não é o preço-régua.
 
 **Mensalidade inclui:**
 - Hospedagem, SSL e monitoramento de uptime geridos + **configuração e gestão do
@@ -72,7 +78,7 @@ migrações de host por capricho (fora as por necessidade técnica).
 
 | Item | Valor |
 |---|---|
-| **Setup (entrega)** | **R$ 5.500** |
+| **Setup (entrega)** | **R$ 8.500** |
 | **Mensalidade (gestão)** | **R$ 1.500/mês** |
 | **Verba de anúncio** | **À parte** (paga pelo cliente às plataformas) — sugestão inicial R$ 1.500 – R$ 5.000/mês |
 
@@ -97,7 +103,33 @@ migrações de host por capricho (fora as por necessidade técnica).
 > fornecidas pelo cliente. Postagens no perfil (feed/stories) são **social media
 > orgânico** — módulo à parte (ver §3). **Vídeo/Reel não está incluído** por
 > ora; se o cliente pedir, vira escopo separado. Se ele fornecer os próprios
-> criativos, a mensalidade cai (ver playbook).
+> criativos, a mensalidade cai — é o **Plano B−** abaixo.
+
+#### Variante — Plano B− (sem criativos)
+
+Mesma máquina do Plano B, mas **o cliente fornece os criativos de anúncio** (ou já
+tem designer/agência que faz). Você gere, otimiza e rastreia — só não produz as
+artes.
+
+| Item | Valor |
+|---|---|
+| **Setup (entrega)** | **R$ 8.500** (site premium + rastreamento — igual ao B) |
+| **Mensalidade (gestão)** | **R$ 1.250/mês** |
+| **Verba de anúncio** | À parte (igual ao B) |
+
+**A única diferença do B:** sai a "produção de 4 criativos/mês". Todo o resto é
+idêntico — rastreamento server-side (Meta + Google), gestão de tráfego,
+integração de leads, relatório de CPL e o Mês 1 cortesia.
+
+**Quando usar:**
+- Cliente que **já tem quem faça criativo** (designer interno, agência de conteúdo).
+- Pra **baixar a recorrência sem furar o piso** nem tocar no rastreamento.
+- Como a **opção do meio** num combo de 3 (**A / B− / B**) — a do meio costuma
+  virar a escolha natural, e ancora o B como o "completo".
+
+> **Piso do B−:** o mensal ainda pode cair a **R$ 1.200** reduzindo pra 1
+> plataforma — mas aí é o mesmo piso do B. Não desça de R$ 1.200. E se o cliente
+> depois quiser os criativos de volta, é só migrar pro B (+R$ 250/mês).
 
 **Regra de ouro:** a verba de mídia **nunca** sai da sua mensalidade — é um custo
 do cliente, pago direto às plataformas.
@@ -179,7 +211,7 @@ Franqueadora adora — paga por resultado, e seu teto de ganho sobe muito.
 | | Plano A | Plano B |
 |---|---|---|
 | Foco | Presença / manutenção | **Resultado (leads)** |
-| Setup | R$ 4.500 | R$ 5.500 |
+| Setup | R$ 6.500 | R$ 8.500 |
 | Mensal | R$ 800 | R$ 1.500 + verba |
 | Recorrência | Baixa | **Alta** |
 | Onde está o lucro | Cobre custos | **O negócio de verdade** |
@@ -360,15 +392,15 @@ Quando o cliente for assumir a operação (interno, novo contratado ou agência)
 > real.** A **verba de anúncio do cliente (~R$ 2.000/mês) é passthrough — NÃO
 > entra na sua receita** (é paga direto às plataformas).
 >
-> Premissas: Plano A → setup R$ 4.500 + R$ 800/mês · Plano B → setup R$ 5.500 +
+> Premissas: Plano A → setup R$ 6.500 + R$ 800/mês · Plano B → setup R$ 8.500 +
 > R$ 1.500/mês (gestão), com Mês 1 como cortesia de lançamento.
 
 ### Plano A vs Plano B (sua receita)
 
 | Período | Plano A | Plano B (Mês 1 cortesia) |
 |---|---|---|
-| **6 meses** | R$ 9.300 | **R$ 13.000** |
-| **12 meses** | R$ 14.100 | **R$ 22.000** |
+| **6 meses** | R$ 11.300 | **R$ 16.000** |
+| **12 meses** | R$ 16.100 | **R$ 25.000** |
 | Recorrente/ano (sem setup) | R$ 9.600 | **R$ 18.000** |
 
 O Plano B ainda rende **~1,6x** o Plano A no primeiro ano — a diferença está na
@@ -380,26 +412,26 @@ do B é **resultado (leads)**, não preço.
 
 | Momento | Entra | Acumulado |
 |---|---|---|
-| Assinatura (setup) | +R$ 5.500 | R$ 5.500 |
-| Mês 1 (cortesia) | +R$ 0 | R$ 5.500 |
-| Mês 2 | +R$ 1.500 | R$ 7.000 |
-| Mês 3 | +R$ 1.500 | R$ 8.500 |
-| Mês 6 | +R$ 1.500 | R$ 13.000 |
-| Mês 12 | +R$ 1.500 | **R$ 22.000** |
+| Assinatura (setup) | +R$ 8.500 | R$ 8.500 |
+| Mês 1 (cortesia) | +R$ 0 | R$ 8.500 |
+| Mês 2 | +R$ 1.500 | R$ 10.000 |
+| Mês 3 | +R$ 1.500 | R$ 11.500 |
+| Mês 6 | +R$ 1.500 | R$ 16.000 |
+| Mês 12 | +R$ 1.500 | **R$ 25.000** |
 
-Média de **~R$ 1.830/mês** no primeiro ano (setup amortizado). Note o "degrau"
+Média de **~R$ 2.080/mês** no primeiro ano (setup amortizado). Note o "degrau"
 do Mês 1: a cortesia custa **1 mensalidade** (R$ 1.500) — o preço do seu case.
-Com a **alternativa de 50%** no Mês 1, o total de 12 meses sobe para R$ 22.750.
+Com a **alternativa de 50%** no Mês 1, o total de 12 meses sobe para R$ 25.750.
 
 ### Cenário otimista (Plano B + módulos + performance, 12 meses)
 
 | Item | Receita |
 |---|---|
-| Base Plano B (12m) | R$ 22.000 |
+| Base Plano B (12m) | R$ 25.000 |
 | + Chatbot WhatsApp (setup + 10 meses) | R$ 6.500 |
 | + Landing por região (1x) | R$ 1.000 |
 | + Performance (~R$ 500/mês × 10) | R$ 5.000 |
-| **Total** | **R$ 34.500** |
+| **Total** | **R$ 37.500** |
 
 ### Escala (o pulo do gato)
 
@@ -458,10 +490,10 @@ vendida** (performance) — a franqueadora paga por resultado, não por gasto.
 
 | Alavanca | Plano A | Plano B |
 |---|---|---|
-| Desconto no **setup** | até ~30% (R$ 4.500 → ~3.150) | até ~25% (R$ 5.500 → ~4.100) |
+| Desconto no **setup** | até ~23% (R$ 6.500 → R$ 5.000) | até ~20% (R$ 8.500 → R$ 6.800) |
 | **Parcelar** o setup | 3x em vez de 2x | 3x–6x |
 | **Diluir** setup na mensalidade | setup menor + mensal um pouco maior | idem |
-| Reduzir **escopo** (baixa o preço) | menos horas/mês; alterações só sob demanda | **1 plataforma só** (Meta *ou* Google); menos criativos; relatório trimestral; cliente fornece criativo; verba menor |
+| Reduzir **escopo** (baixa o preço) | menos horas/mês; alterações só sob demanda | **cliente fornece criativo → Plano B− (R$ 1.250)**; **1 plataforma só** (Meta *ou* Google); relatório trimestral; verba menor |
 | **Mês 1 cortesia / 50%** | — | já é a condição de lançamento |
 
 > No Plano B, **reduzir para uma única plataforma** é a forma mais limpa de baixar
@@ -494,25 +526,58 @@ vendida** (performance) — a franqueadora paga por resultado, não por gasto.
 - **Anual à vista:** 12 meses pagos de uma vez = **1 a 2 meses de cortesia**.
 - Meios: Pix, boleto, cartão (repasse a taxa do cartão se parcelar).
 
-### Estrutura de descontos (com contrapartida)
+### Estrutura de descontos — a escada (com contrapartida)
 
-| Desconto | Você concede | Em troca de |
+**Desça UM degrau por vez, e só depois de esgotar as alavancas que não cortam
+preço. Nunca pule direto pro piso.** Ordem de concessão:
+
+1. **Alavancas que NÃO cortam preço (ofereça primeiro):** parcelar o setup em
+   3x–6x · anual à vista = 1–2 meses de mensalidade cortesia · setup diluído
+   (setup menor + mensal um pouco maior por alguns meses).
+2. **Escada do setup** (só o setup cede — nunca a mensalidade, nunca o
+   rastreamento): degrau a degrau, cada um com sua contrapartida.
+3. **Reduzir escopo** antes de furar o piso.
+4. **Última carta, no fechamento:** "preço de primeiro case" — nunca na abertura.
+
+**Escada do setup — Plano A** (cheio R$ 6.500 + R$ 800/mês):
+
+| Degrau | Setup | Em troca de |
 |---|---|---|
-| **10% no total** | mensalidade | contrato de **12 meses** |
-| **5–8% no setup** | setup | **pagamento à vista** |
-| **1–2 meses grátis** | mensalidade | **pagamento anual antecipado** |
-| **Mês 1 cortesia** (ou 50%) | gestão do Plano B | contrato de 6+ meses |
-| **Desconto por indicação** | mensalidade | cada novo cliente fechado |
+| Cheio — **ancore aqui** | R$ 6.500 | — |
+| −10% | R$ 5.850 | pagamento à vista |
+| −15% | R$ 5.500 | contrato de 12 meses |
+| **Piso (−23%)** | **R$ 5.000** | 12 meses + à vista + depoimento/case · **não desça daqui** |
 
-### Piso (walk-away) — não desça daqui
+**Escada do setup — Plano B** (cheio R$ 8.500 + R$ 1.500/mês + verba):
+
+| Degrau | Setup | Em troca de |
+|---|---|---|
+| Cheio — **ancore aqui** | R$ 8.500 | — |
+| −10% | R$ 7.650 | pagamento à vista |
+| −15% | R$ 7.200 | 12 meses + verba mínima comprometida |
+| **Piso (−20%)** | **R$ 6.800** | 12 meses + verba mínima + depoimento/case · **não desça daqui** |
+
+**A mensalidade não entra na escada.** Se pressionarem no mensal:
+
+- **Plano A (R$ 800):** reduza *escopo* (menos horas/alterações) até o piso de
+  **R$ 500** — nunca corte a taxa "seca".
+- **Plano B (R$ 1.500):** reduza pra **1 plataforma só** (Meta *ou* Google) até o
+  piso de **R$ 1.200**. O **rastreamento é linha vermelha** — nunca cede.
+- Único corte de mensal aceitável: **meses de cortesia por pagamento anual
+  antecipado** (é troca de caixa, não corte de preço).
+- O **Mês 1 cortesia (Plano B)** já é a condição de lançamento — **não some junto**
+  com um desconto de setup. É uma coisa OU outra, não as duas.
+
+### Piso (walk-away) — resumo da linha vermelha
 
 | | Plano A | Plano B |
 |---|---|---|
-| Setup mínimo | ~R$ 3.000 | ~R$ 3.500 |
-| Mensal mínimo | ~R$ 500 | ~R$ 1.200 |
+| Setup mínimo | **R$ 5.000** | **R$ 6.800** |
+| Mensal mínimo | **R$ 500** (só reduzindo escopo) | **R$ 1.200** (só 1 plataforma) |
 
-Abaixo disso o trabalho não paga o seu tempo — prefira **reduzir escopo** a furar
-o piso.
+Abaixo disso o trabalho não paga o seu tempo — e o build premium tem custo real.
+Prefira **reduzir escopo** ou **parcelar** a furar o piso. Melhor não fechar do
+que fechar no prejuízo.
 
 ### Táticas rápidas
 
