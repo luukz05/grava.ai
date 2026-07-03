@@ -79,7 +79,7 @@ construído de verdade.
 | **O site** | Template WordPress/Elementor ou builder RD Station | ✓ Código sob medida (Next.js) — rápido e de alta fidelidade |
 | **Rastreamento** | Pixel básico — perde 20–40% dos dados (iOS, bloqueadores) | ✓ Server-side / CAPI — dado confiável para a campanha |
 | **Verba de anúncio** | Às vezes embutida na mensalidade — caixa-preta | ✓ Separada, paga direto por você às plataformas |
-| **Contas e domínio** | Muitas prendem no nome da agência — lock-in irreversível | ✓ Tudo no seu nome desde o dia 1 — você nunca fica refém |
+| **Contas e domínio** | Muitas prendem no nome da agência — lock-in irreversível | ✓ Contas, domínio e dados no seu nome desde o dia 1 — você nunca fica refém |
 | **Custo por lead** | Nem sempre informado (reclamação nº 1 do setor) | ✓ Relatório mensal de CPL, aberto |
 | **Mensalidade de gestão** | R$ 2.000 – 8.000/mês | ✓ R$ 1.500/mês |
 | **Compromisso** | 6–12 meses com multa de rescisão | ✓ 6 meses — e o 1º mês de gestão como cortesia |

@@ -47,8 +47,8 @@ Seu site no ar, atualizado e sempre ajustável.
 
 | Investimento | Valor |
 |---|---|
-| Implantação (única) | R$ 6.500 |
-| Mensalidade | R$ 800/mês |
+| Implantação (única) | R$ 7.500 |
+| Mensalidade | R$ 850/mês |
 
 ---
 
@@ -133,8 +133,8 @@ Escopo e valores sob demanda.
 
 | | Plano A | Plano B |
 |---|---|---|
-| Implantação | R$ 6.500 | R$ 8.500 |
-| Mensalidade | R$ 800 | R$ 1.500 (1º mês cortesia) |
+| Implantação | R$ 7.500 | R$ 8.500 |
+| Mensalidade | R$ 850 | R$ 1.500 (1º mês cortesia) |
 | Verba de anúncios | — | A partir de R$ 1.500/mês |
 
 **Condições:** implantação em 2 parcelas (50% na assinatura, 50% na entrega);

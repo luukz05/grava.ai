@@ -33,8 +33,8 @@ módulos abaixo.
 
 | Item | Valor |
 |---|---|
-| **Setup (entrega)** | **R$ 6.500** |
-| **Mensalidade** | **R$ 800/mês** |
+| **Setup (entrega)** | **R$ 7.500** |
+| **Mensalidade** | **R$ 850/mês** |
 
 **Setup inclui:**
 - **Redesign premium (nível fsk):** alta fidelidade, motion e componentes sob
@@ -211,8 +211,8 @@ Franqueadora adora — paga por resultado, e seu teto de ganho sobe muito.
 | | Plano A | Plano B |
 |---|---|---|
 | Foco | Presença / manutenção | **Resultado (leads)** |
-| Setup | R$ 6.500 | R$ 8.500 |
-| Mensal | R$ 800 | R$ 1.500 + verba |
+| Setup | R$ 7.500 | R$ 8.500 |
+| Mensal | R$ 850 | R$ 1.500 + verba |
 | Recorrência | Baixa | **Alta** |
 | Onde está o lucro | Cobre custos | **O negócio de verdade** |
 
@@ -363,6 +363,60 @@ Se precisar registrar, preços reais (verificados em jul/2026):
 R$ 800 cobre **gestão, não infraestrutura**. O domínio é pago à parte pelo
 cliente, então sua margem fica cheia, sem custo de domínio saindo do seu bolso.*
 
+### Propriedade do código, saída e prazo mínimo
+
+**Prazo mínimo: 6 meses** (Plano A e B). É o runway do relacionamento e o gatilho
+da transferência do código. O setup é **preço de lançamento condicional a esse
+compromisso** — alinhe isso na largada pra não parecer pegadinha depois.
+
+**Três coisas diferentes — não confundir:**
+
+| Ativo | De quem é | Quando/como |
+|---|---|---|
+| Contas, Pixel, GA4, domínio, dados, leads | **Do cliente** | Dia 1, incondicional. Leva quando quiser, sem multa. |
+| **Código-fonte** | **FSK** (cliente tem licença de uso do site publicado) | Transfere no fim dos 6 meses quitado (sem custo) OU via acerto/buyout |
+| Hospedagem (repo + deploy) | **FSK, gerida** | Durante o contrato; na saída, aponta pra conta do cliente |
+
+**Como o código transfere pro cliente:**
+- **Término regular** (cumpridos os 6 meses + tudo quitado) → transfere **sem custo
+  extra** (a recorrência pagou o build ao longo do tempo).
+- **Buyout/acerto** a qualquer momento → paga a diferença pro valor cheio do build
+  e leva o código na hora.
+
+**Saída ANTES dos 6 meses:**
+- **Sem multa.** Leva contas/domínio/dados/leads (sempre foram dele).
+- **Não leva o código** — salvo se pagar o acerto.
+- A **hospedagem gerida para** (site sai do ar).
+
+**Comprar o site (buyout) — R$ 10.000, uma vez:** dono do código, self-host, sem
+mensalidade; inclui **handoff** (transferência de repo + deploy + doc). É o valor
+"cheio-ish" (sem o subsídio da recorrência; o build vale R$ 14–22k de mercado —
+10k é preço de primeiro-case, generoso de propósito). Quem já está no A/B e quer
+levar o código antes da hora paga o **acerto** = buyout − setup pago (ex.:
+10.000 − 7.500 = **R$ 2.500**).
+
+**Inadimplência (as travas):**
+- **Plano A:** corta a **hospedagem gerida** (site sai do ar) + não transfere o
+  repo. Regularizou → restabelece.
+- **Plano B:** **pausa as campanhas** (dor imediata, lead para no mesmo dia) → se
+  persistir, corta a hospedagem (escalada). A campanha é a trava principal.
+- Cláusula no contrato: não-pagamento após X dias corridos = suspensão até
+  regularização.
+
+**Cláusulas de referência (pré-advogado):**
+- *"O código-fonte é propriedade intelectual da FSK; o cliente detém licença de uso
+  do site publicado durante a vigência. A transferência da propriedade ocorre no
+  término do prazo mínimo de 6 meses com todas as parcelas quitadas, sem custo
+  adicional, ou mediante pagamento do acerto ao valor integral do build, a qualquer
+  momento."*
+- *"Em saída antecipada sem o acerto, não há transferência do código; o cliente
+  permanece proprietário de suas contas, domínio, dados e leads. Não há multa por
+  rescisão. A hospedagem gerida é suspensa em caso de inadimplência, até
+  regularização."*
+
+> ⚠️ Não é assessoria jurídica — use modelo de contrato / advogado pra redigir. A
+> lógica está correta; a redação formal vale revisão profissional.
+
 ### Plano de desmame (handoff) — entrega paga
 
 Quando o cliente for assumir a operação (interno, novo contratado ou agência):
@@ -392,18 +446,18 @@ Quando o cliente for assumir a operação (interno, novo contratado ou agência)
 > real.** A **verba de anúncio do cliente (~R$ 2.000/mês) é passthrough — NÃO
 > entra na sua receita** (é paga direto às plataformas).
 >
-> Premissas: Plano A → setup R$ 6.500 + R$ 800/mês · Plano B → setup R$ 8.500 +
+> Premissas: Plano A → setup R$ 7.500 + R$ 850/mês · Plano B → setup R$ 8.500 +
 > R$ 1.500/mês (gestão), com Mês 1 como cortesia de lançamento.
 
 ### Plano A vs Plano B (sua receita)
 
 | Período | Plano A | Plano B (Mês 1 cortesia) |
 |---|---|---|
-| **6 meses** | R$ 11.300 | **R$ 16.000** |
-| **12 meses** | R$ 16.100 | **R$ 25.000** |
-| Recorrente/ano (sem setup) | R$ 9.600 | **R$ 18.000** |
+| **6 meses** | R$ 12.600 | **R$ 16.000** |
+| **12 meses** | R$ 17.700 | **R$ 25.000** |
+| Recorrente/ano (sem setup) | R$ 10.200 | **R$ 18.000** |
 
-O Plano B ainda rende **~1,6x** o Plano A no primeiro ano — a diferença está na
+O Plano B ainda rende **~1,4x** o Plano A no primeiro ano — a diferença está na
 recorrência da gestão de tráfego (e o Plano B carrega verba de mídia à parte,
 paga pelo cliente). Com o Plano A mais robusto, o salto encolheu: o argumento
 do B é **resultado (leads)**, não preço.
@@ -490,7 +544,7 @@ vendida** (performance) — a franqueadora paga por resultado, não por gasto.
 
 | Alavanca | Plano A | Plano B |
 |---|---|---|
-| Desconto no **setup** | até ~23% (R$ 6.500 → R$ 5.000) | até ~20% (R$ 8.500 → R$ 6.800) |
+| Desconto no **setup** | até ~20% (R$ 7.500 → R$ 6.000) | até ~20% (R$ 8.500 → R$ 6.800) |
 | **Parcelar** o setup | 3x em vez de 2x | 3x–6x |
 | **Diluir** setup na mensalidade | setup menor + mensal um pouco maior | idem |
 | Reduzir **escopo** (baixa o preço) | menos horas/mês; alterações só sob demanda | **cliente fornece criativo → Plano B− (R$ 1.250)**; **1 plataforma só** (Meta *ou* Google); relatório trimestral; verba menor |
@@ -543,10 +597,10 @@ preço. Nunca pule direto pro piso.** Ordem de concessão:
 
 | Degrau | Setup | Em troca de |
 |---|---|---|
-| Cheio — **ancore aqui** | R$ 6.500 | — |
-| −10% | R$ 5.850 | pagamento à vista |
-| −15% | R$ 5.500 | contrato de 12 meses |
-| **Piso (−23%)** | **R$ 5.000** | 12 meses + à vista + depoimento/case · **não desça daqui** |
+| Cheio — **ancore aqui** | R$ 7.500 | — |
+| −10% | R$ 6.750 | pagamento à vista |
+| −15% | R$ 6.375 | contrato de 12 meses |
+| **Piso (−20%)** | **R$ 6.000** | 12 meses + à vista + depoimento/case · **não desça daqui** |
 
 **Escada do setup — Plano B** (cheio R$ 8.500 + R$ 1.500/mês + verba):
 
@@ -559,8 +613,8 @@ preço. Nunca pule direto pro piso.** Ordem de concessão:
 
 **A mensalidade não entra na escada.** Se pressionarem no mensal:
 
-- **Plano A (R$ 800):** reduza *escopo* (menos horas/alterações) até o piso de
-  **R$ 500** — nunca corte a taxa "seca".
+- **Plano A (R$ 850):** reduza *escopo* (menos horas/alterações) até o piso de
+  **R$ 550** — nunca corte a taxa "seca".
 - **Plano B (R$ 1.500):** reduza pra **1 plataforma só** (Meta *ou* Google) até o
   piso de **R$ 1.200**. O **rastreamento é linha vermelha** — nunca cede.
 - Único corte de mensal aceitável: **meses de cortesia por pagamento anual
@@ -572,8 +626,8 @@ preço. Nunca pule direto pro piso.** Ordem de concessão:
 
 | | Plano A | Plano B |
 |---|---|---|
-| Setup mínimo | **R$ 5.000** | **R$ 6.800** |
-| Mensal mínimo | **R$ 500** (só reduzindo escopo) | **R$ 1.200** (só 1 plataforma) |
+| Setup mínimo | **R$ 6.000** | **R$ 6.800** |
+| Mensal mínimo | **R$ 550** (só reduzindo escopo) | **R$ 1.200** (só 1 plataforma) |
 
 Abaixo disso o trabalho não paga o seu tempo — e o build premium tem custo real.
 Prefira **reduzir escopo** ou **parcelar** a furar o piso. Melhor não fechar do

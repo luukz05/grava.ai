@@ -116,12 +116,12 @@
 ### Slide 8 — Plano A e Plano B
 **Mensagem-chave:** Plano A põe o site no ar e sempre ajustável; Plano B é a máquina completa de leads — contra os R$ 2–8 mil/mês do mercado.
 **Conteúdo:**
-- **Plano A — Presença Digital: R$ 4.500 (implantação) + R$ 800/mês**
+- **Plano A — Presença Digital: R$ 7.500 (implantação) + R$ 850/mês**
   - Site no ar com domínio próprio + SSL, hospedagem e monitoramento geridos
   - Atualização contínua de tecnologia e segurança
   - Alterações de conteúdo em até **24h úteis**; até **5 alterações estruturais ou 1 página nova/mês**
   - Suporte prioritário (24h para site fora do ar)
-- **Plano B — Aquisição de Franqueados: R$ 5.500 (implantação) + R$ 1.500/mês + verba à parte**
+- **Plano B — Aquisição de Franqueados: R$ 8.500 (implantação) + R$ 1.500/mês + verba à parte**
   - Tudo do Plano A **+** rastreamento avançado e confiável de leads
   - Campanhas Instagram, Facebook e Google + **4 criativos estáticos/mês** + otimização contínua
   - Integração e envio de leads ao time + **relatório mensal de CPL**
@@ -129,7 +129,7 @@
   - **Condição de lançamento: 1º mês de gestão como cortesia** (contrato de 6 meses)
 - **Divisão da parceria:** FSK cuida de site, campanhas, geração de leads, rastreamento e relatórios; GRAVA.AI cuida do atendimento/negociação dos leads
 - **Âncora:** mercado cobra **R$ 2.000–8.000/mês** de gestão
-**Narração:** "Só agora o preço — e reparem que ele chega depois da prova, não antes. Plano A coloca o site no ar, sempre ajustável, por quatro e meio mais oitocentos por mês. Plano B é a máquina completa de leads: cinco e meio mais mil e quinhentos de gestão, com a verba à parte e no nome de vocês. Eu cuido do site, das campanhas e do relatório; vocês cuidam de atender e fechar o franqueado. O mercado cobra de dois a oito mil por mês pela mesma gestão — e ainda prende suas contas. E o primeiro mês de gestão é cortesia."
+**Narração:** "Só agora o preço — e reparem que ele chega depois da prova, não antes. Plano A coloca o site no ar, sempre ajustável, por sete e meio mais oitocentos e cinquenta por mês. Plano B é a máquina completa de leads: oito e meio mais mil e quinhentos de gestão, com a verba à parte e no nome de vocês. Eu cuido do site, das campanhas e do relatório; vocês cuidam de atender e fechar o franqueado. O mercado cobra de dois a oito mil por mês pela mesma gestão — e ainda prende suas contas. E o primeiro mês de gestão é cortesia."
 **Visual:** Dois cards lado a lado (A mais sóbrio, B em destaque azul com selo "1º mês cortesia"). Faixa inferior comparando "Mercado R$ 2–8k/mês" riscado vs "GRAVA.AI R$ 1.500/mês". Hexágonos nas bordas.
 
 ---
@@ -157,12 +157,11 @@
 ### Slide 10 — Vocês nunca ficam reféns, e uma marca de futuro merece um site à altura
 **Mensagem-chave:** Domínio e contas no seu nome desde o dia 1, CPL aberto e portabilidade total: em poucos dias o site está no ar e a captação começa — vamos dar à GRAVA.AI a presença à altura da sua ambição.
 **Conteúdo:**
-- **Domínio e todas as contas no nome da GRAVA.AI desde o dia 1** — FSK atua só com acesso de gestão
+- **Zero lock-in:** "Contas, domínio, dados e leads são seus desde o dia 1. Você sai quando quiser, sem multa, e leva tudo isso — a migração é de um dia e eu ajudo."
 - **CPL aberto todo mês** — sem caixa-preta
-- **Portabilidade total:** se um dia quiser sair, **você leva tudo**
 - **Em poucos dias o site está no ar e a captação começa**
 - Uma marca de futuro — IA, totens, personalização — **merece uma presença digital à altura**
 - **Proposta válida por 15 dias**
 - **Próximo passo:** aprovar o plano (A ou B) e assinar → implantação em 2 parcelas (50% assinatura / 50% entrega)
-**Narração:** "Fecho com o que mais importa pra vocês: nada aqui fica preso comigo. Domínio, contas de anúncio, dados, públicos — tudo no nome da GRAVA.AI desde o primeiro dia. O custo por lead é aberto, e se um dia quiserem me trocar, levam tudo. Em poucos dias o site está no ar e a captação começa. Vocês construíram uma marca de futuro — com IA, totens, personalização. Ela merece uma presença digital à altura. E a gente já provou, em código, que consegue entregar esse nível. Essa proposta vale por quinze dias. Bora?"
+**Narração:** "Fecho com o que mais importa pra vocês: nada aqui fica preso comigo. Domínio, contas de anúncio, dados, públicos, leads — tudo no nome da GRAVA.AI desde o primeiro dia. O custo por lead é aberto, e se um dia quiserem me trocar, levam tudo: a migração é de um dia e eu ajudo. Enquanto a gente trabalha junto, a hospedagem fica comigo pra facilitar; no dia em que vocês saírem, eu aponto pra conta de vocês e entrego o código-fonte ao fim do contrato. Em poucos dias o site está no ar e a captação começa. Vocês construíram uma marca de futuro — com IA, totens, personalização. Ela merece uma presença digital à altura. E a gente já provou, em código, que consegue entregar esse nível. Essa proposta vale por quinze dias. Bora?"
 **Visual:** Fecho dark cheio de hexágonos azuis convergindo para o logo GRAVA.AI. Selo grande "Zero lock-in — tudo no seu nome". Selo "Válida por 15 dias". CTA final centralizado: **"Aprovar plano e começar"**.

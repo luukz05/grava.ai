@@ -9,8 +9,12 @@ identidade dark + azul + hexágonos) + os documentos comerciais em `docs/`.
 
 ## Planos e preços atuais (fonte da verdade: `docs/proposta-*.md`)
 
-- **Plano A — Presença Digital:** R$ 6.500 setup + R$ 800/mês (site premium sob
-  medida + manutenção).
+- **Plano A — Presença Digital:** R$ 7.500 setup + R$ 850/mês (site premium sob
+  medida + manutenção). Setup colado no B **de propósito** (gap pequeno empurra
+  pro B: a decisão vira "quero leads ou não?", não "quanto site compro").
+- **Buyout (comprar o site outright):** ~R$ 10.000, uma vez (dono do código,
+  self-host, sem mensalidade; inclui handoff). É o valor sem subsídio da
+  recorrência.
 - **Plano B — Aquisição de Franqueados:** R$ 8.500 setup + R$ 1.500/mês + verba de
   anúncio à parte (tudo do A + rastreamento server-side + tráfego Meta/Google +
   **4 criativos estáticos/mês** + relatório de CPL; **Mês 1 de gestão cortesia**).
@@ -29,11 +33,16 @@ identidade dark + azul + hexágonos) + os documentos comerciais em `docs/`.
   `.com.br` ~R$ 40/ano (Registro.br); `grava.ai` ~R$ 358/ano (Spaceship, mín. 2
   anos). **Confirmar antes o que o cliente já possui** — `gravaai.com` e
   `gravaai.com.br` já estavam registrados (jul/2026, provavelmente do cliente).
-- **Zero lock-in (real, mas exige montagem no dia 1):** contas (Meta BM, Pixel,
-  GA4, Google Ads), domínio e dados **no nome do cliente desde o dia 1**; código
-  entregue + deploy no controle dele. "Sair" = remover acesso. Único trade-off
-  consciente: entregar o código-fonte remove o fosso técnico do Lucas — decisão
-  aceita em nome da confiança/venda.
+- **Zero lock-in — preciso, não solto.** Vale pra **contas (Meta BM, Pixel, GA4,
+  Google Ads), domínio, dados e leads**: no nome do cliente **desde o dia 1**,
+  incondicional; sair = remover acesso, sem multa. **NÃO vale pro código:** o
+  código é **PI da FSK** (cliente tem licença de uso do site publicado); só
+  transfere no **término do prazo mínimo de 6 meses quitado** (sem custo) OU via
+  **buyout/acerto** (buyout − setup pago). **Hospedagem (repo + deploy) fica com a
+  FSK** durante o contrato — é a trava de inadimplência (corta hospedagem no A;
+  pausa campanhas + corta hospedagem no B). Saída antes dos 6 meses = leva os
+  ativos, **não leva o código** salvo pagando o acerto. Detalhes em
+  `proposta-comercial.md` §6 "Propriedade do código, saída e prazo mínimo".
 - **Verba de anúncio SEMPRE separada** (paga direto às plataformas) — nunca
   embutida na mensalidade. É anti "caixa-preta" e **linha vermelha**.
 - **Rastreamento server-side** (Meta CAPI + Google Enhanced Conversions + GA4) é
