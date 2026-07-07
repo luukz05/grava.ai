@@ -33,6 +33,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -69,6 +73,49 @@ body {
     rgba(59, 165, 232, 0.1),
     transparent 70%
   );
+}
+
+/* ── Animações ────────────────────────────────────────────────────────────── */
+
+/* Hex individual pulsando (stroke-opacity / fill-opacity são CSS em SVG) */
+@keyframes hexGlow {
+  0%, 100% { stroke-opacity: 0.06; fill-opacity: 0; }
+  50%       { stroke-opacity: 0.55; fill-opacity: 0.04; }
+}
+
+/* Flutuação vertical suave */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+/* Linha do SectionTag cresce da esquerda */
+@keyframes lineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 2rem; opacity: 1; }
+}
+
+/* Fade in suave (sem translate) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Pulsação lenta de brilho em fundo */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+
+/* Ponto de nó pulsando (usado no diagrama de IA) */
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 1; }
+}
+
+/* Tracejado fluindo ao longo de uma linha */
+@keyframes dashFlow {
+  to { stroke-dashoffset: -51; }
 }
 
 /* Caixa de placeholder estilo wireframe (imagem ausente) */

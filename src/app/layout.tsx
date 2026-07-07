@@ -32,10 +32,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* Aviso global de protótipo */}
-        <p className="bg-surface px-4 py-1.5 text-center text-[11px] text-muted">
-          🧩 Wireframe de baixa-média fidelidade — estrutura e hierarquia.
-        </p>
         <Navbar />
         <div className="flex-1">{children}</div>
         <SiteFooter />
