@@ -90,6 +90,9 @@ identidade dark + azul + hexágonos) + os documentos comerciais em `docs/`.
 Outros docs (`brand-and-content.md`, `guia-marketing-digital.md`, `ia-spec.md`,
 `fsk-design-system.md`) são material de referência, não parte do kit comercial.
 
-`fsk-design-system.md` é a fonte da verdade técnica do estilo FSK (stack, tokens,
-componentes, layouts, padrões de seção, princípios). Consultar ao construir ou
-adaptar qualquer site nesse estilo.
+`fsk-design-system.md` é a fonte da verdade técnica do estilo FSK **v1**
+(dark-only, azul #3ba5e8, Geist). O site fsk.tax em produção é uma **v2**
+rebrandeada (indigo, AkagiPro, light+dark, Motion) — auditada em
+`auditoria-ui-ux-fsk-tax.md` (jul/2026), que é a referência para refatorar a UI
+do site grava.ai: sistema de movimento, receitas de seção/componente, convenções
+implícitas e guia de aplicação (marca grava + sistema fsk v2).
