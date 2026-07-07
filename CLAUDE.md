@@ -87,5 +87,9 @@ identidade dark + azul + hexágonos) + os documentos comerciais em `docs/`.
 | `tracking-stack.md` | Stack técnico de tracking Meta+Google (Next.js) | Técnico | `tracking-tecnico` |
 | `tratamento-objecoes.md` | Guia de objeções (fala/medo/resposta/não faça) | Interno | `objecoes` |
 
-Outros docs (`brand-and-content.md`, `guia-marketing-digital.md`, `ia-spec.md`)
-são material de referência, não parte do kit comercial.
+Outros docs (`brand-and-content.md`, `guia-marketing-digital.md`, `ia-spec.md`,
+`fsk-design-system.md`) são material de referência, não parte do kit comercial.
+
+`fsk-design-system.md` é a fonte da verdade técnica do estilo FSK (stack, tokens,
+componentes, layouts, padrões de seção, princípios). Consultar ao construir ou
+adaptar qualquer site nesse estilo.
