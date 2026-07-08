@@ -2,6 +2,7 @@
  * Primitivos reutilizados pelas páginas.
  */
 import Image from "next/image";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 /** Foto real (next/image com fill). fit="contain" para PNG transparente. */
 export function Photo({
@@ -86,22 +87,9 @@ export function GhostNumber({ n }: { n: number }) {
   );
 }
 
-/** Seta fina de CTA (13×7, stroke 1) — assinatura dos links de ação. */
+/** Seta longa de CTA — assinatura dos links de ação (FA6). */
 export function ArrowIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      width="13"
-      height="7"
-      viewBox="0 0 13 7"
-      fill="none"
-      strokeWidth="1"
-      aria-hidden
-      className={`inline-block ${className}`}
-    >
-      <path d="M12.5 3.5H0.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9.5 6.5L12.5 3.5L9.5 0.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+  return <FaArrowRightLong aria-hidden className={`inline-block size-3.5 ${className}`} />;
 }
 
 /*

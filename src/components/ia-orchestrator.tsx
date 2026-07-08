@@ -7,21 +7,29 @@
 
 import Image from "next/image"
 import type { CSSProperties, ReactNode } from "react"
+import {
+  FaBell,
+  FaBagShopping,
+  FaChartColumn,
+  FaHeadset,
+  FaUsers,
+  FaWandMagicSparkles,
+} from "react-icons/fa6"
 import { useInView } from "./motion"
 
 // ── Canvas ────────────────────────────────────────────────────────────────
-const VW = 800
-const VH = 540
-const CX = 400
-const CY = 255
+const VW = 840
+const VH = 620
+const CX = 420
+const CY = 310
 const HEX_R = 100 // circunraio do hexágono central
-const BADGE_R = 210 // raio onde ficam os badges (pontas)
+const BADGE_R = 245 // raio onde ficam os badges (pontas)
 
-// Pontas usadas (pointy-top, sem a de cima — o header da seção respira ali):
-// -30° sup. direita · 30° inf. direita · 90° baixo · 150° inf. esquerda · -150° sup. esquerda
-const ANGLES = [-150, -30, 30, 90, 150]
+// As 6 pontas do hexágono (pointy-top), uma por pilar:
+// -150° sup. esq. · -90° topo · -30° sup. dir. · 30° inf. dir. · 90° baixo · 150° inf. esq.
+const ANGLES = [-150, -90, -30, 30, 90, 150]
 
-const ICON_CLS = "size-4"
+const ICON_CLS = "size-3.5"
 
 type Node = { label: string; sub: string; icon: ReactNode }
 
@@ -30,59 +38,32 @@ const NODES: Node[] = [
   {
     label: "Arte Gerada por IA",
     sub: "Em segundos, no totem",
-    icon: (
-      // sparkles
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
-        <path d="M12 4l1.7 4.3L18 10l-4.3 1.7L12 16l-1.7-4.3L6 10l4.3-1.7L12 4Z" />
-        <path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2Z" />
-      </svg>
-    ),
+    icon: <FaWandMagicSparkles className={ICON_CLS} aria-hidden />,
+  },
+  {
+    label: "Vendas Online",
+    sub: "Pedidos além do ponto físico",
+    icon: <FaBagShopping className={ICON_CLS} aria-hidden />,
   },
   {
     label: "Relatório de Desempenho",
     sub: "KPIs sempre atualizados",
-    icon: (
-      // documento
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
-        <path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5L14 3Z" />
-        <path d="M14 3v4.5h4.5M9.5 13.5h5M9.5 17h5" />
-      </svg>
-    ),
+    icon: <FaChartColumn className={ICON_CLS} aria-hidden />,
   },
   {
     label: "CRM da Franquia",
-    sub: "Visão da matriz em tempo real",
-    icon: (
-      // pessoas
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
-        <circle cx="9" cy="8" r="3.2" />
-        <path d="M3.5 20c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5M16 5.3a3.2 3.2 0 0 1 0 5.4M17.7 15.2c1.6.7 2.6 2.3 2.9 4.8" />
-      </svg>
-    ),
+    sub: "Matriz em tempo real",
+    icon: <FaUsers className={ICON_CLS} aria-hidden />,
   },
   {
     label: "Suporte Automatizado",
     sub: "Da matriz ao franqueado",
-    icon: (
-      // headset
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
-        <path d="M4.5 13v-2a7.5 7.5 0 0 1 15 0v2" />
-        <rect x="3.5" y="13" width="4" height="6" rx="1.5" />
-        <rect x="16.5" y="13" width="4" height="6" rx="1.5" />
-        <path d="M19 19v1a2 2 0 0 1-2 2h-3.5" />
-      </svg>
-    ),
+    icon: <FaHeadset className={ICON_CLS} aria-hidden />,
   },
   {
     label: "Alerta de Reposição",
     sub: "Estoque nunca zerado",
-    icon: (
-      // sino
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
-        <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
-        <path d="M10.5 19a1.9 1.9 0 0 0 3 0" />
-      </svg>
-    ),
+    icon: <FaBell className={ICON_CLS} aria-hidden />,
   },
 ]
 
@@ -167,43 +148,31 @@ export function AIOrchestrator() {
     strokeDashoffset: visible ? 0 : 1,
     transition: "stroke-dashoffset 0.9s var(--ease-brand)",
     transitionDelay: `${250 + i * 80}ms`,
+    // Fase espiral: delay negativo de 1/6 do período por raio — o brilho
+    // percorre as seis pontas em rotação contínua (sentido horário)
+    animationDelay: `${(-i * 0.4).toFixed(1)}s`,
   })
 
   return (
-    <div ref={ref} className="relative mx-auto aspect-[800/540] w-full max-w-3xl">
-      {/* Linhas radiais + pulsos hexagonais (saem do centro para as pontas) */}
+    <div ref={ref} className="relative mx-auto aspect-[840/620] w-full max-w-3xl">
+      {/* Linhas radiais respirando em espiral ao redor do hexágono */}
       <svg
         viewBox={`0 0 ${VW} ${VH}`}
         fill="none"
         aria-hidden
-        className="absolute inset-0 size-full text-brand/40"
+        className="absolute inset-0 size-full text-brand/60"
       >
         {ANGLES.map((angle, i) => (
           <path
             key={`l-${angle}`}
             d={radialPath(angle)}
+            className="line-breath"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             pathLength={1}
             style={lineStyle(i)}
           />
-        ))}
-
-        {/* Mini-hexágonos viajando do centro aos badges */}
-        {ANGLES.map((angle, i) => (
-          <polygon
-            key={`p-${angle}`}
-            points={hexPts(0, 0, 6)}
-            className="fill-brand"
-          >
-            <animateMotion
-              path={radialPath(angle)}
-              dur="2.4s"
-              begin={`${(0.8 + i * 0.18).toFixed(2)}s`}
-              repeatCount="indefinite"
-            />
-          </polygon>
         ))}
       </svg>
 

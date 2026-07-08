@@ -1,6 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
+  FaArrowDown,
+  FaArrowLeftLong,
+  FaCheck,
+  FaDownload,
+} from "react-icons/fa6"
+import { InstagramIcon, WhatsAppIcon } from "@/components/icons"
+import {
   ArrowIcon,
   BTN_OUTLINE_BRAND,
   BTN_PRIMARY,
@@ -20,6 +27,7 @@ import {
   DEPOIMENTOS,
   DESTAQUES,
   DISTRIBUICAO,
+  IA_CLIENTE,
   INCLUSO,
   INSTAGRAM_HANDLE,
   INVESTIMENTO,
@@ -83,7 +91,7 @@ function ModeloSection({
           <ul className="mt-6 space-y-2">
             {m.destaques.map((d) => (
               <li key={d} className="flex items-center gap-3 text-sm text-foreground">
-                <span className="text-brand">✓</span>
+                <FaCheck className="size-3 shrink-0 text-brand" aria-hidden />
                 {d}
               </li>
             ))}
@@ -141,7 +149,7 @@ export default function SejaUmFranqueado() {
                   "Suporte total da matriz, do estoque à operação",
                 ].map((b) => (
                   <li key={b} className="flex items-center gap-3 text-foreground">
-                    <span className="text-brand">✓</span>
+                    <FaCheck className="size-3.5 shrink-0 text-brand" aria-hidden />
                     {b}
                   </li>
                 ))}
@@ -155,7 +163,8 @@ export default function SejaUmFranqueado() {
                 rel="noopener noreferrer"
                 className={`mt-7 ${BTN_OUTLINE_BRAND}`}
               >
-                ✆ Receba a apresentação no WhatsApp
+                <WhatsAppIcon className="size-4" aria-hidden /> Receba a
+                apresentação no WhatsApp
               </a>
             </Reveal>
           </div>
@@ -317,7 +326,7 @@ export default function SejaUmFranqueado() {
               href="#investimento"
               className="inline-flex items-center gap-2 text-sm font-medium text-brand hover:underline"
             >
-              Ver o investimento completo ↓
+              Ver o investimento completo <FaArrowDown className="size-3" aria-hidden />
             </a>
           </Reveal>
         </Shell>
@@ -327,8 +336,8 @@ export default function SejaUmFranqueado() {
       <section className="border-b border-wire-line/50 bg-surface">
         <Shell className="flex flex-col items-start gap-8 py-14 lg:flex-row lg:items-center lg:justify-between">
           <Reveal className="flex items-start gap-5">
-            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/15 text-2xl text-brand">
-              ⬇
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/15 text-brand">
+              <FaDownload className="size-5" aria-hidden />
             </span>
             <div className="max-w-xl">
               <span className="text-xs uppercase tracking-widest text-brand">
@@ -409,11 +418,33 @@ export default function SejaUmFranqueado() {
             </Reveal>
           </div>
 
-          {/* Diagrama (as linhas se desenham e os pulsos viajam ao entrar em vista) */}
-          <div className="mt-20 overflow-x-auto">
-            <div className="min-w-[760px] px-2 pb-2">
-              <AIOrchestrator />
+          <div className="mt-12 grid items-center gap-12 lg:mt-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+            {/* Diagrama radial: 6 pilares da operação nas pontas do hexágono */}
+            <div className="overflow-x-auto">
+              <div className="min-w-[640px] px-2 pb-2">
+                <AIOrchestrator />
+              </div>
             </div>
+
+            {/* O que cada pilar significa para o cliente da unidade */}
+            <Reveal from="right" delay={150}>
+              <SectionTag>Na prática</SectionTag>
+              <h3 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                O que isso significa para o{" "}
+                <span className="text-brand">cliente da sua unidade.</span>
+              </h3>
+              <ul className="mt-7 divide-y divide-wire-line/60">
+                {IA_CLIENTE.map((item) => (
+                  <li key={item.t} className="flex items-start gap-4 py-3.5">
+                    <Hexagon className="mt-1 h-4 w-4 shrink-0 text-brand/70" />
+                    <div>
+                      <h4 className="font-semibold">{item.t}</h4>
+                      <p className="mt-0.5 text-pretty text-sm text-muted">{item.d}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
         </Shell>
       </section>
@@ -569,7 +600,7 @@ export default function SejaUmFranqueado() {
                 className="flex items-center gap-3 border-b border-wire-line/60 pb-4 transition-colors hover:text-brand"
               >
                 <span className="grid h-10 w-10 place-items-center rounded-full text-brand ring-1 ring-brand">
-                  ✆
+                  <WhatsAppIcon className="size-4" aria-hidden />
                 </span>
                 <span>
                   <span className="block text-lg">{WHATSAPP_NUMBER}</span>
@@ -581,7 +612,7 @@ export default function SejaUmFranqueado() {
 
               <div className="flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-full text-brand ring-1 ring-brand">
-                  ◎
+                  <InstagramIcon className="size-4" aria-hidden />
                 </span>
                 <span className="text-lg">{INSTAGRAM_HANDLE}</span>
               </div>
@@ -600,8 +631,9 @@ export default function SejaUmFranqueado() {
       </section>
 
       <p className="border-t border-wire-line/50 py-6 text-center text-xs text-muted">
-        <Link href="/" className="hover:text-brand">
-          ← Voltar ao site institucional
+        <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-brand">
+          <FaArrowLeftLong className="size-3" aria-hidden /> Voltar ao site
+          institucional
         </Link>
       </p>
     </main>

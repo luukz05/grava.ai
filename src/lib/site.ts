@@ -154,6 +154,35 @@ export const DISTRIBUICAO = [
   { t: "Gestão integrada", d: "Unidade sempre abastecida e eficiente." },
 ];
 
+// [FRANQUIA] O que os pilares de IA da operação significam para o cliente
+// final da unidade (espelha, na mesma ordem, os 6 badges do diagrama radial).
+export const IA_CLIENTE = [
+  {
+    t: "Produto único em segundos",
+    d: "A arte nasce na hora, no totem — sem fila e sem designer.",
+  },
+  {
+    t: "Compra de onde estiver",
+    d: "Personaliza online e retira na unidade.",
+  },
+  {
+    t: "Experiência que só melhora",
+    d: "Cada venda alimenta os relatórios que refinam a operação.",
+  },
+  {
+    t: "Atendimento que reconhece",
+    d: "Histórico e pedidos acompanhados de perto pelo CRM.",
+  },
+  {
+    t: "Problema resolvido rápido",
+    d: "Suporte automatizado da matriz, sem burocracia.",
+  },
+  {
+    t: "Nunca encontra prateleira vazia",
+    d: "A reposição é alertada antes de o produto faltar.",
+  },
+];
+
 export const IA_OPERACAO = [
   "No totem: primeiro atendimento e criação da arte para gravação.",
   "No sistema de Vendas Online.",

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { FaRegClock, FaWandMagicSparkles } from "react-icons/fa6"
 import {
   ArrowIcon,
   BTN_PRIMARY,
@@ -88,10 +89,7 @@ export default function Home() {
               style={{ animationDelay: "0.8s" }}
             >
               <span className="grid size-8 place-items-center rounded-full bg-brand/15 text-brand">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden>
-                  <path d="M12 4l1.7 4.3L18 10l-4.3 1.7L12 16l-1.7-4.3L6 10l4.3-1.7L12 4Z" />
-                  <path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2Z" />
-                </svg>
+                <FaWandMagicSparkles className="size-3.5" aria-hidden />
               </span>
               <span className="text-left">
                 <span className="block text-sm font-semibold">Arte com IA</span>
@@ -104,10 +102,7 @@ export default function Home() {
               style={{ animationDelay: "2.4s" }}
             >
               <span className="grid size-8 place-items-center rounded-full bg-brand/15 text-brand">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden>
-                  <circle cx="12" cy="12" r="8.5" />
-                  <path d="M12 7.5V12l3 2" />
-                </svg>
+                <FaRegClock className="size-3.5" aria-hidden />
               </span>
               <span className="text-left">
                 <span className="block text-sm font-semibold">Gravação na hora</span>
