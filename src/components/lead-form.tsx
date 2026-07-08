@@ -2,19 +2,26 @@
 
 import { useState } from "react";
 import { BTN_BASE } from "./wireframe";
+import { Checkbox, Field, Select } from "./form";
 
 /**
  * Formulário de captura de lead (wireframe — sem backend).
  * variant="short": hero (baixa fricção). variant="full": qualificação completa.
  * Campos UTM são capturados ocultos para atribuição de mídia paga.
+ * Controles 100% custom (ver form.tsx) — nada nativo do browser aparece.
  */
 const UF = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB",
   "PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
 ];
 
-const inputClass =
-  "w-full rounded-lg bg-background px-4 py-2.5 text-sm text-foreground ring-1 ring-wire-line placeholder:text-muted/70 transition-shadow duration-150 focus:outline-none focus:ring-brand";
+const CAPITAL = [
+  "Até R$ 100 mil",
+  "R$ 100 mil a R$ 200 mil",
+  "Acima de R$ 200 mil",
+];
+
+const TIMING = ["Imediatamente", "Em até 3 meses", "Em 6 meses ou mais"];
 
 export function LeadForm({
   variant = "short",
@@ -61,65 +68,45 @@ export function LeadForm({
       <p className="mb-4 text-xs text-muted">{subtitle}</p>
 
       <div className="space-y-3">
-        <input className={inputClass} placeholder="Nome completo" required />
-        <input
-          className={inputClass}
-          placeholder="WhatsApp / Celular"
-          type="tel"
-          required
-        />
+        <Field placeholder="Nome completo" required />
+        <Field placeholder="WhatsApp / Celular" type="tel" required />
 
         {variant === "full" && (
-          <input
-            className={inputClass}
-            placeholder="E-mail"
-            type="email"
-            required
-          />
+          <Field placeholder="E-mail" type="email" required />
         )}
 
         <div className="flex gap-3">
-          <select className={`${inputClass} w-24`} defaultValue="" required>
-            <option value="" disabled>
-              UF
-            </option>
-            {UF.map((uf) => (
-              <option key={uf} value={uf}>
-                {uf}
-              </option>
-            ))}
-          </select>
-          <input className={inputClass} placeholder="Cidade" required />
+          <Select
+            options={UF}
+            placeholder="UF"
+            name="uf"
+            required
+            className="w-28 shrink-0"
+          />
+          <Field placeholder="Cidade" required />
         </div>
 
         {variant === "full" && (
           <>
-            <select className={inputClass} defaultValue="" required>
-              <option value="" disabled>
-                Capital disponível para investir
-              </option>
-              <option>Até R$ 100 mil</option>
-              <option>R$ 100 mil a R$ 200 mil</option>
-              <option>Acima de R$ 200 mil</option>
-            </select>
-            <select className={inputClass} defaultValue="" required>
-              <option value="" disabled>
-                Quando pretende começar?
-              </option>
-              <option>Imediatamente</option>
-              <option>Em até 3 meses</option>
-              <option>Em 6 meses ou mais</option>
-            </select>
+            <Select
+              options={CAPITAL}
+              placeholder="Capital disponível para investir"
+              name="capital"
+              required
+            />
+            <Select
+              options={TIMING}
+              placeholder="Quando pretende começar?"
+              name="timing"
+              required
+            />
           </>
         )}
 
-        <label className="flex items-start gap-2 text-xs text-muted">
-          <input type="checkbox" required className="mt-0.5" />
-          <span>
-            Autorizo o contato e o tratamento dos meus dados conforme a Política
-            de Privacidade (LGPD).
-          </span>
-        </label>
+        <Checkbox required>
+          Autorizo o contato e o tratamento dos meus dados conforme a Política
+          de Privacidade (LGPD).
+        </Checkbox>
 
         {/* Campos UTM ocultos para atribuição de tráfego pago */}
         <input type="hidden" name="utm_source" />

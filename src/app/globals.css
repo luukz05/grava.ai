@@ -77,6 +77,69 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* ── Reset de "cara nativa" ────────────────────────────────────────────────
+   Tudo abaixo remove os defaults do browser/OS que denunciam elemento nativo:
+   realce de seleção, fundo de autofill, scrollbar, marcador de <summary>,
+   spinners e realce de toque. A UI fala só a linguagem da marca. */
+
+/* Seleção de texto na cor da marca */
+::selection {
+  background: rgba(59, 165, 232, 0.28);
+  color: var(--foreground);
+}
+
+/* Autofill: o browser força fundo/nas cores dele — anulamos com box-shadow */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--foreground);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+  caret-color: var(--brand);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Sem realce azul de toque no mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Marcador nativo do acordeão <summary> */
+summary::-webkit-details-marker {
+  display: none;
+}
+summary {
+  list-style: none;
+}
+
+/* Sem setas de incremento em inputs numéricos */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Scrollbar da marca (fina, discreta) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--wire-line) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--wire-line);
+  border-radius: 9999px;
+  border: 3px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4d4d4d;
+}
+
 /*
   Container do site — mais largo para aproveitar o espaço lateral.
   Usado dentro de faixas full-bleed (a faixa ocupa 100%, o conteúdo respira).
@@ -201,25 +264,16 @@ body {
   animation: lineBreath 2.4s ease-in-out infinite;
 }
 
-/* FAB: respiração por box-shadow (anel que expande e some) */
+/* FAB: respiração por box-shadow (anel de marca que expande e some) */
 @keyframes fabBreathe {
-  0%, 100% { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(37, 211, 102, 0); }
-  50%       { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(37, 211, 102, 0.18); }
+  0%, 100% { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(59, 165, 232, 0); }
+  50%       { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(59, 165, 232, 0.22); }
 }
 
-/* FAB: wiggle ocasional para chamar atenção (longo período, curto gesto) */
-@keyframes fabWiggle {
-  0%, 86%, 100% { transform: rotate(0deg); }
-  89%            { transform: rotate(-7deg); }
-  93%            { transform: rotate(6deg); }
-  97%            { transform: rotate(-3deg); }
-}
 
-/* FAB de WhatsApp: respira sempre, wiggle ocasional (começa após 3s) */
+/* CTA flutuante de WhatsApp: halo verde respirando para chamar atenção */
 .fab-attention {
-  animation:
-    fabBreathe 3s ease-in-out infinite,
-    fabWiggle 7s ease-in-out 3s infinite;
+  animation: fabBreathe 3s ease-in-out infinite;
 }
 
 /* Flutuação contínua para chips/elementos soltos (delay via animation-delay) */

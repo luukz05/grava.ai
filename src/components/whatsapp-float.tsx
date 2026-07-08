@@ -2,8 +2,9 @@ import { WHATSAPP_LINK } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 
 /**
- * Balão flutuante de WhatsApp no canto inferior direito.
- * Instiga o contato em todas as páginas (colocado no layout global).
+ * CTA flutuante de WhatsApp — pill "Converse com um especialista" com o
+ * símbolo do WhatsApp à direita. Fixo no canto inferior direito, respira
+ * discretamente (halo verde) para chamar atenção sem incomodar.
  */
 export function WhatsAppFloat() {
   return (
@@ -11,16 +12,11 @@ export function WhatsAppFloat() {
       href={WHATSAPP_LINK}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Fale conosco no WhatsApp"
-      className="group fixed bottom-5 right-5 z-50 flex items-center gap-3"
+      aria-label="Converse com um especialista no WhatsApp"
+      className="fab-attention group fixed bottom-5 right-5 z-50 inline-flex items-center gap-2.5 rounded-full bg-brand py-3 pl-5 pr-4 text-sm font-semibold text-black shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.03] active:scale-[0.97] motion-reduce:transition-none"
     >
-      {/* Balãozinho de texto (aparece no hover em telas médias+) */}
-      <span className="pointer-events-none hidden translate-x-2 rounded-full bg-surface px-4 py-2 text-sm text-foreground opacity-0 shadow-lg ring-1 ring-wire-line/70 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 md:block">
-        Fale conosco no WhatsApp
-      </span>
-      <span className="fab-attention relative grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white transition-transform duration-150 ease-out group-hover:scale-105 group-active:scale-[0.97] motion-reduce:transition-none">
-        <WhatsAppIcon className="relative h-7 w-7" />
-      </span>
+      <span>Converse com um especialista</span>
+      <WhatsAppIcon className="h-5 w-5 shrink-0" />
     </a>
   );
 }
