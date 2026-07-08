@@ -199,7 +199,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 3. POR QUE SER FRANQUEADO ──────────────────────────────────── */}
-      <section className="border-b border-wire-line/50">
+      <section id="por-que" className="border-b border-wire-line/50">
         <Shell className="grid gap-y-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
             <Reveal className="relative isolate">
@@ -239,7 +239,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 3b. MODELOS DE LOJA ────────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50">
+      <section id="modelos" className="border-b border-wire-line/50">
         <Shell className="pb-4 pt-20 text-center">
           <Reveal className="relative isolate">
             <GhostNumber n={2} />
@@ -548,7 +548,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 10. FAQ ────────────────────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50">
+      <section id="duvidas" className="border-b border-wire-line/50">
         <Shell className="py-24">
           <Reveal>
             <SectionTag>Dúvidas</SectionTag>
