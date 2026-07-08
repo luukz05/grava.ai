@@ -18,9 +18,7 @@ export function WhatsAppFloat() {
       <span className="pointer-events-none hidden translate-x-2 rounded-full bg-surface px-4 py-2 text-sm text-foreground opacity-0 shadow-lg ring-1 ring-wire-line/70 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 md:block">
         Fale conosco no WhatsApp
       </span>
-      <span className="relative grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/30 transition-transform group-hover:scale-105">
-        {/* pulso sutil */}
-        <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-20" />
+      <span className="fab-attention relative grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white transition-transform duration-150 ease-out group-hover:scale-105 group-active:scale-[0.97] motion-reduce:transition-none">
         <WhatsAppIcon className="relative h-7 w-7" />
       </span>
     </a>

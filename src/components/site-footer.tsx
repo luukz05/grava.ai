@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BrandMark } from "./wireframe";
+import { BrandMark, BTN_PRIMARY_SM } from "./wireframe";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -53,10 +53,7 @@ export function SiteFooter() {
             Transformando ideias em produtos personalizados com Inteligência
             Artificial.
           </p>
-          <Link
-            href="/seja-um-franqueado"
-            className="mt-5 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-black"
-          >
+          <Link href="/seja-um-franqueado" className={`${BTN_PRIMARY_SM} mt-5`}>
             Seja um franqueado
           </Link>
         </div>

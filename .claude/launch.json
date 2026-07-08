@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "grava-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "start"],
+      "autoPort": true,
+      "port": 4041
+    }
+  ]
+}

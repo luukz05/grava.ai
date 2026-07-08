@@ -1,6 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
+  ArrowIcon,
+  BTN_OUTLINE_BRAND,
+  BTN_PRIMARY,
+  GhostNumber,
   Hexagon,
   ImagePlaceholder,
   Photo,
@@ -36,11 +40,8 @@ export const metadata: Metadata = {
 
 function AnchorCta({ children }: { children: React.ReactNode }) {
   return (
-    <a
-      href="#formulario"
-      className="inline-block rounded-full bg-brand px-7 py-3.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-    >
-      {children}
+    <a href="#formulario" className={BTN_PRIMARY}>
+      {children} <ArrowIcon />
     </a>
   )
 }
@@ -75,10 +76,10 @@ function ModeloSection({
           <span className="inline-block rounded-full bg-brand/15 px-3 py-1 text-xs font-medium uppercase tracking-wide text-brand">
             {m.tag}
           </span>
-          <h3 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h3 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
             {m.nome}
           </h3>
-          <p className="mt-4 max-w-md text-muted">{m.desc}</p>
+          <p className="mt-4 max-w-md text-pretty text-muted">{m.desc}</p>
           <ul className="mt-6 space-y-2">
             {m.destaques.map((d) => (
               <li key={d} className="flex items-center gap-3 text-sm text-foreground">
@@ -118,14 +119,14 @@ export default function SejaUmFranqueado() {
             </Reveal>
 
             <Reveal delay={80}>
-              <h1 className="text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="text-balance text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
                 Tenha um negócio inovador de{" "}
                 <span className="text-brand">personalização com IA.</span>
               </h1>
             </Reveal>
 
             <Reveal delay={160}>
-              <p className="mt-6 max-w-lg text-lg text-muted">
+              <p className="mt-6 max-w-lg text-pretty text-lg text-muted">
                 Totens automatizados que criam produtos exclusivos na hora. Uma
                 operação enxuta, movida por Inteligência Artificial — pronta para
                 a sua região.
@@ -152,7 +153,7 @@ export default function SejaUmFranqueado() {
                 href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-brand ring-1 ring-brand transition-colors hover:bg-brand/10"
+                className={`mt-7 ${BTN_OUTLINE_BRAND}`}
               >
                 ✆ Receba a apresentação no WhatsApp
               </a>
@@ -172,11 +173,17 @@ export default function SejaUmFranqueado() {
 
       {/* ── 2. DESTAQUES ───────────────────────────────────────────────── */}
       <section className="border-y border-wire-line/50 bg-surface">
-        <Shell className="grid grid-cols-1 gap-y-6 divide-wire-line/60 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x">
+        <Shell className="grid grid-cols-1 gap-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
           {DESTAQUES.map((s, i) => (
-            <Reveal key={s.t} delay={i * 80} className="lg:px-6">
-              <h3 className="font-semibold text-brand">{s.t}</h3>
-              <p className="mt-1 text-sm text-muted">{s.d}</p>
+            <Reveal key={s.t} delay={i * 80}>
+              <div className="group relative h-full overflow-hidden rounded-2xl bg-surface-2/70 p-6 ring-1 ring-white/5 transition-transform duration-300 hover:-translate-y-1 motion-reduce:transition-none">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-brand/10 opacity-70 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
+                />
+                <h3 className="relative font-semibold text-brand">{s.t}</h3>
+                <p className="relative mt-1 text-pretty text-sm text-muted">{s.d}</p>
+              </div>
             </Reveal>
           ))}
         </Shell>
@@ -186,12 +193,13 @@ export default function SejaUmFranqueado() {
       <section className="border-b border-wire-line/50">
         <Shell className="grid gap-y-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal>
+            <Reveal className="relative isolate">
+              <GhostNumber n={1} />
               <SectionTag>Por que ser um franqueado</SectionTag>
-              <h2 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+              <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                 Um negócio inovador, com retorno rápido.
               </h2>
-              <p className="mt-6 max-w-md text-muted">
+              <p className="mt-6 max-w-md text-pretty text-muted">
                 A GRAVA.AI une uma tendência de mercado em alta a uma operação
                 enxuta e movida por IA. Três motivos para investir:
               </p>
@@ -213,7 +221,7 @@ export default function SejaUmFranqueado() {
                 </span>
                 <div>
                   <h3 className="text-xl font-semibold">{p.t}</h3>
-                  <p className="mt-1.5 text-muted">{p.d}</p>
+                  <p className="mt-1.5 text-pretty text-muted">{p.d}</p>
                 </div>
               </Reveal>
             ))}
@@ -224,14 +232,15 @@ export default function SejaUmFranqueado() {
       {/* ── 3b. MODELOS DE LOJA ────────────────────────────────────────── */}
       <section className="border-b border-wire-line/50">
         <Shell className="pb-4 pt-20 text-center">
-          <Reveal>
+          <Reveal className="relative isolate">
+            <GhostNumber n={2} />
             <SectionTag>
               <span className="mx-auto">Modelos de franquia</span>
             </SectionTag>
-            <h2 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="mx-auto max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Escolha o modelo ideal para a sua região.
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-muted">
+            <p className="mx-auto mt-4 max-w-xl text-pretty text-muted">
               Três formatos pensados para diferentes pontos e perfis de investimento.
             </p>
           </Reveal>
@@ -244,7 +253,7 @@ export default function SejaUmFranqueado() {
       {/* ── 4. COMO SE TORNAR FRANQUEADO ───────────────────────────────── */}
       <section
         id="como-funciona"
-        className="scroll-mt-24 border-b border-wire-line/50 bg-surface/40"
+        className="border-b border-wire-line/50 bg-surface/40"
       >
         <div className="grid items-stretch gap-y-10 lg:grid-cols-2">
           <Photo
@@ -253,9 +262,10 @@ export default function SejaUmFranqueado() {
             className="order-2 h-72 lg:order-1 lg:h-auto lg:min-h-[30rem] lg:rounded-none lg:rounded-r-3xl"
           />
           <div className="order-1 flex flex-col justify-center px-6 py-16 lg:order-2 lg:px-16">
-            <Reveal>
+            <Reveal className="relative isolate">
+              <GhostNumber n={3} />
               <SectionTag>Passo a passo</SectionTag>
-              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+              <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                 Como se tornar um franqueado.
               </h2>
             </Reveal>
@@ -268,7 +278,7 @@ export default function SejaUmFranqueado() {
                     </span>
                     <div>
                       <h3 className="text-lg font-semibold">{p.t}</h3>
-                      <p className="mt-1 text-muted">{p.d}</p>
+                      <p className="mt-1 text-pretty text-muted">{p.d}</p>
                     </div>
                   </li>
                 ))}
@@ -281,12 +291,13 @@ export default function SejaUmFranqueado() {
       {/* ── 5. O QUE VOCÊ RECEBE ───────────────────────────────────────── */}
       <section className="border-b border-wire-line/50">
         <Shell className="py-24">
-          <Reveal className="max-w-2xl">
+          <Reveal className="relative isolate max-w-2xl">
+            <GhostNumber n={4} />
             <SectionTag>Modelo de franquia</SectionTag>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Você começa com tudo pronto para vender.
             </h2>
-            <p className="mt-4 text-muted">
+            <p className="mt-4 text-pretty text-muted">
               Um pacote completo, pensado para você operar com segurança desde o
               primeiro dia — mesmo sem experiência.
             </p>
@@ -296,7 +307,7 @@ export default function SejaUmFranqueado() {
             {INCLUSO.map((item, i) => (
               <Reveal key={item.t} delay={i * 70} className="border-b border-wire-line/60 py-6">
                 <h3 className="text-lg font-semibold">{item.t}</h3>
-                <p className="mt-1 text-muted">{item.d}</p>
+                <p className="mt-1 text-pretty text-muted">{item.d}</p>
               </Reveal>
             ))}
           </div>
@@ -323,11 +334,11 @@ export default function SejaUmFranqueado() {
               <span className="text-xs uppercase tracking-widest text-brand">
                 Material gratuito
               </span>
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h2 className="mt-1 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
                 Baixe o guia gratuito: Como funciona a franquia de personalização
                 com IA da GRAVA.AI
               </h2>
-              <p className="mt-2 text-muted">
+              <p className="mt-2 text-pretty text-muted">
                 Entenda o modelo, a operação e a oportunidade — enviamos no seu
                 WhatsApp, sem compromisso.
               </p>
@@ -335,11 +346,8 @@ export default function SejaUmFranqueado() {
           </Reveal>
 
           <Reveal delay={150}>
-            <a
-              href="#formulario"
-              className="shrink-0 rounded-full bg-brand px-7 py-3.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-            >
-              Baixar guia gratuito
+            <a href="#formulario" className={BTN_PRIMARY}>
+              Baixar guia gratuito <ArrowIcon />
             </a>
           </Reveal>
         </Shell>
@@ -355,12 +363,13 @@ export default function SejaUmFranqueado() {
         />
 
         <Shell className="relative py-24">
-          <Reveal>
+          <Reveal className="relative isolate">
+            <GhostNumber n={5} />
             <SectionTag>Suporte da matriz</SectionTag>
-            <h2 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Distribuição própria. Você não fica sozinho.
             </h2>
-            <p className="mt-4 max-w-xl text-muted">
+            <p className="mt-4 max-w-xl text-pretty text-muted">
               <span className="text-brand">Gestão inteligente</span>, do estoque à
               operação.
             </p>
@@ -370,7 +379,7 @@ export default function SejaUmFranqueado() {
             {DISTRIBUICAO.map((d, i) => (
               <Reveal key={d.t} delay={i * 100} className="border-l-2 border-brand/40 pl-5">
                 <h3 className="text-xl font-semibold text-brand">{d.t}</h3>
-                <p className="mt-1.5 text-muted">{d.d}</p>
+                <p className="mt-1.5 text-pretty text-muted">{d.d}</p>
               </Reveal>
             ))}
           </div>
@@ -384,14 +393,15 @@ export default function SejaUmFranqueado() {
 
         <Shell className="relative py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <Reveal>
+            <Reveal className="relative isolate">
+              <GhostNumber n={6} />
               <SectionTag>
                 <span className="mx-auto">Diferencial</span>
               </SectionTag>
-              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+              <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                 A <span className="text-brand">IA</span> no centro de tudo.
               </h2>
-              <p className="mt-4 text-lg text-muted">
+              <p className="mt-4 text-pretty text-lg text-muted">
                 Do totem ao relatório, do estoque ao CRM — a inteligência artificial
                 da GRAVA.AI integra e automatiza toda a operação da sua franquia em
                 tempo real.
@@ -399,35 +409,24 @@ export default function SejaUmFranqueado() {
             </Reveal>
           </div>
 
-          {/* Diagrama */}
-          <Reveal delay={120} className="mt-16 overflow-x-auto">
-            <div className="min-w-[560px]">
+          {/* Diagrama (as linhas se desenham e os pulsos viajam ao entrar em vista) */}
+          <div className="mt-20 overflow-x-auto">
+            <div className="min-w-[760px] px-2 pb-2">
               <AIOrchestrator />
             </div>
-          </Reveal>
-
-          {/* Legenda abaixo do diagrama */}
-          <Reveal delay={240} className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3">
-            <span className="flex items-center gap-2 text-xs text-muted">
-              <span className="inline-block h-px w-6 border-t border-dashed border-white/25" />
-              Dados que entram na IA
-            </span>
-            <span className="flex items-center gap-2 text-xs text-muted">
-              <span className="inline-block h-px w-6 border-t border-dashed border-brand/50" />
-              Gestão automatizada pela IA
-            </span>
-          </Reveal>
+          </div>
         </Shell>
       </section>
 
       {/* ── 7b. INVESTIMENTO ───────────────────────────────────────────── */}
       <section
         id="investimento"
-        className="scroll-mt-20 border-b border-wire-line/50 bg-surface"
+        className="border-b border-wire-line/50 bg-surface"
       >
         <Shell className="py-24">
           <div className="flex flex-wrap items-end justify-between gap-6 border-b border-wire-line/60 pb-8">
-            <Reveal>
+            <Reveal className="relative isolate">
+              <GhostNumber n={7} />
               <SectionTag>Detalhamento da franquia</SectionTag>
               <h2 className="text-3xl font-semibold uppercase tracking-wide sm:text-4xl">
                 Investimento inicial
@@ -435,9 +434,9 @@ export default function SejaUmFranqueado() {
             </Reveal>
 
             <Reveal delay={100}>
-              <p className="text-5xl font-bold text-foreground sm:text-6xl">
+              <p className="bg-gradient-to-br from-brand-300 to-brand-600 bg-clip-text text-5xl font-bold tabular-nums text-transparent sm:text-6xl">
                 {INVESTIMENTO_VALOR.replace(",00", "")}
-                <span className="text-2xl text-muted">,00</span>
+                <span className="text-2xl">,00</span>
               </p>
             </Reveal>
           </div>
@@ -446,7 +445,7 @@ export default function SejaUmFranqueado() {
             {INVESTIMENTO.map((item, i) => (
               <Reveal key={item.t} delay={i * 70} className="border-b border-wire-line/60 py-6">
                 <h3 className="text-lg font-semibold">{item.t}</h3>
-                <p className="mt-1 text-muted">{item.d}</p>
+                <p className="mt-1 text-pretty text-muted">{item.d}</p>
               </Reveal>
             ))}
           </div>
@@ -465,7 +464,7 @@ export default function SejaUmFranqueado() {
         <Shell className="py-24">
           <Reveal>
             <SectionTag>Prova social</SectionTag>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Quem já é GRAVA.AI.
             </h2>
             <p className="mt-2 text-xs text-muted">
@@ -477,8 +476,8 @@ export default function SejaUmFranqueado() {
             {DEPOIMENTOS.map((d, i) => (
               <Reveal key={d.nome} delay={i * 100}>
                 <figure className="flex h-full flex-col">
-                  <blockquote className="flex-1 text-lg leading-relaxed text-foreground">
-                    "{d.texto}"
+                  <blockquote className="flex-1 text-pretty text-lg leading-relaxed text-foreground">
+                    &ldquo;{d.texto}&rdquo;
                   </blockquote>
                   <figcaption className="mt-5 flex items-center gap-3 border-t border-wire-line/60 pt-5">
                     <span className="h-10 w-10 rounded-full border border-dashed border-wire-line" />
@@ -501,7 +500,7 @@ export default function SejaUmFranqueado() {
             <SectionTag>
               <span className="mx-auto">Oportunidade de mercado</span>
             </SectionTag>
-            <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
               A personalização é uma das maiores tendências do varejo.
             </h2>
           </Reveal>
@@ -510,7 +509,7 @@ export default function SejaUmFranqueado() {
             {MERCADO.map((m, i) => (
               <Reveal key={m.t} delay={i * 100} className="px-6">
                 <h3 className="text-xl font-semibold text-brand">{m.t}</h3>
-                <p className="mt-2 text-sm text-muted">{m.d}</p>
+                <p className="mt-2 text-pretty text-sm text-muted">{m.d}</p>
               </Reveal>
             ))}
           </div>
@@ -522,7 +521,7 @@ export default function SejaUmFranqueado() {
         <Shell className="py-24">
           <Reveal>
             <SectionTag>Dúvidas</SectionTag>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Perguntas frequentes
             </h2>
           </Reveal>
@@ -548,16 +547,16 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 12. FORMULÁRIO FINAL ───────────────────────────────────────── */}
-      <section id="formulario" className="brand-glow scroll-mt-24 relative overflow-hidden">
+      <section id="formulario" className="brand-glow relative overflow-hidden">
         <HexMesh gradientPos="60% 50%" className="opacity-60" />
         <Hexagon className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 text-brand/10" />
 
         <Shell className="relative grid gap-12 py-24 lg:grid-cols-2">
           <Reveal>
-            <h2 className="text-4xl font-bold uppercase leading-tight sm:text-5xl">
+            <h2 className="text-balance text-4xl font-bold uppercase leading-tight sm:text-5xl">
               Agende uma conversa sem compromisso.
             </h2>
-            <p className="mt-6 max-w-sm text-lg text-muted">
+            <p className="mt-6 max-w-sm text-pretty text-lg text-muted">
               Tire todas as suas dúvidas com um especialista e descubra se seu
               perfil combina com a franquia.
             </p>

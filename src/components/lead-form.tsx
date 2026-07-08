@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BTN_BASE } from "./wireframe";
 
 /**
  * Formulário de captura de lead (wireframe — sem backend).
@@ -13,7 +14,7 @@ const UF = [
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-wire-line bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted/70 focus:border-brand focus:outline-none";
+  "w-full rounded-lg bg-background px-4 py-2.5 text-sm text-foreground ring-1 ring-wire-line placeholder:text-muted/70 transition-shadow duration-150 focus:outline-none focus:ring-brand";
 
 export function LeadForm({
   variant = "short",
@@ -34,7 +35,7 @@ export function LeadForm({
     return (
       <div
         id={id}
-        className="rounded-2xl border border-brand/40 bg-surface-2 p-6 text-center"
+        className="animate-scale-in rounded-2xl bg-surface-2 p-6 text-center ring-1 ring-brand/40"
       >
         <p className="text-lg font-semibold text-brand">Recebemos seu contato!</p>
         <p className="mt-2 text-sm text-muted">
@@ -52,7 +53,7 @@ export function LeadForm({
         e.preventDefault();
         setSent(true);
       }}
-      className="rounded-2xl border border-wire-line bg-surface-2 p-6"
+      className="rounded-2xl bg-surface-2 p-6 ring-1 ring-wire-line"
     >
       <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-brand">
         {title}
@@ -130,7 +131,7 @@ export function LeadForm({
 
       <button
         type="submit"
-        className="mt-4 w-full rounded-full bg-brand px-6 py-3 text-sm font-semibold text-black"
+        className={`${BTN_BASE} mt-4 w-full bg-brand px-6 py-3 font-semibold text-black hover:bg-brand-400`}
       >
         {cta}
       </button>

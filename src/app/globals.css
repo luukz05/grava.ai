@@ -1,28 +1,58 @@
 @import "tailwindcss";
 
 /*
-  Wireframe de baixa fidelidade — GRAVA.AI
-  Paleta amostrada do PDF de apresentação (ver docs/brand-and-content.md).
-  Mantida sóbria/grayscale de propósito; o azul entra só como dica de marca.
+  GRAVA.AI — fundações de estilo.
+  Marca: dark + azul #3ba5e8 + hexágonos (ver docs/brand-and-content.md).
+  Sistema (movimento, ritmo, receitas): docs/auditoria-ui-ux-fsk-tax.md.
 */
 :root {
   --background: #0e0e0e;
   --foreground: #ededed;
 
-  /* tokens de marca (uso leve no wireframe) */
-  --brand: #3ba5e8;
+  /* Escala da marca gerada a partir do azul GRAVA (#3ba5e8 = 500) */
+  --brand-50:  #eff8ff;
+  --brand-100: #dbeefe;
+  --brand-200: #bfe3fd;
+  --brand-300: #93d2fb;
+  --brand-400: #63bdf4;
+  --brand-500: #3ba5e8;
+  --brand-600: #2a88c9;
+  --brand-700: #236da3;
+  --brand-800: #1f5a86;
+  --brand-900: #1e4b6e;
+  --brand-950: #14314a;
+
+  /* Aliases legados (uso corrente nas páginas) */
+  --brand: var(--brand-500);
   --brand-cyan: #66cdff;
-  --brand-accent: #388cc6;
+  --brand-accent: var(--brand-600);
   --surface: #1a1a1a;
   --surface-2: #1f1f1f;
   --muted: #a8a8a8;
   --wire-line: #3a3a3a;
+
+  /* Easing assinatura do sistema (easeOutQuint) */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Altura da navbar — âncoras param abaixo dela */
+  --scroll-padding-top: 3.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
   --color-brand-cyan: var(--brand-cyan);
   --color-brand-accent: var(--brand-accent);
   --color-surface: var(--surface);
@@ -31,10 +61,14 @@
   --color-wire-line: var(--wire-line);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --ease-brand: var(--ease-brand);
+  --animate-fade-in-up: fadeInUp 0.6s ease-out forwards;
+  --animate-scale-in: scaleIn 0.5s ease-out forwards;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--scroll-padding-top);
 }
 
 body {
@@ -75,6 +109,35 @@ body {
   );
 }
 
+/*
+  Vidro (glassmorphism sobre dark): tinta branca sutil + brilho interno na
+  aresta superior. O blur vem da utility Tailwind no markup (backdrop-blur-xl
+  no .glass, backdrop-blur-2xl no .glass-deep) — o minificador do build
+  descarta backdrop-filter escrito aqui. Combinar com ring-1 ring-white/10 e
+  o raio desejado (rounded-2xl/3xl/full).
+*/
+.glass {
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+.glass-deep {
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+/*
+  Textura de ruído (feTurbulence) para painéis com gradiente de marca.
+  Aplicar num overlay absoluto com mix-blend-overlay.
+*/
+.noise-overlay {
+  background-position: center;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 100 100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='turbulence' baseFrequency='1.4' numOctaves='1' seed='2' stitchTiles='stitch' result='n'/%3E%3CfeComponentTransfer result='g'%3E%3CfeFuncR type='linear' slope='4' intercept='1'/%3E%3CfeFuncG type='linear' slope='4' intercept='1'/%3E%3CfeFuncB type='linear' slope='4' intercept='1'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix type='saturate' values='0' in='g'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* ── Animações ────────────────────────────────────────────────────────────── */
 
 /* Hex individual pulsando (stroke-opacity / fill-opacity são CSS em SVG) */
@@ -101,6 +164,18 @@ body {
   to   { opacity: 1; }
 }
 
+/* Entrada padrão de item de lista (stagger via animation-delay inline) */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Entrada por escala (nós centrais, destaques) */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 /* Pulsação lenta de brilho em fundo */
 @keyframes glowPulse {
   0%, 100% { opacity: 0.7; }
@@ -113,9 +188,30 @@ body {
   50%       { opacity: 1; }
 }
 
-/* Tracejado fluindo ao longo de uma linha */
-@keyframes dashFlow {
-  to { stroke-dashoffset: -51; }
+/* FAB: respiração por box-shadow (anel que expande e some) */
+@keyframes fabBreathe {
+  0%, 100% { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(37, 211, 102, 0); }
+  50%       { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(37, 211, 102, 0.18); }
+}
+
+/* FAB: wiggle ocasional para chamar atenção (longo período, curto gesto) */
+@keyframes fabWiggle {
+  0%, 86%, 100% { transform: rotate(0deg); }
+  89%            { transform: rotate(-7deg); }
+  93%            { transform: rotate(6deg); }
+  97%            { transform: rotate(-3deg); }
+}
+
+/* FAB de WhatsApp: respira sempre, wiggle ocasional (começa após 3s) */
+.fab-attention {
+  animation:
+    fabBreathe 3s ease-in-out infinite,
+    fabWiggle 7s ease-in-out 3s infinite;
+}
+
+/* Flutuação contínua para chips/elementos soltos (delay via animation-delay) */
+.float-gentle {
+  animation: floatY 6s ease-in-out infinite;
 }
 
 /* Caixa de placeholder estilo wireframe (imagem ausente) */
@@ -129,4 +225,21 @@ body {
     rgba(255, 255, 255, 0.025) 11px,
     rgba(255, 255, 255, 0.025) 12px
   );
+}
+
+/* Movimento é acabamento, nunca barreira */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-fade-in-up,
+  .animate-scale-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .fab-attention,
+  .float-gentle {
+    animation: none;
+  }
 }

@@ -1,9 +1,38 @@
 "use client"
 
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react"
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from "react"
+
+// ── prefers-reduced-motion ───────────────────────────────────────────────────
+// Movimento é acabamento, nunca barreira. SSR assume "com movimento" (false).
+const REDUCED_QUERY = "(prefers-reduced-motion: reduce)"
+
+function subscribeReducedMotion(callback: () => void) {
+  const mq = window.matchMedia(REDUCED_QUERY)
+  mq.addEventListener("change", callback)
+  return () => mq.removeEventListener("change", callback)
+}
+
+export function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_QUERY).matches,
+    () => false,
+  )
+}
 
 // ── Reveal ───────────────────────────────────────────────────────────────────
-// Scroll-triggered fade-up. Fires once, stays visible.
+// Scroll-triggered reveal. Fires once, stays visible.
+// Distâncias curtas de propósito (16/12px) — o movimento sugere, não desloca.
+// A direção carrega significado: "left"/"right" = de onde o conteúdo vem;
+// "scale" = nasce no lugar (nós centrais, destaques).
 export function Reveal({
   children,
   className = "",
@@ -13,43 +42,72 @@ export function Reveal({
   children: ReactNode
   className?: string
   delay?: number
-  from?: "bottom" | "left" | "right"
+  from?: "bottom" | "left" | "right" | "scale"
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [inView, setInView] = useState(false)
+  const reduced = usePrefersReducedMotion()
+  const visible = inView || reduced
 
   useEffect(() => {
+    if (reduced) return
     const el = ref.current
     if (!el) return
     const io = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); io.disconnect() } },
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); io.disconnect() } },
       { threshold: 0.08, rootMargin: "0px 0px -40px 0px" },
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [reduced])
 
-  const base: CSSProperties = {
-    transition: `opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1)`,
-    transitionDelay: `${delay}ms`,
-  }
+  const base: CSSProperties = reduced
+    ? {}
+    : {
+        transition: `opacity 0.6s var(--ease-brand), transform 0.6s var(--ease-brand)`,
+        transitionDelay: `${delay}ms`,
+      }
 
   const hidden: CSSProperties = {
     ...base,
     opacity: 0,
     transform:
-      from === "bottom" ? "translateY(28px)"
-      : from === "left"  ? "translateX(-20px)"
-      : "translateX(20px)",
+      from === "bottom" ? "translateY(16px)"
+      : from === "left"  ? "translateX(-12px)"
+      : from === "right" ? "translateX(12px)"
+      : "scale(0.95)",
   }
 
-  const shown: CSSProperties = { ...base, opacity: 1, transform: "translate(0,0)" }
+  const shown: CSSProperties = { ...base, opacity: 1, transform: "none" }
 
   return (
     <div ref={ref} className={className} style={visible ? shown : hidden}>
       {children}
     </div>
   )
+}
+
+// ── useInView ────────────────────────────────────────────────────────────────
+// Observa um container e devolve visibilidade (uma vez). Para componentes que
+// coreografam a própria entrada (ex.: AIOrchestrator).
+export function useInView<T extends HTMLElement>(threshold = 0.2) {
+  const ref = useRef<T>(null)
+  const [inView, setInView] = useState(false)
+  const reduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    if (reduced) return
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); io.disconnect() } },
+      { threshold },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [threshold, reduced])
+
+  return { ref, visible: inView || reduced }
 }
 
 // ── HexMesh ──────────────────────────────────────────────────────────────────

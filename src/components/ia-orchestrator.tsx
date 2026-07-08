@@ -1,298 +1,279 @@
 "use client"
 
-// Diagrama de orquestração: dados entram pela esquerda, a IA GRAVA.AI
-// processa no centro (hexágono), e as ações/gestões saem pela direita.
+// Diagrama radial de orquestração: a IA GRAVA.AI no centro (hexágono com a
+// logo) e, em 5 pontas do hexágono, os pontos da operação onde ela atua.
+// Pulsos em forma de mini-hexágono saem do centro em direção aos badges
+// (SMIL <animateMotion>, dur 2.4s, stagger 0.18s — docs/auditoria-ui-ux-fsk-tax.md §2.4).
 
-import { useId } from "react"
+import Image from "next/image"
+import type { CSSProperties, ReactNode } from "react"
+import { useInView } from "./motion"
 
-// ── Dimensões do canvas ───────────────────────────────────────────────────
-const VW  = 860
-const VH  = 500
-const HCX = 430   // centro do hexágono X
-const HCY = 250   // centro do hexágono Y
-const HR  = 76    // circunraio do hexágono
-const CONN_R = HR + 14  // raio do ponto de conexão (fora do hex)
+// ── Canvas ────────────────────────────────────────────────────────────────
+const VW = 800
+const VH = 540
+const CX = 400
+const CY = 255
+const HEX_R = 100 // circunraio do hexágono central
+const BADGE_R = 210 // raio onde ficam os badges (pontas)
 
-// ── Dados ────────────────────────────────────────────────────────────────
-const INPUTS = [
-  { label: "Atendimento no Totem",  sub: "Cliente e arte criada com IA"  },
-  { label: "Volume de Vendas",       sub: "Pedidos e ticket médio"        },
-  { label: "Estoque em Tempo Real",  sub: "Matéria-prima e produtos"      },
+// Pontas usadas (pointy-top, sem a de cima — o header da seção respira ali):
+// -30° sup. direita · 30° inf. direita · 90° baixo · 150° inf. esquerda · -150° sup. esquerda
+const ANGLES = [-150, -30, 30, 90, 150]
+
+const ICON_CLS = "size-4"
+
+type Node = { label: string; sub: string; icon: ReactNode }
+
+// Um ponto de atuação da IA por ponta, na ordem de ANGLES
+const NODES: Node[] = [
+  {
+    label: "Arte Gerada por IA",
+    sub: "Em segundos, no totem",
+    icon: (
+      // sparkles
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
+        <path d="M12 4l1.7 4.3L18 10l-4.3 1.7L12 16l-1.7-4.3L6 10l4.3-1.7L12 4Z" />
+        <path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Relatório de Desempenho",
+    sub: "KPIs sempre atualizados",
+    icon: (
+      // documento
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
+        <path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5L14 3Z" />
+        <path d="M14 3v4.5h4.5M9.5 13.5h5M9.5 17h5" />
+      </svg>
+    ),
+  },
+  {
+    label: "CRM da Franquia",
+    sub: "Visão da matriz em tempo real",
+    icon: (
+      // pessoas
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
+        <circle cx="9" cy="8" r="3.2" />
+        <path d="M3.5 20c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5M16 5.3a3.2 3.2 0 0 1 0 5.4M17.7 15.2c1.6.7 2.6 2.3 2.9 4.8" />
+      </svg>
+    ),
+  },
+  {
+    label: "Suporte Automatizado",
+    sub: "Da matriz ao franqueado",
+    icon: (
+      // headset
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
+        <path d="M4.5 13v-2a7.5 7.5 0 0 1 15 0v2" />
+        <rect x="3.5" y="13" width="4" height="6" rx="1.5" />
+        <rect x="16.5" y="13" width="4" height="6" rx="1.5" />
+        <path d="M19 19v1a2 2 0 0 1-2 2h-3.5" />
+      </svg>
+    ),
+  },
+  {
+    label: "Alerta de Reposição",
+    sub: "Estoque nunca zerado",
+    icon: (
+      // sino
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={ICON_CLS} aria-hidden>
+        <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
+        <path d="M10.5 19a1.9 1.9 0 0 0 3 0" />
+      </svg>
+    ),
+  },
 ]
 
-const OUTPUTS = [
-  { label: "Arte Gerada por IA",       sub: "Em segundos, no totem"           },
-  { label: "Alerta de Reposição",      sub: "Estoque nunca zerado"            },
-  { label: "Relatório de Desempenho",  sub: "KPIs sempre atualizados"         },
-  { label: "CRM da Franquia",          sub: "Visão da matriz em tempo real"   },
-  { label: "Suporte Automatizado",     sub: "Da matriz ao franqueado"         },
-]
-
-// ── Helpers ──────────────────────────────────────────────────────────────
-function spread(count: number, cy: number, gap: number): number[] {
-  const start = cy - ((count - 1) * gap) / 2
-  return Array.from({ length: count }, (_, i) => start + i * gap)
+// ── Geometria ────────────────────────────────────────────────────────────
+function rad(deg: number): number {
+  return (deg * Math.PI) / 180
 }
 
-// Ponto no limite do hex na direção de (tx, ty)
-function hexEdge(tx: number, ty: number): [number, number] {
-  const dx = tx - HCX
-  const dy = ty - HCY
-  const d  = Math.sqrt(dx * dx + dy * dy)
-  return [HCX + (dx / d) * CONN_R, HCY + (dy / d) * CONN_R]
+function at(angle: number, r: number): [number, number] {
+  return [CX + r * Math.cos(rad(angle)), CY + r * Math.sin(rad(angle))]
 }
 
 function hexPts(cx: number, cy: number, r: number): string {
   return Array.from({ length: 6 }, (_, i) => {
-    const a = ((i * 60 - 90) * Math.PI) / 180
+    const a = rad(i * 60 - 90)
     return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`
   }).join(" ")
 }
 
-// ── Posições dos nós ──────────────────────────────────────────────────────
-const BW = 168   // largura da caixa
-const BH = 54    // altura da caixa (inputs)
-const BOH = 50   // altura da caixa (outputs)
+// Linha radial: da borda do hexágono central até a chegada no badge
+function radialPath(angle: number): string {
+  const [x1, y1] = at(angle, HEX_R + 12)
+  const [x2, y2] = at(angle, BADGE_R - 52)
+  return `M ${x1.toFixed(1)} ${y1.toFixed(1)} L ${x2.toFixed(1)} ${y2.toFixed(1)}`
+}
 
-const INP_CX = 84
-const INP_YS = spread(3, HCY, 108)  // 3 inputs com gap de 108px
-
-const OUT_CX = 776
-const OUT_YS = spread(5, HCY, 80)   // 5 outputs com gap de 80px
-
-// ── Sub-componente: caixa de nó ───────────────────────────────────────────
-function NodeBox({
-  cx, cy, w, h, label, sub, isOutput, delay,
+// ── Badge (HTML, ancorado na ponta) ───────────────────────────────────────
+function Badge({
+  node,
+  angle,
+  visible,
+  delay,
 }: {
-  cx: number; cy: number; w: number; h: number
-  label: string; sub: string; isOutput: boolean; delay: number
+  node: Node
+  angle: number
+  visible: boolean
+  delay: number
 }) {
-  const x   = cx - w / 2
-  const y   = cy - h / 2
-  const dot = isOutput ? x : x + w  // lado voltado ao centro
-
+  const [x, y] = at(angle, BADGE_R)
+  const style: CSSProperties = {
+    left: `${(x / VW) * 100}%`,
+    top: `${(y / VH) * 100}%`,
+    opacity: visible ? 1 : 0,
+    transform: visible
+      ? "translate(-50%, -50%) scale(1)"
+      : "translate(-50%, -50%) scale(0.92)",
+    transition: "opacity 0.6s var(--ease-brand), transform 0.6s var(--ease-brand)",
+    transitionDelay: `${delay}ms`,
+  }
   return (
-    <g>
-      {/* Caixa */}
-      <rect
-        x={x} y={y} width={w} height={h} rx="9"
-        fill={isOutput ? "rgba(59,165,232,0.07)" : "rgba(237,237,237,0.04)"}
-        stroke={isOutput ? "rgba(59,165,232,0.32)" : "rgba(237,237,237,0.12)"}
-        strokeWidth="0.8"
-      />
-      {/* Ponto de conexão */}
-      <circle
-        cx={dot} cy={cy} r={3.8}
-        fill={isOutput ? "rgba(59,165,232,0.75)" : "rgba(237,237,237,0.4)"}
-        style={{ animation: `dotPulse ${2.2 + delay * 0.4}s ease-in-out infinite ${delay}s` }}
-      />
-      {/* Textos */}
-      <text
-        x={isOutput ? x + 14 : x + w - 14}
-        y={cy - 7}
-        textAnchor={isOutput ? "start" : "end"}
-        fill={isOutput ? "rgb(102,205,255)" : "rgb(210,210,210)"}
-        fontSize="9.5"
-        fontWeight="600"
-      >
-        {label}
-      </text>
-      <text
-        x={isOutput ? x + 14 : x + w - 14}
-        y={cy + 9}
-        textAnchor={isOutput ? "start" : "end"}
-        fill="rgba(168,168,168,0.75)"
-        fontSize="8"
-      >
-        {sub}
-      </text>
-    </g>
+    <div className="absolute" style={style}>
+      <div className="glass flex items-center gap-2.5 rounded-full py-2 pl-2 pr-4 ring-1 ring-white/10 backdrop-blur-xl">
+        {/* Ícone dentro de um pequeno hexágono */}
+        <span className="relative grid size-9 shrink-0 place-items-center text-brand">
+          <svg viewBox="0 0 100 115" className="absolute inset-0 size-full" aria-hidden>
+            <polygon
+              points="50,4 96,30 96,85 50,111 4,85 4,30"
+              fill="rgba(59,165,232,0.12)"
+              stroke="rgba(59,165,232,0.55)"
+              strokeWidth="4"
+            />
+          </svg>
+          <span className="relative">{node.icon}</span>
+        </span>
+        <span className="min-w-0 text-left">
+          <span className="block truncate text-sm font-semibold text-foreground">
+            {node.label}
+          </span>
+          <span className="block truncate text-xs text-muted">{node.sub}</span>
+        </span>
+      </div>
+    </div>
   )
 }
 
 // ── Componente principal ──────────────────────────────────────────────────
 export function AIOrchestrator() {
-  const uid = useId().replace(/:/g, "")
-  const gradId  = `aiGlow-${uid}`
-  const maskId  = `aiMask-${uid}`
-  const inCls   = `ai-inp-${uid}`
-  const outCls  = `ai-out-${uid}`
+  const { ref, visible } = useInView<HTMLDivElement>(0.25)
+
+  const lineStyle = (i: number): CSSProperties => ({
+    strokeDasharray: 1,
+    strokeDashoffset: visible ? 0 : 1,
+    transition: "stroke-dashoffset 0.9s var(--ease-brand)",
+    transitionDelay: `${250 + i * 80}ms`,
+  })
 
   return (
-    <svg
-      viewBox={`0 0 ${VW} ${VH}`}
-      className="w-full"
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="Diagrama: a IA GRAVA.AI no centro de toda a operação da franquia"
-    >
-      <defs>
-        {/* Brilho radial no centro */}
-        <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="rgb(59,165,232)" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="rgb(59,165,232)" stopOpacity="0"    />
-        </radialGradient>
-        {/* Máscara de fade para as linhas (some perto dos extremos) */}
-        <linearGradient id={`${maskId}-l`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stopColor="white" stopOpacity="0" />
-          <stop offset="18%"  stopColor="white" stopOpacity="1" />
-          <stop offset="82%"  stopColor="white" stopOpacity="1" />
-          <stop offset="100%" stopColor="white" stopOpacity="0" />
-        </linearGradient>
-        {/* Animações com scope por uid */}
-        <style>{`
-          .${inCls}  { stroke-dasharray: 5 12; animation: dashFlow 2.2s linear infinite; }
-          .${outCls} { stroke-dasharray: 5 12; animation: dashFlow 2.2s linear infinite; }
-        `}</style>
-      </defs>
-
-      {/* ── Fundo: brilho no centro ─────────────────────────────────── */}
-      <circle
-        cx={HCX} cy={HCY} r={170}
-        fill={`url(#${gradId})`}
-        style={{ animation: "glowPulse 4s ease-in-out infinite" }}
-      />
-
-      {/* ── Linhas estáticas de base ────────────────────────────────── */}
-      {INPUTS.map((inp, i) => {
-        const [ex, ey] = hexEdge(INP_CX, INP_YS[i])
-        return (
-          <line
-            key={`s-in-${i}`}
-            x1={INP_CX} y1={INP_YS[i]}
-            x2={ex}     y2={ey}
-            stroke="rgba(237,237,237,0.06)" strokeWidth="1"
-          />
-        )
-      })}
-      {OUTPUTS.map((out, i) => {
-        const [ex, ey] = hexEdge(OUT_CX, OUT_YS[i])
-        return (
-          <line
-            key={`s-out-${i}`}
-            x1={ex}     y1={ey}
-            x2={OUT_CX} y2={OUT_YS[i]}
-            stroke="rgba(59,165,232,0.07)" strokeWidth="1"
-          />
-        )
-      })}
-
-      {/* ── Linhas tracejadas animadas (inputs → centro) ────────────── */}
-      {INPUTS.map((inp, i) => {
-        const [ex, ey] = hexEdge(INP_CX, INP_YS[i])
-        return (
-          <line
-            key={`d-in-${i}`}
-            x1={INP_CX} y1={INP_YS[i]}
-            x2={ex}     y2={ey}
-            stroke="rgba(200,200,200,0.28)"
-            strokeWidth="1"
-            className={inCls}
-            style={{ animationDelay: `${i * 0.4}s` }}
-          />
-        )
-      })}
-
-      {/* ── Linhas tracejadas animadas (centro → outputs) ───────────── */}
-      {OUTPUTS.map((out, i) => {
-        const [ex, ey] = hexEdge(OUT_CX, OUT_YS[i])
-        return (
-          <line
-            key={`d-out-${i}`}
-            x1={ex}     y1={ey}
-            x2={OUT_CX} y2={OUT_YS[i]}
-            stroke="rgba(59,165,232,0.5)"
-            strokeWidth="1"
-            className={outCls}
-            style={{ animationDelay: `${i * 0.3}s` }}
-          />
-        )
-      })}
-
-      {/* ── Hexágono central ────────────────────────────────────────── */}
-      {/* Anel externo decorativo */}
-      <polygon
-        points={hexPts(HCX, HCY, HR + 22)}
+    <div ref={ref} className="relative mx-auto aspect-[800/540] w-full max-w-3xl">
+      {/* Linhas radiais + pulsos hexagonais (saem do centro para as pontas) */}
+      <svg
+        viewBox={`0 0 ${VW} ${VH}`}
         fill="none"
-        stroke="rgba(59,165,232,0.1)"
-        strokeWidth="1"
-        strokeDasharray="3 8"
-        style={{ animation: "glowPulse 6s ease-in-out infinite" }}
-      />
-      {/* Hexágono principal */}
-      <polygon
-        points={hexPts(HCX, HCY, HR)}
-        fill="rgba(59,165,232,0.09)"
-        stroke="rgba(59,165,232,0.65)"
-        strokeWidth="1.75"
-      />
-      {/* Hexágono interno (double border effect) */}
-      <polygon
-        points={hexPts(HCX, HCY, HR - 18)}
-        fill="none"
-        stroke="rgba(59,165,232,0.22)"
-        strokeWidth="0.75"
-        strokeDasharray="3 6"
-      />
-
-      {/* Wordmark */}
-      <text
-        x={HCX} y={HCY - 18}
-        textAnchor="middle"
-        fill="rgb(59,165,232)"
-        fontSize="16" fontWeight="700" letterSpacing="2.5"
+        aria-hidden
+        className="absolute inset-0 size-full text-brand/40"
       >
-        GRAVA
-      </text>
-      <text
-        x={HCX} y={HCY + 4}
-        textAnchor="middle"
-        fill="rgb(59,165,232)"
-        fontSize="16" fontWeight="700" letterSpacing="2.5"
+        {ANGLES.map((angle, i) => (
+          <path
+            key={`l-${angle}`}
+            d={radialPath(angle)}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            pathLength={1}
+            style={lineStyle(i)}
+          />
+        ))}
+
+        {/* Mini-hexágonos viajando do centro aos badges */}
+        {ANGLES.map((angle, i) => (
+          <polygon
+            key={`p-${angle}`}
+            points={hexPts(0, 0, 6)}
+            className="fill-brand"
+          >
+            <animateMotion
+              path={radialPath(angle)}
+              dur="2.4s"
+              begin={`${(0.8 + i * 0.18).toFixed(2)}s`}
+              repeatCount="indefinite"
+            />
+          </polygon>
+        ))}
+      </svg>
+
+      {/* Centro: hexágono da marca com a logo (nasce por escala) */}
+      <div
+        className="absolute left-1/2 top-1/2"
+        style={{
+          left: `${(CX / VW) * 100}%`,
+          top: `${(CY / VH) * 100}%`,
+          opacity: visible ? 1 : 0,
+          transform: visible
+            ? "translate(-50%, -50%) scale(1)"
+            : "translate(-50%, -50%) scale(0.9)",
+          transition: "opacity 0.6s var(--ease-brand), transform 0.6s var(--ease-brand)",
+          transitionDelay: "150ms",
+        }}
       >
-        .AI
-      </text>
-      <text
-        x={HCX} y={HCY + 24}
-        textAnchor="middle"
-        fill="rgba(102,205,255,0.5)"
-        fontSize="6.5" letterSpacing="3.5"
-      >
-        INTELIGÊNCIA ARTIFICIAL
-      </text>
+        <div className="relative flex size-52 items-center justify-center sm:size-56">
+          <div className="absolute size-44 rounded-full bg-brand/15 blur-3xl" aria-hidden />
+          <svg viewBox="0 0 220 220" className="absolute inset-0 size-full" aria-hidden>
+            <polygon
+              points={hexPts(110, 110, 104)}
+              fill="none"
+              stroke="rgba(59,165,232,0.12)"
+              strokeWidth="1"
+              strokeDasharray="3 8"
+              style={{ animation: "glowPulse 6s ease-in-out infinite" }}
+            />
+            <polygon
+              points={hexPts(110, 110, 88)}
+              fill="rgba(59,165,232,0.09)"
+              stroke="rgba(59,165,232,0.65)"
+              strokeWidth="1.75"
+            />
+            <polygon
+              points={hexPts(110, 110, 72)}
+              fill="none"
+              stroke="rgba(59,165,232,0.22)"
+              strokeWidth="0.75"
+              strokeDasharray="3 6"
+            />
+          </svg>
+          <div className="relative flex flex-col items-center gap-1.5 text-center">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={271}
+              height={321}
+              className="h-11 w-auto"
+            />
+            <span className="text-base font-bold tracking-[0.12em] text-brand">
+              GRAVA.AI
+            </span>
+            <span className="text-[7px] uppercase tracking-[0.32em] text-brand-cyan/60">
+              Inteligência Artificial
+            </span>
+          </div>
+        </div>
+      </div>
 
-      {/* ── Rótulos das colunas ─────────────────────────────────────── */}
-      <text x={INP_CX} y={40} textAnchor="middle" fill="rgba(237,237,237,0.25)" fontSize="7.5" letterSpacing="3">
-        DADOS DE ENTRADA
-      </text>
-      <line x1={INP_CX - 68} y1={47} x2={INP_CX + 68} y2={47} stroke="rgba(237,237,237,0.08)" strokeWidth="0.5" />
-
-      <text x={OUT_CX} y={40} textAnchor="middle" fill="rgba(59,165,232,0.45)" fontSize="7.5" letterSpacing="3">
-        GESTÃO E SAÍDA
-      </text>
-      <line x1={OUT_CX - 68} y1={47} x2={OUT_CX + 68} y2={47} stroke="rgba(59,165,232,0.15)" strokeWidth="0.5" />
-
-      {/* ── Caixas de nó ────────────────────────────────────────────── */}
-      {INPUTS.map((inp, i) => (
-        <NodeBox
-          key={inp.label}
-          cx={INP_CX} cy={INP_YS[i]}
-          w={BW} h={BH}
-          label={inp.label} sub={inp.sub}
-          isOutput={false}
-          delay={i * 0.45}
+      {/* Badges nas pontas do hexágono */}
+      {NODES.map((node, i) => (
+        <Badge
+          key={node.label}
+          node={node}
+          angle={ANGLES[i]}
+          visible={visible}
+          delay={400 + i * 90}
         />
       ))}
-      {OUTPUTS.map((out, i) => (
-        <NodeBox
-          key={out.label}
-          cx={OUT_CX} cy={OUT_YS[i]}
-          w={BW} h={BOH}
-          label={out.label} sub={out.sub}
-          isOutput={true}
-          delay={i * 0.3}
-        />
-      ))}
-    </svg>
+    </div>
   )
 }

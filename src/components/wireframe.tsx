@@ -71,6 +71,54 @@ export function SectionTag({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Número-fantasma de capítulo: gigante, quase invisível, atrás do header.
+ * Envolver o header em `relative isolate` (o número usa -z-10).
+ */
+export function GhostNumber({ n }: { n: number }) {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute -left-1 -top-10 -z-10 select-none text-7xl font-bold leading-none tracking-tight text-white/[0.05] sm:-top-14 sm:text-8xl"
+    >
+      {String(n).padStart(2, "0")}
+    </span>
+  );
+}
+
+/** Seta fina de CTA (13×7, stroke 1) — assinatura dos links de ação. */
+export function ArrowIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      width="13"
+      height="7"
+      viewBox="0 0 13 7"
+      fill="none"
+      strokeWidth="1"
+      aria-hidden
+      className={`inline-block ${className}`}
+    >
+      <path d="M12.5 3.5H0.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9.5 6.5L12.5 3.5L9.5 0.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/*
+  Botões — pill sempre, com "press física" (active:scale) e transição de cor.
+  Um botão brand por viewport; o resto é ghost/outline.
+*/
+export const BTN_BASE =
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm transition-[transform,background-color,box-shadow] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100";
+
+export const BTN_PRIMARY = `${BTN_BASE} bg-brand px-7 py-3.5 font-semibold text-black hover:bg-brand-400`;
+
+export const BTN_PRIMARY_SM = `${BTN_BASE} bg-brand px-5 py-2.5 font-medium text-black hover:bg-brand-400`;
+
+export const BTN_GHOST = `${BTN_BASE} px-7 py-3.5 font-medium text-foreground ring-1 ring-wire-line hover:bg-white/5 hover:ring-brand`;
+
+export const BTN_OUTLINE_BRAND = `${BTN_BASE} px-6 py-3 font-medium text-brand ring-1 ring-brand hover:bg-brand/10`;
+
 /** Container largo para conteúdo dentro de faixas full-bleed. */
 export function Shell({
   children,
@@ -82,19 +130,29 @@ export function Shell({
   return <div className={`shell ${className}`}>{children}</div>;
 }
 
-export function BrandMark({ className = "" }: { className?: string }) {
+export function BrandMark({
+  className = "",
+  size = "md",
+}: {
+  className?: string;
+  size?: "sm" | "md";
+}) {
   // Logo real: símbolo hexagonal (extraído do PDF) + wordmark.
   return (
-    <span className={`flex items-center gap-2.5 ${className}`}>
+    <span className={`flex items-center ${size === "sm" ? "gap-2" : "gap-2.5"} ${className}`}>
       <Image
         src="/logo-mark.png"
         alt="GRAVA.AI"
         width={271}
         height={321}
-        className="h-7 w-auto"
+        className={size === "sm" ? "h-5.5 w-auto" : "h-7 w-auto"}
         priority
       />
-      <span className="text-lg font-bold tracking-tight text-brand">GRAVA.AI</span>
+      <span
+        className={`font-bold tracking-tight text-brand ${size === "sm" ? "text-sm" : "text-lg"}`}
+      >
+        GRAVA.AI
+      </span>
     </span>
   );
 }
