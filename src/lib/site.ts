@@ -29,9 +29,9 @@ export const DESTAQUES = [
 ];
 
 export const PILARES = [
-  { t: "Inovação", d: "Uma ideia nova de personalizados, criada para facilitar." },
-  { t: "Experiência", d: "Traz o cliente para participar da criação do produto." },
-  { t: "Rentabilidade", d: "Um modelo pensado para gerar lucro com retorno rápido." },
+  { t: "Inovação", d: "Uma ideia nova de personalizados, criada para facilitar.", icon: "lightbulb" },
+  { t: "Experiência", d: "Traz o cliente para participar da criação do produto.", icon: "handSparkles" },
+  { t: "Rentabilidade", d: "Um modelo pensado para gerar lucro com retorno rápido.", icon: "trendUp" },
 ];
 
 export const LOCAIS = [
@@ -45,14 +45,17 @@ export const PASSOS = [
   {
     t: "Escolha e crie com IA",
     d: "No totem, o cliente escolhe ou gera a arte com Inteligência Artificial.",
+    icon: "sparkles",
   },
   {
     t: "Grave na hora",
     d: "O produto é personalizado na hora, com qualidade padronizada.",
+    icon: "bolt",
   },
   {
     t: "Leve uma história",
     d: "O cliente sai com um produto exclusivo que carrega um significado.",
+    icon: "gift",
   },
 ];
 
@@ -61,35 +64,38 @@ export const IA_PRODUTO = [
   {
     t: "IA que cria",
     d: "O cliente gera a arte ideal em segundos, com Inteligência Artificial.",
+    icon: "sparkles",
   },
   {
     t: "Personalização na hora",
     d: "Do conceito ao produto gravado, em poucos minutos.",
+    icon: "bolt",
   },
   {
     t: "Experiência guiada",
     d: "A IA conduz o cliente do primeiro toque até a retirada.",
+    icon: "route",
   },
 ];
 
 // [FRANQUIA] Passo a passo para se tornar franqueado
 export const COMO_SER_FRANQUEADO = [
-  { t: "Preencha o formulário", d: "Deixe seus dados e o capital disponível para investir." },
-  { t: "Converse com um especialista", d: "Nosso time apresenta o modelo e tira suas dúvidas." },
-  { t: "Análise de viabilidade", d: "Avaliamos juntos a região e o ponto ideal." },
-  { t: "Assinatura do contrato", d: "Formalização e definição do plano de implantação." },
-  { t: "Implantação e treinamento", d: "Montagem da unidade e capacitação completa." },
-  { t: "Inauguração", d: "Sua unidade GRAVA.AI pronta para operar e vender." },
+  { t: "Preencha o formulário", d: "Deixe seus dados e o capital disponível para investir.", icon: "penToSquare" },
+  { t: "Converse com um especialista", d: "Nosso time apresenta o modelo e tira suas dúvidas.", icon: "comments" },
+  { t: "Análise de viabilidade", d: "Avaliamos juntos a região e o ponto ideal.", icon: "chart" },
+  { t: "Assinatura do contrato", d: "Formalização e definição do plano de implantação.", icon: "contract" },
+  { t: "Implantação e treinamento", d: "Montagem da unidade e capacitação completa.", icon: "graduation" },
+  { t: "Inauguração", d: "Sua unidade GRAVA.AI pronta para operar e vender.", icon: "store" },
 ];
 
 // O que o franqueado recebe (qualitativo — fica no topo/meio da página)
 export const INCLUSO = [
-  { t: "Totem com IA", d: "O equipamento completo para operar a sua unidade." },
-  { t: "Estoque inicial", d: "Você já começa pronto para vender no primeiro dia." },
-  { t: "Treinamento completo", d: "Capacitação total, mesmo sem nenhuma experiência." },
-  { t: "Marketing e tecnologia", d: "Plataforma, CRM e apoio de divulgação da matriz." },
-  { t: "Distribuição garantida", d: "Produtos e matéria-prima direto da matriz." },
-  { t: "Suporte contínuo", d: "Acompanhamento em tempo real, sempre ao seu lado." },
+  { t: "Totem com IA", d: "O equipamento completo para operar a sua unidade.", icon: "robot" },
+  { t: "Estoque inicial", d: "Você já começa pronto para vender no primeiro dia.", icon: "boxes" },
+  { t: "Treinamento completo", d: "Capacitação total, mesmo sem nenhuma experiência.", icon: "graduation" },
+  { t: "Marketing e tecnologia", d: "Plataforma, CRM e apoio de divulgação da matriz.", icon: "bullhorn" },
+  { t: "Distribuição garantida", d: "Produtos e matéria-prima direto da matriz.", icon: "truck" },
+  { t: "Suporte contínuo", d: "Acompanhamento em tempo real, sempre ao seu lado.", icon: "headset" },
 ];
 
 // Detalhamento financeiro (valores da apresentação em PDF) — vai MAIS ABAIXO,

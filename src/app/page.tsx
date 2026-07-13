@@ -3,7 +3,6 @@ import { FaRegClock, FaWandMagicSparkles } from "react-icons/fa6"
 import {
   ArrowIcon,
   BTN_PRIMARY,
-  GhostNumber,
   Hexagon,
   Photo,
   SectionTag,
@@ -11,7 +10,11 @@ import {
 } from "@/components/wireframe"
 import { HexMesh, Reveal, FloatingHex } from "@/components/motion"
 import { ProductShowcase } from "@/components/product-showcase"
+import { FEATURE_ICONS, type FeatureIconName } from "@/components/icons"
 import { IA_PRODUTO, LOCAIS, PASSOS } from "@/lib/site"
+
+// Ícones dos locais de atuação (mapeados por índice de LOCAIS)
+const LOCAL_ICONS: FeatureIconName[] = ["bag", "cart", "plane"]
 
 export default function Home() {
   return (
@@ -127,11 +130,10 @@ export default function Home() {
       </section>
 
       {/* ── SOBRE ────────────────────────────────────────────────────────── */}
-      <section id="sobre" className="border-t border-wire-line/50">
+      <section id="sobre">
         <Shell className="grid gap-y-10 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal className="relative isolate">
-              <GhostNumber n={1} />
+            <Reveal>
               <SectionTag>Quem somos</SectionTag>
               <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                 O mercado mudou. E nossa marca acompanhou.
@@ -168,37 +170,46 @@ export default function Home() {
       {/* ── COMO FUNCIONA ────────────────────────────────────────────────── */}
       <section
         id="como-funciona"
-        className="border-t border-wire-line/50 bg-surface/40"
       >
         <Shell className="py-24">
-          <Reveal className="relative isolate">
-            <GhostNumber n={2} />
+          <Reveal>
             <SectionTag>O produto</SectionTag>
             <h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Da ideia ao produto, em 3 passos.
             </h2>
           </Reveal>
 
-          <div className="mt-14 grid gap-x-12 gap-y-10 md:grid-cols-3 md:divide-x md:divide-wire-line/60">
-            {PASSOS.map((p, i) => (
-              <Reveal key={p.t} delay={i * 120} className="md:px-8 md:first:pl-0">
-                <span className="text-5xl font-semibold text-brand/40 tabular-nums">
-                  0{i + 1}
-                </span>
-                <h3 className="mt-5 text-xl font-semibold">{p.t}</h3>
-                <p className="mt-2 text-pretty text-muted">{p.d}</p>
-              </Reveal>
-            ))}
+          {/* Passos: ícone + rótulo de etapa (cards com seta de fluxo entre eles) */}
+          <div className="mt-14 grid gap-8 md:grid-cols-3">
+            {PASSOS.map((p, i) => {
+              const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+              return (
+                <Reveal key={p.t} delay={i * 120} className="relative">
+                  <div className="flex items-center gap-3">
+                    <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                    <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
+                      Passo {i + 1}
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-xl font-semibold">{p.t}</h3>
+                  <p className="mt-2 text-pretty text-muted">{p.d}</p>
+                  {i < PASSOS.length - 1 && (
+                    <ArrowIcon className="absolute -right-1 top-3 hidden text-brand/40 md:block" />
+                  )}
+                </Reveal>
+              )
+            })}
           </div>
         </Shell>
       </section>
 
       {/* ── IA ───────────────────────────────────────────────────────────── */}
-      <section className="border-t border-wire-line/50">
+      <section>
         <Shell className="grid gap-y-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal className="relative isolate">
-              <GhostNumber n={3} />
+            <Reveal>
               <SectionTag>Tecnologia</SectionTag>
               <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                 Movidos por{" "}
@@ -211,18 +222,26 @@ export default function Home() {
             </Reveal>
           </div>
 
-          <div className="divide-y divide-wire-line/60">
-            {IA_PRODUTO.map((item, i) => (
-              <Reveal key={item.t} delay={i * 100} className="flex gap-6 py-6 first:pt-0">
-                <span className="text-3xl font-semibold text-brand/70 tabular-nums">
-                  0{i + 1}
-                </span>
-                <div>
-                  <h3 className="text-xl font-semibold">{item.t}</h3>
-                  <p className="mt-1.5 text-pretty text-muted">{item.d}</p>
-                </div>
-              </Reveal>
-            ))}
+          {/* Lista com ícone em hexágono (sem numeração) */}
+          <div className="space-y-4">
+            {IA_PRODUTO.map((item, i) => {
+              const Icon = FEATURE_ICONS[item.icon as FeatureIconName]
+              return (
+                <Reveal
+                  key={item.t}
+                  delay={i * 100}
+                  className="flex items-start gap-5 rounded-2xl bg-surface-2/50 p-5 ring-1 ring-white/5"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand/15 text-brand">
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-semibold">{item.t}</h3>
+                    <p className="mt-1 text-pretty text-muted">{item.d}</p>
+                  </div>
+                </Reveal>
+              )
+            })}
           </div>
         </Shell>
       </section>
@@ -230,7 +249,6 @@ export default function Home() {
       {/* ── ONDE ATUAMOS ─────────────────────────────────────────────────── */}
       <section
         id="onde-atuamos"
-        className="border-t border-wire-line/50 bg-surface/40"
       >
         <div className="grid items-stretch gap-y-10 lg:grid-cols-2">
           <Photo
@@ -239,31 +257,35 @@ export default function Home() {
             className="order-2 h-72 lg:order-1 lg:h-auto lg:min-h-[26rem] lg:rounded-none lg:rounded-r-3xl"
           />
           <div className="order-1 flex flex-col justify-center px-6 py-16 lg:order-2 lg:px-16">
-            <Reveal className="relative isolate">
-              <GhostNumber n={4} />
+            <Reveal>
               <SectionTag>Onde atuamos</SectionTag>
               <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                 Onde a <span className="text-brand">GRAVA.AI</span> pode estar?
               </h2>
             </Reveal>
+            {/* Chips com ícone do tipo de ponto (sem numeração) */}
             <Reveal delay={100}>
-              <ul className="mt-8 divide-y divide-wire-line/60">
-                {LOCAIS.map((l, i) => (
-                  <li key={l} className="flex items-center gap-5 py-4">
-                    <span className="text-2xl font-semibold text-brand/70 tabular-nums">
-                      0{i + 1}
+              <div className="mt-8 flex flex-wrap gap-3">
+                {LOCAIS.map((l, i) => {
+                  const Icon = FEATURE_ICONS[LOCAL_ICONS[i]]
+                  return (
+                    <span
+                      key={l}
+                      className="inline-flex items-center gap-2.5 rounded-full bg-surface-2/70 px-4 py-2.5 text-sm ring-1 ring-white/10"
+                    >
+                      <Icon className="size-4 shrink-0 text-brand" aria-hidden />
+                      {l}
                     </span>
-                    <span className="text-lg">{l}</span>
-                  </li>
-                ))}
-              </ul>
+                  )
+                })}
+              </div>
             </Reveal>
           </div>
         </div>
       </section>
 
       {/* ── CTA FRANQUIA ─────────────────────────────────────────────────── */}
-      <section className="brand-glow-left relative overflow-hidden border-y border-wire-line/50 bg-surface">
+      <section className="brand-glow-left relative overflow-hidden">
         {/* Hex decorativo — canto direito */}
         <Hexagon className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 text-brand/15" />
 

@@ -45,7 +45,7 @@ function SocialRow() {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-wire-line">
+    <footer className="border-t border-white/5">
       <div className="shell grid gap-8 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <BrandMark />

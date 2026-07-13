@@ -6,20 +6,24 @@ import {
   FaCheck,
   FaDownload,
 } from "react-icons/fa6"
-import { InstagramIcon, WhatsAppIcon } from "@/components/icons"
+import {
+  FEATURE_ICONS,
+  InstagramIcon,
+  WhatsAppIcon,
+  type FeatureIconName,
+} from "@/components/icons"
 import {
   ArrowIcon,
   BTN_OUTLINE_BRAND,
   BTN_PRIMARY,
-  GhostNumber,
   Hexagon,
-  ImagePlaceholder,
   Photo,
   SectionTag,
   Shell,
 } from "@/components/wireframe"
 import { HexMesh, Reveal, FloatingHex } from "@/components/motion"
 import { AIOrchestrator } from "@/components/ia-orchestrator"
+import { ProductModels } from "@/components/product-models"
 import { LeadForm } from "@/components/lead-form"
 import { Faq } from "@/components/faq"
 import {
@@ -34,7 +38,6 @@ import {
   INVESTIMENTO_VALOR,
   LOCAIS,
   MERCADO,
-  MODELOS,
   PILARES,
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
@@ -51,57 +54,6 @@ function AnchorCta({ children }: { children: React.ReactNode }) {
     <a href="#formulario" className={BTN_PRIMARY}>
       {children} <ArrowIcon />
     </a>
-  )
-}
-
-function ModeloSection({
-  m,
-  i,
-}: {
-  m: (typeof MODELOS)[number]
-  i: number
-}) {
-  const reverse = i % 2 === 1
-  return (
-    <section
-      className={`border-t border-wire-line/50 ${i % 2 === 1 ? "bg-surface/40" : ""}`}
-    >
-      <Shell className="grid items-center gap-10 py-16 lg:grid-cols-2 lg:gap-16">
-        <Reveal className={reverse ? "lg:order-2" : ""} from={reverse ? "right" : "left"}>
-          {m.img ? (
-            <Photo
-              src={m.img}
-              alt={m.nome}
-              fit={m.fit === "contain" ? "contain" : "cover"}
-              className="h-64 w-full rounded-3xl lg:h-80"
-            />
-          ) : (
-            <ImagePlaceholder label={m.placeholder} className="h-64 lg:h-80" />
-          )}
-        </Reveal>
-
-        <Reveal delay={100} className={reverse ? "lg:order-1" : ""}>
-          <span className="inline-block rounded-full bg-brand/15 px-3 py-1 text-xs font-medium uppercase tracking-wide text-brand">
-            {m.tag}
-          </span>
-          <h3 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            {m.nome}
-          </h3>
-          <p className="mt-4 max-w-md text-pretty text-muted">{m.desc}</p>
-          <ul className="mt-6 space-y-2">
-            {m.destaques.map((d) => (
-              <li key={d} className="flex items-center gap-3 text-sm text-foreground">
-                <FaCheck className="size-3 shrink-0 text-brand" aria-hidden />
-                {d}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8">
-            <AnchorCta>Quero este modelo</AnchorCta>
-          </div>
-        </Reveal>
-      </Shell>
-    </section>
   )
 }
 
@@ -181,7 +133,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 2. DESTAQUES ───────────────────────────────────────────────── */}
-      <section className="border-y border-wire-line/50 bg-surface">
+      <section>
         <Shell className="grid grid-cols-1 gap-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
           {DESTAQUES.map((s, i) => (
             <Reveal key={s.t} delay={i * 80}>
@@ -199,11 +151,10 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 3. POR QUE SER FRANQUEADO ──────────────────────────────────── */}
-      <section id="por-que" className="border-b border-wire-line/50">
+      <section id="por-que">
         <Shell className="grid gap-y-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal className="relative isolate">
-              <GhostNumber n={1} />
+            <Reveal>
               <SectionTag>Por que ser um franqueado</SectionTag>
               <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                 Um negócio inovador, com retorno rápido.
@@ -222,27 +173,28 @@ export default function SejaUmFranqueado() {
             </Reveal>
           </div>
 
-          <div className="divide-y divide-wire-line/60">
-            {PILARES.map((p, i) => (
-              <Reveal key={p.t} delay={i * 100} className="flex gap-6 py-6 first:pt-0">
-                <span className="text-3xl font-semibold text-brand/70 tabular-nums">
-                  0{i + 1}
-                </span>
-                <div>
-                  <h3 className="text-xl font-semibold">{p.t}</h3>
-                  <p className="mt-1.5 text-pretty text-muted">{p.d}</p>
-                </div>
-              </Reveal>
-            ))}
+          {/* Pilares: ícone em destaque + título + texto (sem numeração) */}
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-10">
+            {PILARES.map((p, i) => {
+              const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+              return (
+                <Reveal key={p.t} delay={i * 100}>
+                  <span className="grid size-14 place-items-center rounded-2xl bg-brand/15 text-2xl text-brand">
+                    <Icon className="size-6" aria-hidden />
+                  </span>
+                  <h3 className="mt-4 text-xl font-semibold">{p.t}</h3>
+                  <p className="mt-1.5 max-w-sm text-pretty text-muted">{p.d}</p>
+                </Reveal>
+              )
+            })}
           </div>
         </Shell>
       </section>
 
-      {/* ── 3b. MODELOS DE LOJA ────────────────────────────────────────── */}
-      <section id="modelos" className="border-b border-wire-line/50">
-        <Shell className="pb-4 pt-20 text-center">
-          <Reveal className="relative isolate">
-            <GhostNumber n={2} />
+      {/* ── 3b. MODELOS DE LOJA (acordeão full-bleed) ──────────────────── */}
+      <section id="modelos" className="py-24">
+        <Shell>
+          <Reveal className="text-center">
             <SectionTag>
               <span className="mx-auto">Modelos de franquia</span>
             </SectionTag>
@@ -254,15 +206,16 @@ export default function SejaUmFranqueado() {
             </p>
           </Reveal>
         </Shell>
+
+        {/* Sai do Shell: ocupa a largura toda até as laterais da página */}
+        <Reveal delay={100} className="mt-12 px-4 md:px-6">
+          <ProductModels />
+        </Reveal>
       </section>
-      {MODELOS.map((m, i) => (
-        <ModeloSection key={m.nome} m={m} i={i} />
-      ))}
 
       {/* ── 4. COMO SE TORNAR FRANQUEADO ───────────────────────────────── */}
       <section
         id="como-funciona"
-        className="border-b border-wire-line/50 bg-surface/40"
       >
         <div className="grid items-stretch gap-y-10 lg:grid-cols-2">
           <Photo
@@ -271,26 +224,29 @@ export default function SejaUmFranqueado() {
             className="order-2 h-72 lg:order-1 lg:h-auto lg:min-h-[30rem] lg:rounded-none lg:rounded-r-3xl"
           />
           <div className="order-1 flex flex-col justify-center px-6 py-16 lg:order-2 lg:px-16">
-            <Reveal className="relative isolate">
-              <GhostNumber n={3} />
+            <Reveal>
               <SectionTag>Passo a passo</SectionTag>
               <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                 Como se tornar um franqueado.
               </h2>
             </Reveal>
+            {/* Timeline vertical: linha conectora + marcos com ícone */}
             <Reveal delay={80}>
-              <ol className="mt-8 divide-y divide-wire-line/60">
-                {COMO_SER_FRANQUEADO.map((p, i) => (
-                  <li key={p.t} className="flex gap-5 py-5">
-                    <span className="text-2xl font-semibold text-brand/70 tabular-nums">
-                      0{i + 1}
-                    </span>
-                    <div>
-                      <h3 className="text-lg font-semibold">{p.t}</h3>
-                      <p className="mt-1 text-pretty text-muted">{p.d}</p>
-                    </div>
-                  </li>
-                ))}
+              <ol className="relative mt-8 space-y-6 before:absolute before:bottom-3 before:left-[1.375rem] before:top-3 before:w-px before:bg-wire-line/70">
+                {COMO_SER_FRANQUEADO.map((p) => {
+                  const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+                  return (
+                    <li key={p.t} className="relative flex gap-5">
+                      <span className="relative z-10 grid size-11 shrink-0 place-items-center rounded-full bg-brand/15 text-brand ring-4 ring-background">
+                        <Icon className="size-4" aria-hidden />
+                      </span>
+                      <div className="pt-1.5">
+                        <h3 className="text-lg font-semibold">{p.t}</h3>
+                        <p className="mt-1 text-pretty text-muted">{p.d}</p>
+                      </div>
+                    </li>
+                  )
+                })}
               </ol>
             </Reveal>
           </div>
@@ -298,10 +254,9 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 5. O QUE VOCÊ RECEBE ───────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50">
+      <section>
         <Shell className="py-24">
-          <Reveal className="relative isolate max-w-2xl">
-            <GhostNumber n={4} />
+          <Reveal className="max-w-2xl">
             <SectionTag>Modelo de franquia</SectionTag>
             <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Você começa com tudo pronto para vender.
@@ -312,13 +267,24 @@ export default function SejaUmFranqueado() {
             </p>
           </Reveal>
 
-          <div className="mt-12 grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
-            {INCLUSO.map((item, i) => (
-              <Reveal key={item.t} delay={i * 70} className="border-b border-wire-line/60 py-6">
-                <h3 className="text-lg font-semibold">{item.t}</h3>
-                <p className="mt-1 text-pretty text-muted">{item.d}</p>
-              </Reveal>
-            ))}
+          {/* Grid de cards com ícone (sem numeração) */}
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {INCLUSO.map((item, i) => {
+              const Icon = FEATURE_ICONS[item.icon as FeatureIconName]
+              return (
+                <Reveal
+                  key={item.t}
+                  delay={i * 70}
+                  className="rounded-2xl bg-surface-2/50 p-6 ring-1 ring-white/5"
+                >
+                  <span className="grid size-12 place-items-center rounded-xl bg-brand/15 text-brand">
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                  <h3 className="mt-4 text-lg font-semibold">{item.t}</h3>
+                  <p className="mt-1 text-pretty text-muted">{item.d}</p>
+                </Reveal>
+              )
+            })}
           </div>
 
           <Reveal delay={400} className="mt-10">
@@ -333,7 +299,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 5b. LEAD MAGNET ────────────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50 bg-surface">
+      <section>
         <Shell className="flex flex-col items-start gap-8 py-14 lg:flex-row lg:items-center lg:justify-between">
           <Reveal className="flex items-start gap-5">
             <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/15 text-brand">
@@ -363,7 +329,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 6. DISTRIBUIÇÃO PRÓPRIA ────────────────────────────────────── */}
-      <section className="brand-glow-left relative overflow-hidden border-b border-wire-line/50 bg-surface">
+      <section className="brand-glow-left relative overflow-hidden">
         <Hexagon className="pointer-events-none absolute -bottom-24 right-0 h-96 w-96 text-brand/10" />
         <FloatingHex
           size={280}
@@ -372,8 +338,7 @@ export default function SejaUmFranqueado() {
         />
 
         <Shell className="relative py-24">
-          <Reveal className="relative isolate">
-            <GhostNumber n={5} />
+          <Reveal>
             <SectionTag>Suporte da matriz</SectionTag>
             <h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Distribuição própria. Você não fica sozinho.
@@ -396,14 +361,13 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 7. IA NA OPERAÇÃO — diagrama de orquestração ───────────────── */}
-      <section className="relative overflow-hidden border-b border-wire-line/50">
+      <section className="relative overflow-hidden">
         {/* Hex mesh sutil de fundo */}
         <HexMesh className="opacity-40" gradientPos="50% 50%" />
 
         <Shell className="relative py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <Reveal className="relative isolate">
-              <GhostNumber n={6} />
+            <Reveal>
               <SectionTag>
                 <span className="mx-auto">Diferencial</span>
               </SectionTag>
@@ -452,12 +416,10 @@ export default function SejaUmFranqueado() {
       {/* ── 7b. INVESTIMENTO ───────────────────────────────────────────── */}
       <section
         id="investimento"
-        className="border-b border-wire-line/50 bg-surface"
       >
         <Shell className="py-24">
           <div className="flex flex-wrap items-end justify-between gap-6 border-b border-wire-line/60 pb-8">
-            <Reveal className="relative isolate">
-              <GhostNumber n={7} />
+            <Reveal>
               <SectionTag>Detalhamento da franquia</SectionTag>
               <h2 className="text-3xl font-semibold uppercase tracking-wide sm:text-4xl">
                 Investimento inicial
@@ -491,7 +453,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 8. DEPOIMENTOS ─────────────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50 bg-surface/40">
+      <section>
         <Shell className="py-24">
           <Reveal>
             <SectionTag>Prova social</SectionTag>
@@ -525,7 +487,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 9. OPORTUNIDADE DE MERCADO ─────────────────────────────────── */}
-      <section className="border-b border-wire-line/50">
+      <section>
         <Shell className="py-24 text-center">
           <Reveal>
             <SectionTag>
@@ -548,7 +510,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 10. FAQ ────────────────────────────────────────────────────── */}
-      <section id="duvidas" className="border-b border-wire-line/50">
+      <section id="duvidas">
         <Shell className="py-24">
           <Reveal>
             <SectionTag>Dúvidas</SectionTag>
@@ -561,7 +523,7 @@ export default function SejaUmFranqueado() {
       </section>
 
       {/* ── 11. URGÊNCIA ───────────────────────────────────────────────── */}
-      <section className="border-b border-wire-line/50 bg-surface">
+      <section>
         <Shell className="py-6 text-center">
           <Reveal>
             <p className="text-foreground">
@@ -630,7 +592,7 @@ export default function SejaUmFranqueado() {
         </Shell>
       </section>
 
-      <p className="border-t border-wire-line/50 py-6 text-center text-xs text-muted">
+      <p className="py-6 text-center text-xs text-muted">
         <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-brand">
           <FaArrowLeftLong className="size-3" aria-hidden /> Voltar ao site
           institucional
