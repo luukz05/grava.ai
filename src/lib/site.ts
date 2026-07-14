@@ -40,6 +40,34 @@ export const LOCAIS = [
   "Aeroportos",
 ];
 
+// [HOME] Os pontos de atuação, com o que realmente interessa a quem vai operar:
+// qual formato de unidade cabe ali, quem circula e por que essa pessoa compra.
+// `formato` sai dos MODELOS (abaixo). [REVISAR] `publico` e `compra` são leitura
+// de comportamento de compra — validar com o cliente antes de publicar.
+export const PONTOS = [
+  {
+    local: "Shopping center",
+    icon: "bag",
+    formato: "Quiosque ou Store",
+    publico: "Famílias e casais em passeio, sem pressa.",
+    compra: "Presente com significado — que ninguém mais tem igual.",
+  },
+  {
+    local: "Supermercado e hipermercado",
+    icon: "cart",
+    formato: "Quiosque",
+    publico: "Fluxo diário, compra de rotina.",
+    compra: "Impulso no caminho — entra no carrinho na saída.",
+  },
+  {
+    local: "Aeroporto",
+    icon: "plane",
+    formato: "Express",
+    publico: "Passageiro em espera, com tempo sobrando.",
+    compra: "Lembrança da viagem, com o nome de quem ficou.",
+  },
+];
+
 // [HOME] Como funciona o produto (experiência do cliente no totem)
 export const PASSOS = [
   {

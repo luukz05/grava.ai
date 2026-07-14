@@ -246,10 +246,13 @@ input[type="number"]::-webkit-outer-spin-button {
   50%       { opacity: 1; }
 }
 
-/* Ponto de nó pulsando (usado no diagrama de IA) */
+/* Ponto de nó pulsando (diagrama de IA e status "processando" dos mockups) */
 @keyframes dotPulse {
   0%, 100% { opacity: 0.45; }
   50%       { opacity: 1; }
+}
+.dot-pulse {
+  animation: dotPulse 1.6s ease-in-out infinite;
 }
 
 /*
@@ -333,7 +336,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
   .fab-attention,
   .float-gentle,
-  .line-breath {
+  .line-breath,
+  .dot-pulse {
     animation: none;
   }
 }

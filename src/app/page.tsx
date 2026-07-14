@@ -10,11 +10,33 @@ import {
 } from "@/components/wireframe"
 import { HexMesh, Reveal, FloatingHex } from "@/components/motion"
 import { ProductShowcase } from "@/components/product-showcase"
+import { TOTEM_MOCKS } from "@/components/totem-mockups"
+import { ShelfContrast } from "@/components/shelf-contrast"
 import { FEATURE_ICONS, type FeatureIconName } from "@/components/icons"
-import { FORCAS, LOCAIS, PASSOS } from "@/lib/site"
+import { FORCAS, PASSOS, PONTOS } from "@/lib/site"
 
-// Ícones dos locais de atuação (mapeados por índice de LOCAIS)
-const LOCAL_ICONS: FeatureIconName[] = ["bag", "cart", "plane"]
+/**
+ * Célula do quadro de pontos. No desktop as colunas já são rotuladas no
+ * cabeçalho; no mobile a linha vira ficha e cada célula carrega o próprio rótulo.
+ */
+function Campo({
+  label,
+  className = "",
+  children,
+}: {
+  label: string
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className={className}>
+      <span className="block text-[11px] font-medium uppercase tracking-[0.18em] text-muted lg:hidden">
+        {label}
+      </span>
+      <span className="mt-1.5 block lg:mt-0">{children}</span>
+    </div>
+  )
+}
 
 export default function Home() {
   return (
@@ -129,138 +151,221 @@ export default function Home() {
         </Shell>
       </section>
 
-      {/* ── QUEM SOMOS + O PRODUTO (faixas horizontais) ──────────────────── */}
-      {/* Equação de mercado (3 forças = GRAVA.AI) que, logo abaixo, deriva a
-          ideia em produto nos mesmos 3 passos. Duas faixas sob um header. */}
+      {/* ── QUEM SOMOS (por que existe) ───────────────────────────────────── */}
+      {/* Tese + as 3 forças de mercado que, somadas, originam a GRAVA.AI.
+          Cards com glow de canto que intensifica no hover + lift (auditoria §3.5):
+          profundidade por hairline e brilho desfocado, nunca por sombra pesada. */}
       <section id="sobre">
-        <Shell className="flex flex-col gap-16 py-24">
-          {/* Quem somos — a equação de mercado: 3 forças que, somadas, dão a GRAVA.AI */}
-          <div>
-            <Reveal className="max-w-3xl">
-              <SectionTag>Quem somos</SectionTag>
-              <h2 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-                O varejo mudou. A <span className="text-brand">GRAVA.AI</span> nasceu
-                para liderar essa nova forma de comprar.
-              </h2>
-              <p className="mt-6 text-pretty text-base/7 text-muted">
-                Hoje as pessoas querem{" "}
-                <strong className="font-semibold text-foreground">produtos únicos</strong>,
-                feitos na hora e do jeito delas — e três forças tornaram isso possível
-                ao mesmo tempo.
-              </p>
-            </Reveal>
+        <Shell className="flex flex-col gap-12 py-24">
+          <Reveal className="max-w-3xl">
+            <SectionTag>Quem somos</SectionTag>
+            <h2 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
+              O varejo mudou. A <span className="text-brand">GRAVA.AI</span> nasceu
+              para liderar essa nova forma de comprar.
+            </h2>
+            <p className="mt-6 text-pretty text-base/7 text-muted">
+              Hoje as pessoas querem{" "}
+              <strong className="font-semibold text-foreground">produtos únicos</strong>,
+              feitos na hora e do jeito delas — e três forças tornaram isso possível ao
+              mesmo tempo.
+            </p>
+          </Reveal>
 
-            {/* As 3 forças somadas: o "+" mora no gap, como a seta entre os passos */}
-            <div className="mt-12 grid gap-8 md:grid-cols-3">
-              {FORCAS.map((f, i) => {
-                const Icon = FEATURE_ICONS[f.icon as FeatureIconName]
-                return (
-                  <Reveal key={f.t} delay={i * 120} className="relative">
-                    <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
-                      <Icon className="size-5" aria-hidden />
+          {/* A tese MOSTRADA: a prateleira antiga ao lado da prateleira GRAVA.AI */}
+          <ShelfContrast />
+
+          {/* As três forças — banda de réguas hairline (o gap-px vira a linha) */}
+          <div className="grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-3">
+            {FORCAS.map((f, i) => {
+              const Icon = FEATURE_ICONS[f.icon as FeatureIconName]
+              return (
+                <Reveal
+                  key={f.t}
+                  delay={i * 90}
+                  className="flex gap-4 bg-background p-6"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand/15 text-brand">
+                    <Icon className="size-4" aria-hidden />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold">{f.t}</span>
+                    <span className="mt-1 block text-pretty text-xs/5 text-muted">
+                      {f.d}
                     </span>
-                    <h3 className="mt-5 text-xl font-semibold">{f.t}</h3>
-                    <p className="mt-2 text-pretty text-muted">{f.d}</p>
-                    {i < FORCAS.length - 1 && (
-                      <span
-                        aria-hidden
-                        className="absolute -right-1 top-3 hidden text-xl font-medium leading-none text-brand/40 md:block"
-                      >
-                        +
-                      </span>
-                    )}
-                  </Reveal>
-                )
-              })}
-            </div>
-
-            {/* O resultado da soma — nasce por escala (a marca "acende" no lugar) */}
-            <Reveal delay={360} from="scale" className="mt-12">
-              <div className="flex items-start gap-4 border-t border-white/10 pt-8">
-                <span aria-hidden className="text-xl font-medium leading-7 text-brand/50">
-                  =
-                </span>
-                <p className="max-w-3xl text-pretty text-base/7 text-muted">
-                  A <strong className="font-semibold text-foreground">GRAVA.AI</strong> une
-                  essas três forças num só lugar: personalização com IA, gravada na hora,
-                  onde o cliente já está — e cada peça carrega uma história.
-                </p>
-              </div>
-            </Reveal>
+                  </span>
+                </Reveal>
+              )
+            })}
           </div>
 
-          {/* O produto — a GRAVA.AI transforma a ideia em produto nos 3 passos */}
-          <div id="como-funciona" className="scroll-mt-24">
-            <Reveal className="max-w-2xl">
-              <SectionTag>O produto</SectionTag>
-              <h3 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                E é assim que ela transforma a ideia em produto — em 3 passos.
-              </h3>
-            </Reveal>
+          {/* A soma das três — a conclusão, em contraste alto */}
+          <Reveal from="scale">
+            <p className="max-w-3xl text-pretty text-lg leading-8">
+              A <span className="font-semibold text-brand">GRAVA.AI</span> une essas três
+              forças num só lugar: personalização com IA, gravada na hora, onde o cliente
+              já está — e cada peça carrega uma história.
+            </p>
+          </Reveal>
+        </Shell>
+      </section>
 
-            {/* Passos: ícone + rótulo de etapa (cards com seta de fluxo entre eles) */}
-            <div className="mt-12 grid gap-8 md:grid-cols-3">
-              {PASSOS.map((p, i) => {
-                const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
-                return (
-                  <Reveal key={p.t} delay={i * 120} className="relative">
-                    <div className="flex items-center gap-3">
-                      <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
-                        <Icon className="size-5" aria-hidden />
-                      </span>
-                      <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
-                        Passo {i + 1}
-                      </span>
+      {/* ── O PRODUTO (como funciona) ─────────────────────────────────────── */}
+      {/* Cada passo é um card-moldura (tinta de 2,5% + p-2) com o texto de um lado
+          e a TELA DO TOTEM do outro — mockup em HTML/SVG, nunca screenshot
+          (auditoria §3.6 e §4). Os lados alternam via `group-even`, sem JS. */}
+      <section id="como-funciona" className="scroll-mt-24">
+        <Shell className="flex flex-col gap-12 pb-24">
+          <Reveal className="max-w-2xl">
+            <SectionTag>O produto</SectionTag>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              E é assim que ela transforma a ideia em produto — em 3 passos.
+            </h2>
+          </Reveal>
+
+          <div className="flex flex-col gap-4">
+            {PASSOS.map((p, i) => {
+              const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+              const Mock = TOTEM_MOCKS[i]
+              return (
+                <Reveal key={p.t} delay={i * 80} className="group">
+                  <article className="grid gap-2 rounded-3xl bg-white/[0.025] p-2 ring-1 ring-white/5 lg:grid-cols-2">
+                    <div className="flex flex-col justify-center gap-4 p-6 sm:p-10 lg:col-start-1 lg:row-start-1 lg:group-even:col-start-2">
+                      <div className="flex items-center gap-3">
+                        <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
+                          <Icon className="size-5" aria-hidden />
+                        </span>
+                        <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
+                          Passo {i + 1}
+                        </span>
+                      </div>
+                      <h3 className="text-balance text-2xl font-semibold">{p.t}</h3>
+                      <p className="text-pretty text-muted">{p.d}</p>
                     </div>
-                    <h4 className="mt-5 text-xl font-semibold">{p.t}</h4>
-                    <p className="mt-2 text-pretty text-muted">{p.d}</p>
-                    {i < PASSOS.length - 1 && (
-                      <ArrowIcon className="absolute -right-1 top-3 hidden text-brand/40 md:block" />
-                    )}
-                  </Reveal>
-                )
-              })}
-            </div>
+
+                    {/* Painel de marca com ruído; a tela do totem flutua nele.
+                        Coluna E linha explícitas nos dois lados: item com linha
+                        definida é posicionado antes dos automáticos, e sem isso o
+                        mockup roubava a coluna 1 em todas as faixas. */}
+                    <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand-700/45 to-brand-500/15 p-5 sm:p-8 lg:col-start-2 lg:row-start-1 lg:group-even:col-start-1">
+                      <span
+                        aria-hidden
+                        className="noise-overlay pointer-events-none absolute inset-0 opacity-40 mix-blend-overlay"
+                      />
+                      <div className="relative">
+                        <Mock />
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              )
+            })}
           </div>
         </Shell>
       </section>
 
       {/* ── ONDE ATUAMOS ─────────────────────────────────────────────────── */}
-      <section
-        id="onde-atuamos"
-      >
-        <div className="grid items-stretch gap-y-10 lg:grid-cols-2">
+      {/* Antes eram três chips com o NOME do lugar — e nada mais. Agora cada
+          ponto diz o que interessa a quem vai operar: o formato de unidade que
+          cabe ali, quem circula e por que essa pessoa compra. */}
+      <section id="onde-atuamos" className="relative">
+        {/* A unidade real em operação, com a pergunta por cima */}
+        <div className="relative">
           <Photo
             src="/shopping.jpg"
-            alt="Quiosque GRAVA.AI em um shopping"
-            className="order-2 h-72 lg:order-1 lg:h-auto lg:min-h-[26rem] lg:rounded-none lg:rounded-r-3xl"
+            alt="Quiosque GRAVA.AI em operação num shopping"
+            className="h-80 w-full lg:h-[26rem]"
+            priority
           />
-          <div className="order-1 flex flex-col justify-center px-6 py-16 lg:order-2 lg:px-16">
-            <Reveal>
+          {/* Escurece a foto o bastante para o texto ler, e a dissolve no preto.
+              No mobile o texto ocupa a largura toda e invade a parte clara da
+              foto — daí o véu extra, que some no desktop. */}
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-background/55 lg:hidden"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-r from-background via-background/85 to-background/20"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-20 bg-linear-to-b from-background to-transparent"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-background"
+          />
+
+          <Shell className="absolute inset-0 flex flex-col justify-center">
+            <Reveal className="max-w-xl">
               <SectionTag>Onde atuamos</SectionTag>
               <h2 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
                 Onde a <span className="text-brand">GRAVA.AI</span> pode estar?
               </h2>
+              <p className="mt-4 text-pretty text-base/7 text-muted">
+                Onde tem gente em movimento. Cada ponto tem um público, um momento de
+                compra — e um{" "}
+                <strong className="font-semibold text-foreground">
+                  formato de unidade
+                </strong>{" "}
+                que cabe nele.
+              </p>
             </Reveal>
-            {/* Chips com ícone do tipo de ponto (sem numeração) */}
-            <Reveal delay={100}>
-              <div className="mt-8 flex flex-wrap gap-3">
-                {LOCAIS.map((l, i) => {
-                  const Icon = FEATURE_ICONS[LOCAL_ICONS[i]]
-                  return (
-                    <span
-                      key={l}
-                      className="inline-flex items-center gap-2.5 rounded-full bg-surface-2/70 px-4 py-2.5 text-sm ring-1 ring-white/10"
-                    >
-                      <Icon className="size-4 shrink-0 text-brand" aria-hidden />
-                      {l}
-                    </span>
-                  )
-                })}
-              </div>
-            </Reveal>
-          </div>
+          </Shell>
         </div>
+
+        {/* O quadro de pontos — colunas rotuladas no desktop, fichas no mobile */}
+        <Shell className="pb-24 pt-10">
+          <div className="hidden grid-cols-12 gap-6 border-b border-white/10 pb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-muted lg:grid">
+            <span className="col-span-4">O ponto</span>
+            <span className="col-span-2">Formato</span>
+            <span className="col-span-3">Quem passa por ali</span>
+            <span className="col-span-3">A compra é</span>
+          </div>
+
+          <div className="divide-y divide-white/10">
+            {PONTOS.map((p, i) => {
+              const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+              return (
+                <Reveal
+                  key={p.local}
+                  delay={i * 90}
+                  className="grid gap-4 py-6 lg:grid-cols-12 lg:items-center lg:gap-6"
+                >
+                  <div className="flex items-center gap-3 lg:col-span-4">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand/15 text-brand">
+                      <Icon className="size-4" aria-hidden />
+                    </span>
+                    <span className="font-semibold">{p.local}</span>
+                  </div>
+
+                  <Campo label="Formato" className="lg:col-span-2">
+                    <span className="inline-flex rounded-full bg-brand/10 px-3 py-1 text-sm text-brand ring-1 ring-brand/25">
+                      {p.formato}
+                    </span>
+                  </Campo>
+
+                  <Campo label="Quem passa por ali" className="lg:col-span-3">
+                    <span className="text-pretty text-sm/6 text-muted">{p.publico}</span>
+                  </Campo>
+
+                  <Campo label="A compra é" className="lg:col-span-3">
+                    <span className="text-pretty text-sm/6 text-muted">{p.compra}</span>
+                  </Campo>
+                </Reveal>
+              )
+            })}
+          </div>
+
+          <Reveal delay={280}>
+            <Link
+              href="/seja-um-franqueado"
+              className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-brand transition-colors hover:text-brand-300"
+            >
+              Veja os formatos de unidade por dentro <ArrowIcon />
+            </Link>
+          </Reveal>
+        </Shell>
       </section>
 
       {/* ── CTA FRANQUIA ─────────────────────────────────────────────────── */}

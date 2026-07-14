@@ -37,7 +37,7 @@ function GroundShadow() {
 }
 
 // ── Gravações (motivos a laser) ───────────────────────────────────────────
-function EngraveName({ name, color }: { name: string; color: string }) {
+export function EngraveName({ name, color }: { name: string; color: string }) {
   return (
     <text
       textAnchor="middle"
@@ -52,7 +52,7 @@ function EngraveName({ name, color }: { name: string; color: string }) {
   )
 }
 
-function EngraveMonogram({ letter, color }: { letter: string; color: string }) {
+export function EngraveMonogram({ letter, color }: { letter: string; color: string }) {
   return (
     <g opacity="0.9">
       <circle r="26" fill="none" stroke={color} strokeWidth="1.5" />
@@ -63,7 +63,7 @@ function EngraveMonogram({ letter, color }: { letter: string; color: string }) {
   )
 }
 
-function EngraveHeart({ initials, color }: { initials: string; color: string }) {
+export function EngraveHeart({ initials, color }: { initials: string; color: string }) {
   return (
     <g opacity="0.9">
       <path
@@ -87,7 +87,7 @@ function hexOutline(r: number): string {
   }).join(" ")
 }
 
-function EngraveHexes({ color }: { color: string }) {
+export function EngraveHexes({ color }: { color: string }) {
   return (
     <g opacity="0.9" fill="none" stroke={color} strokeWidth="1.5">
       <polygon points={hexOutline(16)} />
@@ -97,7 +97,7 @@ function EngraveHexes({ color }: { color: string }) {
   )
 }
 
-function EngravePaw({ color }: { color: string }) {
+export function EngravePaw({ color }: { color: string }) {
   return (
     <g fill={color} opacity="0.9">
       <ellipse rx="11" ry="9" cy="8" />
@@ -110,7 +110,7 @@ function EngravePaw({ color }: { color: string }) {
 }
 
 // ── Produtos ──────────────────────────────────────────────────────────────
-function Tumbler({
+export function Tumbler({
   base,
   engraving,
   className = "",
@@ -147,7 +147,7 @@ function Tumbler({
   )
 }
 
-function Bottle({
+export function Bottle({
   base,
   engraving,
   className = "",
@@ -177,7 +177,7 @@ function Bottle({
   )
 }
 
-function Mug({
+export function Mug({
   base,
   engraving,
   className = "",
@@ -214,7 +214,7 @@ function Mug({
   )
 }
 
-function KeychainHex({
+export function KeychainHex({
   base,
   engraving,
   className = "",
@@ -249,7 +249,7 @@ function KeychainHex({
   )
 }
 
-function KeychainTag({
+export function KeychainTag({
   base,
   engraving,
   className = "",
