@@ -11,7 +11,7 @@ import {
 import { HexMesh, Reveal, FloatingHex } from "@/components/motion"
 import { ProductShowcase } from "@/components/product-showcase"
 import { FEATURE_ICONS, type FeatureIconName } from "@/components/icons"
-import { LOCAIS, PASSOS } from "@/lib/site"
+import { FORCAS, LOCAIS, PASSOS } from "@/lib/site"
 
 // Ícones dos locais de atuação (mapeados por índice de LOCAIS)
 const LOCAL_ICONS: FeatureIconName[] = ["bag", "cart", "plane"]
@@ -134,47 +134,66 @@ export default function Home() {
           ideia em produto nos mesmos 3 passos. Duas faixas sob um header. */}
       <section id="sobre">
         <Shell className="flex flex-col gap-16 py-24">
-          {/* Manifesto — tese grande centrada + origem em 2 colunas de texto */}
-          <div className="mx-auto max-w-4xl text-center">
-            <Reveal>
-              <SectionTag>
-                <span className="mx-auto">Quem somos</span>
-              </SectionTag>
-            </Reveal>
-            <Reveal delay={80}>
-              <h2 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+          {/* Quem somos — a equação de mercado: 3 forças que, somadas, dão a GRAVA.AI */}
+          <div>
+            <Reveal className="max-w-3xl">
+              <SectionTag>Quem somos</SectionTag>
+              <h2 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
                 O varejo mudou. A <span className="text-brand">GRAVA.AI</span> nasceu
                 para liderar essa nova forma de comprar.
               </h2>
+              <p className="mt-6 text-pretty text-base/7 text-muted">
+                Hoje as pessoas querem{" "}
+                <strong className="font-semibold text-foreground">produtos únicos</strong>,
+                feitos na hora e do jeito delas — e três forças tornaram isso possível
+                ao mesmo tempo.
+              </p>
             </Reveal>
 
-            <div className="mt-12 grid gap-8 text-left text-lg text-muted sm:grid-cols-2 sm:gap-12">
-              <Reveal delay={160}>
-                <p className="text-pretty">
-                  Hoje as pessoas querem{" "}
-                  <strong className="font-semibold text-foreground">produtos únicos</strong>,
-                  feitos na hora e do jeito delas. A Inteligência Artificial tornou
-                  isso possível em qualquer ponto de grande fluxo.
-                </p>
-              </Reveal>
-              <Reveal delay={280}>
-                <p className="text-pretty">
-                  A GRAVA.AI une essas forças num só lugar:{" "}
-                  <strong className="font-semibold text-foreground">personalização com IA</strong>,
-                  gravada na hora, onde o cliente já está — e cada peça carrega uma
-                  história.
-                </p>
-              </Reveal>
+            {/* As 3 forças somadas: o "+" mora no gap, como a seta entre os passos */}
+            <div className="mt-12 grid gap-8 md:grid-cols-3">
+              {FORCAS.map((f, i) => {
+                const Icon = FEATURE_ICONS[f.icon as FeatureIconName]
+                return (
+                  <Reveal key={f.t} delay={i * 120} className="relative">
+                    <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                    <h3 className="mt-5 text-xl font-semibold">{f.t}</h3>
+                    <p className="mt-2 text-pretty text-muted">{f.d}</p>
+                    {i < FORCAS.length - 1 && (
+                      <span
+                        aria-hidden
+                        className="absolute -right-1 top-3 hidden text-xl font-medium leading-none text-brand/40 md:block"
+                      >
+                        +
+                      </span>
+                    )}
+                  </Reveal>
+                )
+              })}
             </div>
+
+            {/* O resultado da soma — nasce por escala (a marca "acende" no lugar) */}
+            <Reveal delay={360} from="scale" className="mt-12">
+              <div className="flex items-start gap-4 border-t border-white/10 pt-8">
+                <span aria-hidden className="text-xl font-medium leading-7 text-brand/50">
+                  =
+                </span>
+                <p className="max-w-3xl text-pretty text-base/7 text-muted">
+                  A <strong className="font-semibold text-foreground">GRAVA.AI</strong> une
+                  essas três forças num só lugar: personalização com IA, gravada na hora,
+                  onde o cliente já está — e cada peça carrega uma história.
+                </p>
+              </div>
+            </Reveal>
           </div>
 
-          {/* Faixa 2 — a GRAVA.AI transforma a ideia em produto nos 3 passos */}
+          {/* O produto — a GRAVA.AI transforma a ideia em produto nos 3 passos */}
           <div id="como-funciona" className="scroll-mt-24">
             <Reveal className="max-w-2xl">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-brand">
-                O produto
-              </p>
-              <h3 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              <SectionTag>O produto</SectionTag>
+              <h3 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
                 E é assim que ela transforma a ideia em produto — em 3 passos.
               </h3>
             </Reveal>

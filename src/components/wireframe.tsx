@@ -72,21 +72,6 @@ export function SectionTag({ children }: { children: React.ReactNode }) {
   );
 }
 
-/**
- * Número-fantasma de capítulo: gigante, quase invisível, atrás do header.
- * Envolver o header em `relative isolate` (o número usa -z-10).
- */
-export function GhostNumber({ n }: { n: number }) {
-  return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute -left-1 -top-10 -z-10 select-none text-7xl font-bold leading-none tracking-tight text-white/[0.05] sm:-top-14 sm:text-8xl"
-    >
-      {String(n).padStart(2, "0")}
-    </span>
-  );
-}
-
 /** Seta longa de CTA — assinatura dos links de ação (FA6). */
 export function ArrowIcon({ className = "" }: { className?: string }) {
   return <FaArrowRightLong aria-hidden className={`inline-block size-3.5 ${className}`} />;
