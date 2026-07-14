@@ -78,6 +78,25 @@ export const IA_PRODUTO = [
   },
 ];
 
+// [HOME] Forças de mercado que, somadas, originam a GRAVA.AI (seção "Quem somos")
+export const FORCAS = [
+  {
+    t: "O cliente quer o exclusivo",
+    d: "Cada pessoa busca um produto só dela — não mais de prateleira.",
+    icon: "handSparkles",
+  },
+  {
+    t: "IA na palma da mão",
+    d: "A arte ideal nasce em segundos, sem designer nem espera.",
+    icon: "sparkles",
+  },
+  {
+    t: "Varejo de alto fluxo",
+    d: "Shoppings, mercados e aeroportos cheios de gente em movimento.",
+    icon: "bag",
+  },
+];
+
 // [FRANQUIA] Passo a passo para se tornar franqueado
 export const COMO_SER_FRANQUEADO = [
   { t: "Preencha o formulário", d: "Deixe seus dados e o capital disponível para investir.", icon: "penToSquare" },

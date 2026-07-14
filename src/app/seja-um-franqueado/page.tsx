@@ -87,26 +87,29 @@ export default function SejaUmFranqueado() {
 
             <Reveal delay={160}>
               <p className="mt-6 max-w-lg text-pretty text-lg text-muted">
-                Totens automatizados que criam produtos exclusivos na hora. Uma
-                operação enxuta, movida por Inteligência Artificial — pronta para
-                a sua região.
+                Totens automatizados que criam{" "}
+                <strong className="font-semibold text-foreground">produtos exclusivos na hora</strong>.
+                Uma <strong className="font-semibold text-foreground">operação enxuta</strong>,
+                movida por Inteligência Artificial — pronta para a sua região.
               </p>
             </Reveal>
 
-            <Reveal delay={240}>
-              <ul className="mt-7 space-y-2.5">
-                {[
-                  "Um mercado em alta, que valoriza o exclusivo",
-                  "Operação simples, com estoque e treinamento inclusos",
-                  "Suporte total da matriz, do estoque à operação",
-                ].map((b) => (
-                  <li key={b} className="flex items-center gap-3 text-foreground">
-                    <FaCheck className="size-3.5 shrink-0 text-brand" aria-hidden />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
+            <ul className="mt-7 space-y-2.5">
+              {[
+                "Um mercado em alta, que valoriza o exclusivo",
+                "Operação simples, com estoque e treinamento inclusos",
+                "Suporte total da matriz, do estoque à operação",
+              ].map((b, i) => (
+                <li
+                  key={b}
+                  style={{ animationDelay: `${240 + i * 80}ms` }}
+                  className="flex items-center gap-3 text-foreground animate-fade-in-up opacity-0 [animation-fill-mode:forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+                >
+                  <FaCheck className="size-3.5 shrink-0 text-brand" aria-hidden />
+                  {b}
+                </li>
+              ))}
+            </ul>
 
             <Reveal delay={320}>
               <a
@@ -262,8 +265,9 @@ export default function SejaUmFranqueado() {
               Você começa com tudo pronto para vender.
             </h2>
             <p className="mt-4 text-pretty text-muted">
-              Um pacote completo, pensado para você operar com segurança desde o
-              primeiro dia — mesmo sem experiência.
+              Um <strong className="font-semibold text-foreground">pacote completo</strong>,
+              pensado para você operar com segurança desde o primeiro dia —{" "}
+              <strong className="font-semibold text-foreground">mesmo sem experiência</strong>.
             </p>
           </Reveal>
 
@@ -592,12 +596,14 @@ export default function SejaUmFranqueado() {
         </Shell>
       </section>
 
-      <p className="py-6 text-center text-xs text-muted">
-        <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-brand">
-          <FaArrowLeftLong className="size-3" aria-hidden /> Voltar ao site
-          institucional
-        </Link>
-      </p>
+      <Reveal>
+        <p className="py-6 text-center text-xs text-muted">
+          <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-brand">
+            <FaArrowLeftLong className="size-3" aria-hidden /> Voltar ao site
+            institucional
+          </Link>
+        </p>
+      </Reveal>
     </main>
   )
 }

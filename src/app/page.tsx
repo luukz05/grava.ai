@@ -11,7 +11,7 @@ import {
 import { HexMesh, Reveal, FloatingHex } from "@/components/motion"
 import { ProductShowcase } from "@/components/product-showcase"
 import { FEATURE_ICONS, type FeatureIconName } from "@/components/icons"
-import { IA_PRODUTO, LOCAIS, PASSOS } from "@/lib/site"
+import { LOCAIS, PASSOS } from "@/lib/site"
 
 // Ícones dos locais de atuação (mapeados por índice de LOCAIS)
 const LOCAL_ICONS: FeatureIconName[] = ["bag", "cart", "plane"]
@@ -53,9 +53,9 @@ export default function Home() {
 
           <Reveal delay={160}>
             <p className="mt-6 max-w-2xl text-pretty text-lg text-muted">
-              A GRAVA.AI une Inteligência Artificial e personalização para criar
-              produtos exclusivos na hora — onde tem gente em movimento em busca
-              de algo especial.
+              A GRAVA.AI une Inteligência Artificial e personalização para criar{" "}
+              <strong className="font-semibold text-foreground">produtos exclusivos na hora</strong>{" "}
+              — onde tem gente em movimento em busca de algo especial.
             </p>
           </Reveal>
 
@@ -73,8 +73,8 @@ export default function Home() {
             </div>
           </Reveal>
 
-          {/* Palco do produto — lineup direto sobre o fundo, estilo Apple */}
-          <Reveal delay={320} className="relative mt-16 w-full max-w-4xl sm:mt-20">
+          {/* Palco do produto — nasce por escala (o produto "acende" no lugar) */}
+          <Reveal delay={320} from="scale" className="relative mt-16 w-full max-w-4xl sm:mt-20">
             {/* Glow que "acende" os produtos por baixo */}
             <div
               aria-hidden
@@ -129,119 +129,79 @@ export default function Home() {
         </Shell>
       </section>
 
-      {/* ── SOBRE ────────────────────────────────────────────────────────── */}
+      {/* ── QUEM SOMOS + O PRODUTO (faixas horizontais) ──────────────────── */}
+      {/* Equação de mercado (3 forças = GRAVA.AI) que, logo abaixo, deriva a
+          ideia em produto nos mesmos 3 passos. Duas faixas sob um header. */}
       <section id="sobre">
-        <Shell className="grid gap-y-10 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+        <Shell className="flex flex-col gap-16 py-24">
+          {/* Manifesto — tese grande centrada + origem em 2 colunas de texto */}
+          <div className="mx-auto max-w-4xl text-center">
             <Reveal>
-              <SectionTag>Quem somos</SectionTag>
-              <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                O mercado mudou. E nossa marca acompanhou.
+              <SectionTag>
+                <span className="mx-auto">Quem somos</span>
+              </SectionTag>
+            </Reveal>
+            <Reveal delay={80}>
+              <h2 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+                O varejo mudou. A <span className="text-brand">GRAVA.AI</span> nasceu
+                para liderar essa nova forma de comprar.
               </h2>
             </Reveal>
+
+            <div className="mt-12 grid gap-8 text-left text-lg text-muted sm:grid-cols-2 sm:gap-12">
+              <Reveal delay={160}>
+                <p className="text-pretty">
+                  Hoje as pessoas querem{" "}
+                  <strong className="font-semibold text-foreground">produtos únicos</strong>,
+                  feitos na hora e do jeito delas. A Inteligência Artificial tornou
+                  isso possível em qualquer ponto de grande fluxo.
+                </p>
+              </Reveal>
+              <Reveal delay={280}>
+                <p className="text-pretty">
+                  A GRAVA.AI une essas forças num só lugar:{" "}
+                  <strong className="font-semibold text-foreground">personalização com IA</strong>,
+                  gravada na hora, onde o cliente já está — e cada peça carrega uma
+                  história.
+                </p>
+              </Reveal>
+            </div>
           </div>
 
-          <div className="space-y-5 text-lg text-muted">
-            <Reveal delay={0}>
-              <p className="text-pretty">
-                Hoje as pessoas buscam produtos exclusivos, experiências
-                personalizadas e soluções rápidas. A Inteligência Artificial está
-                transformando como criamos, compramos e nos conectamos com as marcas.
+          {/* Faixa 2 — a GRAVA.AI transforma a ideia em produto nos 3 passos */}
+          <div id="como-funciona" className="scroll-mt-24">
+            <Reveal className="max-w-2xl">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-brand">
+                O produto
               </p>
+              <h3 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                E é assim que ela transforma a ideia em produto — em 3 passos.
+              </h3>
             </Reveal>
-            <Reveal delay={120}>
-              <p className="text-pretty">
-                <span className="text-brand">É nesse cenário que nasce a GRAVA.AI:</span>{" "}
-                uma marca que coloca o cliente no centro da criação e usa tecnologia
-                para transformar cada momento em um produto que carrega uma história.
-              </p>
-            </Reveal>
-            <Reveal delay={240}>
-              <p className="text-pretty text-base text-muted/70">
-                Uma empresa construída sobre três pilares: inovação no processo de
-                personalização, experiência imersiva para o cliente e rentabilidade
-                real para quem opera a franquia.
-              </p>
-            </Reveal>
-          </div>
-        </Shell>
-      </section>
 
-      {/* ── COMO FUNCIONA ────────────────────────────────────────────────── */}
-      <section
-        id="como-funciona"
-      >
-        <Shell className="py-24">
-          <Reveal>
-            <SectionTag>O produto</SectionTag>
-            <h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              Da ideia ao produto, em 3 passos.
-            </h2>
-          </Reveal>
-
-          {/* Passos: ícone + rótulo de etapa (cards com seta de fluxo entre eles) */}
-          <div className="mt-14 grid gap-8 md:grid-cols-3">
-            {PASSOS.map((p, i) => {
-              const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
-              return (
-                <Reveal key={p.t} delay={i * 120} className="relative">
-                  <div className="flex items-center gap-3">
-                    <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
-                      <Icon className="size-5" aria-hidden />
-                    </span>
-                    <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
-                      Passo {i + 1}
-                    </span>
-                  </div>
-                  <h3 className="mt-5 text-xl font-semibold">{p.t}</h3>
-                  <p className="mt-2 text-pretty text-muted">{p.d}</p>
-                  {i < PASSOS.length - 1 && (
-                    <ArrowIcon className="absolute -right-1 top-3 hidden text-brand/40 md:block" />
-                  )}
-                </Reveal>
-              )
-            })}
-          </div>
-        </Shell>
-      </section>
-
-      {/* ── IA ───────────────────────────────────────────────────────────── */}
-      <section>
-        <Shell className="grid gap-y-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-x-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <Reveal>
-              <SectionTag>Tecnologia</SectionTag>
-              <h2 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                Movidos por{" "}
-                <span className="text-brand">Inteligência Artificial.</span>
-              </h2>
-              <p className="mt-6 max-w-md text-pretty text-muted">
-                A IA é o coração da GRAVA.AI — da criação da arte à experiência do
-                cliente no totem.
-              </p>
-            </Reveal>
-          </div>
-
-          {/* Lista com ícone em hexágono (sem numeração) */}
-          <div className="space-y-4">
-            {IA_PRODUTO.map((item, i) => {
-              const Icon = FEATURE_ICONS[item.icon as FeatureIconName]
-              return (
-                <Reveal
-                  key={item.t}
-                  delay={i * 100}
-                  className="flex items-start gap-5 rounded-2xl bg-surface-2/50 p-5 ring-1 ring-white/5"
-                >
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand/15 text-brand">
-                    <Icon className="size-5" aria-hidden />
-                  </span>
-                  <div>
-                    <h3 className="text-xl font-semibold">{item.t}</h3>
-                    <p className="mt-1 text-pretty text-muted">{item.d}</p>
-                  </div>
-                </Reveal>
-              )
-            })}
+            {/* Passos: ícone + rótulo de etapa (cards com seta de fluxo entre eles) */}
+            <div className="mt-12 grid gap-8 md:grid-cols-3">
+              {PASSOS.map((p, i) => {
+                const Icon = FEATURE_ICONS[p.icon as FeatureIconName]
+                return (
+                  <Reveal key={p.t} delay={i * 120} className="relative">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
+                        <Icon className="size-5" aria-hidden />
+                      </span>
+                      <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
+                        Passo {i + 1}
+                      </span>
+                    </div>
+                    <h4 className="mt-5 text-xl font-semibold">{p.t}</h4>
+                    <p className="mt-2 text-pretty text-muted">{p.d}</p>
+                    {i < PASSOS.length - 1 && (
+                      <ArrowIcon className="absolute -right-1 top-3 hidden text-brand/40 md:block" />
+                    )}
+                  </Reveal>
+                )
+              })}
+            </div>
           </div>
         </Shell>
       </section>
@@ -296,7 +256,9 @@ export default function Home() {
               Leve a GRAVA.AI para a sua região.
             </h2>
             <p className="mt-4 text-pretty text-muted">
-              Conheça o modelo de franquia, o investimento e a operação completa.
+              Conheça o{" "}
+              <strong className="font-semibold text-foreground">modelo de franquia</strong>,
+              o investimento e a operação completa.
             </p>
           </Reveal>
 
