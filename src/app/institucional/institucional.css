@@ -1,0 +1,84 @@
+/* GRAVA.AI — institucional.
+   Só o que a landing não tinha. Todo o resto (.hold, .sec, .cellart, .cta,
+   .foot, .dock, tokens) vem do v5.css: uma página institucional que
+   redeclara o sistema deixa de ser a mesma marca. */
+
+/* .cells é de quatro. Os pilares e a tecnologia são três, e três blocos numa
+   grade de quatro deixam um vão que lê como item faltando. */
+@media (min-width: 901px) {
+  .cells--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Os três estados: a arte manda na altura, então cada passo é uma coluna
+   com a chapa em cima e o texto embaixo. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+@media (max-width: 780px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.step {
+  border: 1px solid var(--hair);
+  transition: border-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .step:hover {
+    border-color: var(--hair-hot);
+  }
+}
+
+.step figure {
+  margin: 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.step .txt {
+  padding: clamp(0.9rem, 2.2vw, 1.3rem);
+}
+
+.step h3 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+
+.step p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+}
+
+/* O número do passo em ciano é a única cor da seção: é ele que carrega a
+   ordem, e ordem é a informação desta parte da página. */
+.step .num {
+  color: var(--cyan);
+}
+
+/* Bloco de citação da marca: fio à esquerda, texto em display médio.
+   É a frase de propósito — precisa de peso sem virar manchete. */
+.creed {
+  margin: clamp(1.5rem, 4vw, 2.5rem) 0 0;
+  border-left: 2px solid var(--hair-hot);
+  padding-left: clamp(1rem, 2.5vw, 1.75rem);
+  font-size: clamp(1.125rem, 2.4vw, 1.5rem);
+  line-height: 1.34;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  max-width: 40ch;
+}
+
+/* Rodapé institucional: a linha de assinatura e o ©, sem inventar link para
+   página que não existe. Política de Privacidade e Termos ficam de fora até
+   existirem — link morto é pior que ausência. */

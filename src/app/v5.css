@@ -1,0 +1,2606 @@
+/* GRAVA.AI — Data-As-Texture v5 · DARK · hex radar, trace drawn on load. */
+
+/* Contraste calibrado contra a referência Linear do acervo (9,5):
+   display quase branco, corpo em cinza mudo, fio de 1px, e o ciano
+   reservado para poucos momentos. Antes tudo vivia na faixa média. */
+.v5 {
+  --bg: #05090d;
+  --bg-2: #0b1219;
+  --fg: #f2f8ff;
+  --fg-2: #7c8fa0;
+  --hair: rgba(242, 248, 255, 0.1);
+  --hair-hot: rgba(102, 205, 255, 0.34);
+  --blue: #3ba5e8;
+  /* Superfície: preenchimento, halo, lavagem, degradê. Nunca texto — no tema
+     claro este valor não alcança contraste de leitura. */
+  --cyan: #66cdff;
+  /* Tinta de realce: texto, ícone funcional, borda de estado, anel de foco.
+     É o par de --fg para quando a ênfase precisa de cor. */
+  --fg-hot: #66cdff;
+  /* Folga da barra até o topo da viewport. Entra em três contas: o padding do
+     bloco dela, o `top` do sticky e a margem negativa da chapa. */
+  --nav-gap: clamp(0.75rem, 1.6vw, 1.25rem);
+
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-txt), system-ui, sans-serif;
+  /* Bricolage Grotesque: largura e terminais irregulares de propósito.
+     Geist saiu por estar na lista de faces saturadas do detector. */
+  font-size: 15.5px;
+  line-height: 1.62;
+  /* `clip` e não `hidden`: `hidden` faz deste elemento um contêiner de
+     rolagem, e contêiner de rolagem mata o `position: sticky` de todo
+     descendente — era por isso que o índice e a barra não acompanhavam.
+     `clip` corta o transbordo lateral sem criar o contêiner. */
+  overflow-x: clip;
+}
+
+/* O reset que zerava o raio de tudo saiu: a página é arredondada por inteiro
+   agora. Ele tinha especificidade de classe mais universal e vencia qualquer
+   regra de componente escrita com uma classe só — era por isso que as pílulas
+   da navbar saíam quadradas mesmo com raio declarado. */
+
+.hold {
+  width: 100%;
+  max-width: 82rem;
+  margin-inline: auto;
+  /* Folga lateral menor que antes: o conteúdo ganha horizontal e a página fica
+     menos colunar. O piso de 1rem continua, senão o texto encosta na borda no
+     celular. */
+  padding-inline: clamp(1rem, 2.6vw, 2rem);
+}
+
+.mono {
+  font-family: var(--f-mono), monospace;
+  /* 12px, não 10px: piso de legibilidade para texto funcional, e o cenário
+     aqui é celular à noite. O tracking também baixou, porque 0.18em em caixa
+     alta destrói o reconhecimento de palavra. */
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+/* A linha do topo. Não é barra: é só o contêiner de largura da página com os
+   três blocos em linha. Sticky com folga, e sem superfície própria — a única
+   coisa desenhada aqui é a cápsula das pílulas. */
+.navbar {
+  /* Estática e colada no topo: fica onde começa e sai com a rolagem. Antes era
+     sticky com folga, e acompanhava a página inteira. */
+  position: relative;
+  z-index: 12;
+  margin-top: 0;
+  padding-top: var(--nav-gap);
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 1rem);
+  min-height: 58px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+
+
+
+
+
+
+
+/* `.nav nav a` tem especificidade maior que `.cta` e vinha pintando o rótulo
+   do botão de --fg-2: cinza sobre azul, contraste ~2,3:1, ilegível. O botão
+   da nav é o mesmo componente do resto da página e usa a mesma tinta. */
+
+
+.cta {
+  background: var(--blue);
+  color: #04131e;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+  text-decoration: none;
+  white-space: nowrap;
+  /* propriedades nomeadas, nunca `all` */
+  transition: background-color 150ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    background: #57b6f0;
+    color: #04131e;
+  }
+}
+
+.cta:focus-visible {
+  background: #57b6f0;
+  color: #04131e;
+}
+
+/* O botão precisa dizer que ouviu o clique. É o CTA do WhatsApp,
+   a única métrica desta página. */
+.cta:active {
+  transform: scale(0.97);
+}
+
+.cta--lg {
+  padding: 1rem 1.9rem;
+  font-size: 1rem;
+}
+
+.cta--out {
+  background: transparent;
+  border: 1px solid var(--hair);
+  color: var(--fg);
+}
+
+.cta--out:hover,
+.cta--out:focus-visible {
+  background: rgba(59, 165, 232, 0.12);
+  color: var(--fg);
+}
+
+.v5 a:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 3px;
+}
+
+/* A chapa sobe por trás da barra até o topo da página. A margem negativa é
+   a altura do bloco da barra (folga + 62px), então o fundo começa no pixel
+   zero e a barra flutua sobre ele. */
+.herowrap {
+  margin-top: calc(-1 * (var(--nav-gap) + 58px));
+  /* A margem negativa sobe o bloco para trás da barra, então ele precisa ser
+     mais alto na mesma medida: sem isso a chapa acaba antes da dobra e o
+     primeiro viewport fecha com uma faixa sem fundo. */
+  min-height: calc(80svh + var(--nav-gap) + 58px);
+}
+
+.hero {
+  /* Abre ocupando quase o viewport inteiro. O padding de cima limpa a barra e
+     a folga dela; o de baixo mantém a faixa seguinte respirando. */
+  /* 80svh e não 100: sobra faixa suficiente para o título da primeira seção
+     aparecer acima da dobra. Herói de viewport cheio esconde que existe
+     conteúdo abaixo, e meia linha de título resolve isso melhor que qualquer
+     seta de rolagem.
+     essa faixa é o que diz que a página continua. Herói de viewport cheio
+     esconde que existe conteúdo abaixo. */
+  min-height: 80svh;
+  padding-top: calc(var(--nav-gap) + 58px + clamp(1.25rem, 4vh, 3rem));
+  padding-bottom: clamp(2rem, 6vh, 4.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+  align-content: center;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.hero h1 {
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(2.25rem, 6.6vw, 4.75rem);
+  font-weight: 600;
+  line-height: 0.98;
+  /* tracking apertado no display, como na referência escura do acervo */
+  letter-spacing: -0.045em;
+  margin: 0;
+  max-width: 15ch;
+  color: var(--fg);
+  text-wrap: balance;
+}
+
+.hero h1 mark {
+  background: none;
+  color: var(--fg-hot);
+}
+
+.hero p {
+  margin: 1.15rem 0 0;
+  max-width: 46ch;
+  color: var(--fg-2);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.scope {
+  border: 1px solid var(--hair);
+  background: var(--bg-2);
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+/* ---------- chapa de entalhe atrás do herói ---------- */
+
+/* A camada de canvas dissolve nas bordas em vez de cortar. O chão dela é o mesmo
+   #05090d da página, então o que a máscara apaga é o traço, não um retângulo:
+   não sobra emenda entre o herói e o trilho de números. */
+.herowrap > [aria-hidden="true"] {
+  /* Sólida do topo até quase o fim. O degradê de entrada saiu: a chapa agora
+     começa no pixel zero da página, atrás da barra, e apagar os primeiros 9%
+     deixava justamente essa faixa sem fundo. Embaixo o corte desceu de 66%
+     para 88%, senão a dissolução comia a área acima da dobra. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+/* O painel ASCII era opaco e apagava a chapa justamente onde a luz vive. Com
+   fundo translúcido os dois materiais convivem, e o fio de 1px continua sendo
+   quem define o retângulo. Sem backdrop-filter: sobre um canvas que repinta a
+   cada quadro ele custa caro e empilha como mancha. */
+.herowrap .scope {
+  background: rgba(11, 18, 25, 0.78);
+  border-color: rgba(102, 205, 255, 0.18);
+}
+
+.scope svg,
+.cellart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- arte ASCII ---------- */
+
+.ascii {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ascii .a-cell {
+  opacity: 0.55;
+}
+
+.ascii .a-mark {
+  opacity: 0.95;
+}
+
+/* A onda percorre a malha na diagonal. Cada célula recebe o mesmo ciclo com
+   atraso próprio, calculado da posição — é o atraso que vira a onda. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Só as células densas ondulam. As fracas ficam paradas: elas quase não
+     aparecem em movimento e cada nó animado a menos é custo a menos num
+     campo de ~1500 elementos de texto. */
+  .ascii .a-cell[data-live="1"] {
+    animation: swell 3.6s ease-in-out infinite alternate;
+    will-change: opacity;
+  }
+  .ascii .a-mark {
+    animation: markbreath 6s ease-in-out infinite;
+  }
+  .ascii .a-on {
+    animation: onpulse 2.8s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes swell {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes markbreath {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes onpulse {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* `draw`, `spin` e `glow` foram removidos: eram do radar que a versão
+   ASCII substituiu, e nenhum tinha mais uso no CSS. */
+
+/* O totem: a tela cicla entre campo e arte. O mesmo ciclo nas duas camadas,
+   em contrafase — a arte entra enquanto o ruído recua, e o atraso radial de
+   cada célula é o que faz o desenho fechar do centro para fora. */
+.ascii .t-noise {
+  opacity: 0.45;
+}
+
+.ascii .t-form {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ascii .t-noise {
+    animation: scrfade 9s ease-in-out infinite;
+    will-change: opacity;
+  }
+  .ascii .t-form {
+    animation: scrform 9s ease-in-out infinite;
+    will-change: opacity;
+  }
+}
+
+@keyframes scrform {
+  0%,
+  18% {
+    opacity: 0;
+  }
+  38%,
+  68% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scrfade {
+  0%,
+  18% {
+    opacity: 0.5;
+  }
+  38%,
+  68% {
+    opacity: 0.12;
+  }
+  88%,
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* Sem movimento, a tela fica no estado que importa: a arte pronta.
+   Um totem com a tela em ruído não explica nada. */
+@media (prefers-reduced-motion: reduce) {
+  .ascii .t-form {
+    opacity: 1;
+  }
+  .ascii .t-noise {
+    opacity: 0.12;
+  }
+}
+
+/* Movimento reduzido não é movimento zero. Quem pediu redução continua
+   recebendo a marca respirando em opacidade, que ajuda a compreensão;
+   o que sai é a onda e o deslocamento dos ícones. */
+@media (prefers-reduced-motion: reduce) {
+  .ascii .a-mark {
+    animation: markbreath 8s ease-in-out infinite;
+  }
+}
+
+/* ---------- o que esperar: três pilares ----------
+   Lição das anotações do acervo, que repetem "hierarquia tipográfica forte" e
+   "espaço negativo" em quase todas: pouca coisa, grande, com ar em volta. */
+
+.pilares {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3.5vw, 3rem);
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (max-width: 860px) {
+  .pilares {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pilares h3 {
+  margin: 0.9rem 0 0.4rem;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pilares p {
+  margin: 0;
+  color: var(--fg-2);
+  max-width: 30ch;
+}
+
+/* O circuito virou parte da seção da IA em vez de seção própria: é o mesmo
+   assunto visto de outro ângulo, e duas paradas no índice para um assunto só
+   inflavam o percurso. */
+.sistema {
+  margin-top: clamp(3rem, 7vw, 5rem);
+  padding-top: clamp(2rem, 5vw, 3rem);
+  border-top: 1px solid var(--hair);
+}
+
+/* ---------- índice na margem ----------
+   Vive na folga à esquerda do `.hold`, que é limitado a 82rem. Por isso só
+   aparece quando existe folga de verdade: abaixo de 1400px ele cobriria o
+   conteúdo, e uma barra lateral sobre o texto é pior que nenhuma barra. */
+
+.indice-rail {
+  display: none;
+}
+
+@media (min-width: 1400px) {
+  /* O bloco que o índice acompanha. Ele começa na seção da IA e termina no
+     fim da página — é esse contêiner que define até onde o sticky gruda. */
+  .corpo {
+    position: relative;
+  }
+
+  /* A coluna do índice ocupa a folga à esquerda do `.hold` (82rem). O `top`
+     dela é o padding da primeira seção, para o índice nascer na mesma linha do
+     título da primeira seção do bloco e não no topo dele. */
+  .indice-rail {
+    display: block;
+    position: absolute;
+    top: clamp(1.5rem, 3.5vw, 2.5rem);
+    bottom: 0;
+    left: max(1.25rem, calc((100vw - 82rem) / 2 - 11.5rem));
+    width: 10.5rem;
+    pointer-events: none;
+  }
+
+  /* Aqui está o comportamento pedido: até o título da IA chegar ao teto, o
+     índice sobe junto com a página; a partir dali ele para e acompanha. O
+     `top` do sticky é a navbar mais um respiro. */
+  .indice {
+    position: sticky;
+    top: 6rem;
+    pointer-events: auto;
+  }
+}
+
+.indice ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.indice a {
+  display: grid;
+  grid-template-columns: 1.6rem 1.1rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.4rem;
+  padding-block: 0.34rem;
+  text-decoration: none;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--fg-2);
+  transition: color 180ms ease;
+}
+
+.indice-n {
+  opacity: 0.55;
+}
+
+/* O traço mostra o percurso: cresce na seção atual e fica curto nas outras. */
+.indice-traco {
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.3;
+  transform-origin: left;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease;
+  transform: scaleX(0.45);
+}
+
+.indice-rot {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.indice li[data-estado="passou"] a {
+  opacity: 0.45;
+}
+
+.indice li[data-estado="adiante"] a {
+  opacity: 0.7;
+}
+
+.indice li[data-estado="atual"] a {
+  color: var(--fg-hot);
+  opacity: 1;
+}
+
+.indice li[data-estado="atual"] .indice-traco {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.indice li[data-estado="atual"] .indice-n {
+  opacity: 1;
+}
+
+.indice a:hover,
+.indice a:focus-visible {
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indice a,
+  .indice-traco {
+    transition: none;
+  }
+}
+
+/* As âncoras param abaixo da navbar: sem isso o título da seção fica escondido
+   atrás dela quando o índice leva até lá. */
+.v5 [id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* ---------- placeholder de visualização ----------
+   Provisório: substitui a arte ASCII enquanto o layout está sendo lido. Cinza
+   neutro de propósito, sem ciano e sem textura, para não parecer conteúdo. */
+
+.ph {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background: #1b2027;
+  border: 1px dashed #39424c;
+  color: #7c8794;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.ph span {
+  max-width: 90%;
+}
+
+/* ---------- o sistema em anel, reativo à rolagem ---------- */
+
+.sist-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+@media (max-width: 900px) {
+  .sist-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A arte fica presa enquanto as seis estações passam. É o que transforma a
+   lista num percurso: você lê a estação e o anel continua ali do lado. */
+.sist-art {
+  position: sticky;
+  top: 84px;
+}
+
+@media (max-width: 900px) {
+  .sist-art {
+    position: static;
+  }
+}
+
+.sist-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.sist-step {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.15rem 1rem;
+  padding-block: clamp(1rem, 2.4vw, 1.5rem);
+  border-bottom: 1px solid var(--hair);
+}
+
+.sist-k {
+  grid-row: span 3;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  color: var(--fg-hot);
+  padding-top: 0.35rem;
+}
+
+/* O lado é a informação que faz a seção fazer sentido: metade das estações é
+   o cliente, metade é a operação, e é o mesmo circuito. */
+.sist-lado {
+  font-family: var(--f-mono), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.sist-step[data-lado="operação"] .sist-k {
+  color: var(--blue);
+}
+
+.sist-step h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.sist-step p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  max-width: 44ch;
+}
+
+.sist-foot {
+  margin-top: clamp(1.25rem, 3vw, 2rem);
+  max-width: 52ch;
+}
+
+/* Reatividade à rolagem sem uma linha de JavaScript: a linha do tempo é a
+   própria posição do elemento na viewport. Onde `view()` não existe, nada
+   disso roda e a seção já está no estado final — a rolagem enriquece, não
+   sustenta. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sist-step {
+      animation: stepin linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 34%;
+    }
+
+    .circuito .c-ring,
+    .circuito .c-spoke {
+      animation: ringin linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    .circuito .c-node {
+      animation: nodein linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 55%;
+    }
+
+    .circuito .c-core {
+      animation: corein linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 60%;
+    }
+  }
+}
+
+@keyframes stepin {
+  from {
+    opacity: 0.24;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ringin {
+  from {
+    opacity: 0.08;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes nodein {
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes corein {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- tipos de loja ---------- */
+
+.lojas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+@media (max-width: 880px) {
+  .lojas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.loja {
+  border: 1px solid var(--hair);
+  background: var(--bg-2);
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+}
+
+.loja h3 {
+  margin: 0.6rem 0 0.3rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.loja > p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+}
+
+.steps {
+  list-style: none;
+  margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.2rem 1rem;
+  padding-block: clamp(0.85rem, 2vw, 1.15rem);
+  border-bottom: 1px solid var(--hair);
+}
+
+.steps-k {
+  grid-row: span 2;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  color: var(--fg-hot);
+  padding-top: 0.2rem;
+}
+
+.steps h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.steps p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  max-width: 46ch;
+}
+
+.sec {
+  padding-block: clamp(2.5rem, 7vw, 4.5rem);
+  border-bottom: 1px solid var(--hair);
+}
+
+.sec h2 {
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 1rem;
+  max-width: 20ch;
+}
+
+.sec > p {
+  margin: 0;
+  color: var(--fg-2);
+  max-width: 56ch;
+}
+
+.cells {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+@media (max-width: 900px) {
+  .cells {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .cells {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.cellart {
+  border: 1px solid var(--hair);
+  padding: clamp(1rem, 2.4vw, 1.4rem);
+  /* 150ms, não 260ms: hover é visto dezenas de vezes por sessão e
+     reação a hover deve ser reduzida, não coreografada. */
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+/* Gate de hover: em toque o :hover gruda no tap e fica aceso depois
+   do dedo sair. O cenário real desta página é celular. */
+@media (hover: hover) and (pointer: fine) {
+  .cellart:hover {
+    border-color: var(--hair-hot);
+    background: rgba(102, 205, 255, 0.04);
+  }
+}
+
+/* ícone: traço fino, cor mudinha, acende no hover do bloco */
+.ico {
+  display: block;
+  width: 26px;
+  height: 26px;
+  color: var(--fg-2);
+  /* 180ms no transform: hover tem que responder, não coreografar */
+  transition: color 150ms ease, transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ico svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cellart:hover .ico {
+    color: var(--fg-hot);
+    transform: translateY(-2px);
+  }
+}
+
+/* Entrada dos ícones: 600ms e escalonada por bloco. Oito ícones
+   desenhando ao mesmo tempo lê como glitch; em cascata lê como intenção. */
+@media (prefers-reduced-motion: no-preference) {
+  .ico svg path,
+  .ico svg rect {
+    stroke-dasharray: 90;
+    stroke-dashoffset: 90;
+    animation: trace 600ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+  .cells > *:nth-child(1) .ico svg * {
+    animation-delay: 0ms;
+  }
+  .cells > *:nth-child(2) .ico svg * {
+    animation-delay: 60ms;
+  }
+  .cells > *:nth-child(3) .ico svg * {
+    animation-delay: 120ms;
+  }
+  .cells > *:nth-child(4) .ico svg * {
+    animation-delay: 180ms;
+  }
+}
+
+@keyframes trace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cellart h3 {
+  margin: 0.85rem 0 0.25rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+
+.cellart p {
+  margin: 0 0 0.75rem;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+}
+
+.close {
+  padding-block: clamp(2.5rem, 7vw, 4.5rem) clamp(5.5rem, 11vw, 6rem);
+}
+
+/* A marca empilhada assinando o fechamento. O arquivo é 640×640 com folga
+   grande em volta do desenho, então o que controla o tamanho ótico é a altura,
+   não a largura da caixa. */
+.close-logo {
+  height: clamp(3.5rem, 8vw, 5.25rem);
+  width: auto;
+  margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.close h2 {
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  /* faltava: sem isto a manchete de fechamento herdava o 1,62 do corpo e
+     abria um vão de linha que nenhuma outra display da página tem */
+  line-height: 1.05;
+  margin: 0 0 1rem;
+  max-width: 17ch;
+}
+
+.close p {
+  margin: 0 0 1.5rem;
+  color: var(--fg-2);
+  max-width: 44ch;
+}
+
+/* O rodapé perdeu a classe mono: a linha institucional tem 58 caracteres
+   e caixa alta em frase inteira é ilegível. Os links ficam em caixa mista. */
+/* ---------- rodapé ----------
+   Marca de um lado, canais do outro, um fio, e embaixo a assinatura à esquerda
+   com os links empurrados para a direita. A grade de dez colunas é o que faz
+   isso: a assinatura ocupa as três primeiras e atravessa as duas linhas, os
+   links ficam com o resto e se alinham ao fim. */
+
+.rodape {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  font-size: 0.8125rem;
+  color: var(--fg-2);
+}
+
+.rodape-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.rodape-marca img {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+.rodape-redes {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Mesmo material da chave de tema da barra do topo: os dois são botão de
+   ícone da mesma página, e dois desenhos para o mesmo papel seria
+   inconsistência, não variedade. */
+.rodape-redes a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+  color: var(--fg-2);
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.rodape-redes a:hover,
+.rodape-redes a:focus-visible {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 9%, transparent);
+}
+
+.rodape-redes svg {
+  width: 19px;
+  height: 19px;
+}
+
+.rodape-grade {
+  margin-top: clamp(1.5rem, 4vw, 2rem);
+  padding-top: clamp(1.25rem, 3vw, 1.75rem);
+  border-top: 1px solid var(--hair);
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .rodape-grade {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0.75rem 1.5rem;
+  }
+
+  .rodape-nav {
+    grid-column: 4 / 11;
+  }
+
+  .rodape-legais {
+    grid-column: 4 / 11;
+  }
+
+  /* Atravessa as duas linhas: é o bloco mais alto e ancora a coluna da
+     esquerda enquanto os links descem à direita. */
+  .rodape-copy {
+    grid-row: 1 / 3;
+    grid-column: 1 / 4;
+  }
+}
+
+.rodape-nav ul,
+.rodape-legais {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 900px) {
+  .rodape-nav ul,
+  .rodape-legais {
+    justify-content: flex-end;
+  }
+}
+
+.rodape-nav a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.rodape-legais a {
+  color: var(--fg-2);
+  text-decoration: none;
+}
+
+.rodape-nav a:hover,
+.rodape-nav a:focus-visible,
+.rodape-legais a:hover,
+.rodape-legais a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.rodape-copy {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 34ch;
+  line-height: 1.5;
+}
+
+/* Alvo de polegar nos links, sem esticar a linha no desktop. */
+@media (any-pointer: coarse) {
+  .rodape-nav a,
+  .rodape-legais a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: none;
+  padding: 0.65rem clamp(0.85rem, 4vw, 1.25rem);
+  /* A faixa do indicador de home do iPhone fica por baixo de qualquer coisa
+     colada no rodapé; sem isto o botão encosta nela. */
+  padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
+  /* Token e não valor cru: no tema claro a cor fixa deixava uma tarja preta
+     colada no rodapé de uma página de papel. */
+  background: color-mix(in srgb, var(--bg) 95%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--hair);
+}
+
+.dock a {
+  display: block;
+  text-align: center;
+}
+
+@media (max-width: 780px) {
+  .dock {
+    display: block;
+  }
+}
+
+/* ---------- fechamento em duas colunas ---------- */
+
+.close-duo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(1.75rem, 5vw, 4rem);
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .close-duo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- formulário de interesse ----------
+   Mesmo material dos cartões da página: fio de 1px, fundo do painel, tipografia
+   do corpo. Nada de sombra colorida nem campo com fundo mais claro que o
+   contêiner — a página inteira se define por borda, e o formulário também. */
+
+.form-fr {
+  border: 1px solid var(--hair);
+  background: var(--bg-2);
+  padding: clamp(1.15rem, 3vw, 1.9rem);
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.4rem);
+}
+
+.form-fr-head h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* No arredondado a display angular sai, como no resto da página. */
+.v5[data-forma="oblongo"] .form-fr-head h3 {
+  font-family: var(--f-txt), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.form-fr-head p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  max-width: 46ch;
+}
+
+.form-fr-campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+@media (max-width: 560px) {
+  .form-fr-campos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.campo--largo {
+  grid-column: 1 / -1;
+}
+
+.campo {
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* Rótulo visível e acima do campo. Placeholder como rótulo some no momento em
+   que a pessoa digita, e aí ela não sabe mais o que aquele campo era. */
+.campo > span {
+  font-family: var(--f-mono), monospace;
+  /* mesmo piso de 11px do resto do texto funcional — e num rótulo de campo
+     ele importa mais, porque é o que diz o que digitar */
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+
+.campo > span em {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--hair);
+  color: var(--fg);
+  font-family: var(--f-txt), system-ui, sans-serif;
+  /* 16px cravados: abaixo disso o Safari do iPhone dá zoom no campo ao focar e
+     empurra o layout inteiro para fora da tela. O público desta página chega
+     de campanha, no celular. */
+  font-size: 1rem;
+  padding: 0.72rem 0.85rem;
+  /* Herda o eixo da forma: reto no boxy, macio no arredondado. */
+  border-radius: inherit;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.v5[data-forma="oblongo"] .campo input,
+.v5[data-forma="oblongo"] .campo select {
+  border-radius: 12px;
+}
+
+.campo input::placeholder {
+  color: var(--fg-2);
+  opacity: 0.72;
+}
+
+.campo input:hover,
+.campo select:hover {
+  border-color: var(--fg-2);
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Só marca erro depois que a pessoa mexeu no campo. `:invalid` puro pinta o
+   formulário inteiro de vermelho antes de qualquer interação. */
+.campo input:user-invalid {
+  border-color: #d6604a;
+}
+
+.form-fr-pe {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.form-fr-pe .cta {
+  justify-self: start;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--f-txt), system-ui, sans-serif;
+}
+
+.form-fr-pe .cta:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.form-fr-aviso {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.8125rem;
+  max-width: 44ch;
+}
+
+
+/* ---------- barra em cápsula ----------
+   Proporções tiradas da referência: a cápsula é um respiro de 4px em volta dos
+   itens, cada item tem folga horizontal quase três vezes a vertical, e o item
+   ativo é o único preenchido. Nada de divisória entre eles — o que separa é o
+   espaço, e o que marca é o preenchimento. */
+
+.brand-simbolo {
+  height: 32px;
+  width: auto;
+}
+
+.nav-pilulas {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 6px;
+  margin-right: auto;
+  border-radius: 999px;
+  /* A cápsula é só um degrau de superfície acima da barra, não um cartão.
+     Contraste demais aqui e ela vira caixa dentro de caixa. */
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--fg-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.pilula:hover {
+  color: var(--fg);
+}
+
+.pilula:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 2px;
+}
+
+/* A página atual é a única preenchida, com o texto em peso maior. O
+   preenchimento usa a superfície e não o azul: o azul é do botão de conversão,
+   e dividir ele com navegação enfraquece os dois. */
+.pilula[aria-current="page"] {
+  background: var(--bg-2);
+  color: var(--fg);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px -12px rgba(0, 0, 0, 0.9);
+}
+
+[data-tema="light"] .v5 .nav-pilulas {
+  background: color-mix(in srgb, #0b1116 4%, transparent);
+}
+
+[data-tema="light"] .v5 .pilula[aria-current="page"] {
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(11, 17, 22, 0.1), 0 6px 14px -10px rgba(11, 17, 22, 0.3);
+}
+
+.nav-acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 820px) {
+  .nav-pilulas {
+    display: none;
+  }
+  .nav-acoes {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .nav-cta {
+    font-size: 0.8125rem;
+    padding-inline: 0.9rem;
+  }
+}
+
+/* ---------- nada quadrado ----------
+   A página é arredondada por inteiro. Estes são os elementos que não tinham
+   raio próprio e ficavam retos depois que o reset global saiu. */
+
+.v5 input,
+.v5 select,
+.v5 textarea,
+.v5 button {
+  border-radius: 12px;
+}
+
+.v5 .cta,
+.v5 .tema-switch,
+.v5 .orb-no {
+  border-radius: 999px;
+}
+
+.v5 .close-logo,
+.v5 .brand-simbolo {
+  border-radius: 0;
+}
+
+/* O botão da barra acompanha a altura das pílulas: com o grupo mais alto, o
+   CTA no tamanho antigo ficava pequeno ao lado e desalinhava a linha. */
+.nav-cta {
+  padding: 0.78rem 1.6rem;
+  font-size: 0.9375rem;
+}
+
+/* A primeira seção entra logo abaixo do herói, com metade do respiro que as
+   outras têm no topo. O herói já é o respiro dela, e o padding cheio empurrava
+   o título inteiro para fora da dobra. O `top` do trilho do índice acompanha
+   este mesmo valor, senão o índice deixa de nascer na linha do título. */
+#esperar {
+  padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+
+/* ---------- sobre a GRAVA.AI ----------
+   Estrutura do bloco `about-3`: cabeçalho em duas colunas, uma peça grande ao
+   lado de uma coluna com cartão e peça menor, e o painel de números embaixo.
+   A adaptação troca as imagens de banco por slots rotulados e a vitrine de
+   métricas por fatos que a rede confirmou. */
+
+.sobre-topo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1rem, 4vw, 3rem);
+  align-items: start;
+  margin-bottom: clamp(1.75rem, 4vw, 3rem);
+}
+
+@media (max-width: 860px) {
+  .sobre-topo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sobre-topo h2 {
+  margin: 0;
+}
+
+.sobre-topo p {
+  margin: 0;
+  color: var(--fg-2);
+  max-width: 52ch;
+}
+
+.sobre-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (max-width: 900px) {
+  .sobre-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sobre-lado {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  align-content: start;
+}
+
+@media (min-width: 620px) and (max-width: 900px) {
+  /* Na faixa do meio o cartão e a peça ficam lado a lado: empilhados, a coluna
+     ficaria mais alta que a peça principal e desequilibraria o bloco. */
+  .sobre-lado {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sobre-peca {
+  margin: 0;
+}
+
+.sobre-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  padding: clamp(1.1rem, 2.6vw, 1.75rem);
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-lg, 24px);
+}
+
+.sobre-marca {
+  height: 34px;
+  width: auto;
+  margin-right: auto;
+}
+
+.sobre-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.0625rem, 1.9vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.24;
+}
+
+.sobre-card p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+}
+
+.sobre-card .cta {
+  align-self: start;
+}
+
+/* Alinhamento do bloco sobre.
+   A peça grande define a altura da linha; a coluna da direita precisa terminar
+   exatamente onde ela termina. O cartão tem a altura que o conteúdo pede e a
+   peça de baixo estica para preencher o resto — por isso `auto 1fr`, e por isso
+   o placeholder dela abre mão da proporção fixa: dentro desta coluna quem manda
+   é a altura da peça vizinha, não o 4/3. */
+
+.sobre-grid {
+  align-items: stretch;
+}
+
+.sobre-grid > .sobre-peca,
+.sobre-grid > .sobre-peca .ph {
+  height: 100%;
+}
+
+.sobre-lado {
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+}
+
+.sobre-lado .sobre-peca {
+  min-height: 0;
+  height: 100%;
+}
+
+.sobre-lado .sobre-peca .ph {
+  height: 100%;
+  aspect-ratio: auto;
+  min-height: 7rem;
+}
+
+/* Na faixa em que a coluna vira duas, as duas voltam a ter altura própria: com
+   `1fr` numa linha só, a peça esticaria sozinha e desalinharia do cartão. */
+@media (min-width: 620px) and (max-width: 900px) {
+  .sobre-lado {
+    grid-template-rows: auto;
+    align-items: stretch;
+  }
+}
+
+/* ---------- placeholder sem moldura ----------
+   O `.ph` já se anuncia com a linha tracejada. Quando ele é o conteúdo de um
+   painel — o do herói, o do totem, o cartão da galeria — o painel somava borda,
+   fundo e padding por fora, e o resultado era moldura grossa com o rótulo
+   minúsculo dentro. Enquanto a arte real não entra, o invólucro sai de cena e
+   fica só a linha tracejada, como na seção sobre.
+
+   `:has()` é o que permite fazer isso sem tocar em nenhum dos componentes: a
+   regra vale só enquanto houver um placeholder ali dentro, e some sozinha no
+   dia em que o `<Ph>` for substituído pela arte. */
+
+.v5 .scope:has(> .ph),
+.v5 .cellart:has(> .ph),
+.v5 figure:has(> .ph) {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* O cartão da galeria continua sendo cartão, mas para de emoldurar o
+   placeholder: o texto abaixo dele mantém o respiro lateral. */
+.v5 .loja:has(> .ph) {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.v5 .loja:has(> .ph) h3 {
+  margin-top: 0.85rem;
+}
+
+/* A linha tracejada é a única coisa que desenha o slot. Um pouco mais viva do
+   que estava, porque agora ela é sozinha. */
+.v5 .ph {
+  border-style: dashed;
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--fg) 22%, transparent);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+  color: var(--fg-2);
+}
+
+/* Os dois destinos do cartão: a história na institucional e as peças na
+   galeria. Ficam lado a lado enquanto couber e quebram juntos. */
+.sobre-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.sobre-acoes .cta {
+  flex: 1 1 auto;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ---------- órbita das frentes da IA ----------
+   Anel com os quatro nós e a marca no centro, texto sincronizado ao lado.
+   O posicionamento é polar: cada nó recebe um ângulo por variável e o mesmo
+   par de transforms coloca todos na circunferência — sem quatro regras de
+   `top/left` que quebram quando o anel muda de tamanho. */
+
+/* Desenho de um lado, as quatro frentes do outro — as quatro ao mesmo tempo,
+   não uma de cada vez. */
+.orbita {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(1.75rem, 5vw, 4rem);
+  align-items: center;
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (max-width: 900px) {
+  .orbita {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* O leque. Círculo inteiro deixava o miolo vazio e empurrava dois nós para
+   baixo da linha da marca; um terço de círculo concentra os quatro em cima da
+   origem e fecha o desenho. As medidas saem todas da largura, então o arco
+   escala inteiro sem uma única media query. */
+.orb-arco {
+  position: relative;
+  --arco: clamp(19rem, 38vw, 28rem);
+  width: var(--arco);
+  /* 240/440 — a mesma proporção da caixa de coordenadas do SVG, senão a
+     origem do CSS e a origem do desenho param em pontos diferentes */
+  height: calc(var(--arco) * 0.545);
+  margin-inline: auto;
+  /* a marca desce metade da altura dela para fora da caixa; esta margem é o
+     chão que ela precisa */
+  margin-bottom: 2.5rem;
+}
+
+/* Brilho fraco subindo da origem. É o que tira o vazio de dentro do arco sem
+   colocar nada desenhado ali. */
+.orb-arco::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    62% 78% at 50% 96%,
+    color-mix(in srgb, var(--cyan) 9%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.orb-arcos {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--hair);
+  stroke-width: 1;
+  /* Quina viva nos vértices: é o que faz ler hexágono e não polígono qualquer
+     com o canto lascado pelo antialias. */
+  stroke-linejoin: miter;
+  /* As pontas somem em vez de terminar no talho. O corte seco denunciaria que
+     o arco é um pedaço de círculo; o esmaecer faz ele nascer do escuro. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 42%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 42%, transparent 96%);
+}
+
+.orb-no {
+  position: absolute;
+  /* Desenho, não controle: o clique saiu quando o ciclo saiu. */
+  /* Todos os nós saem do mesmo ponto — a origem, embaixo no centro, onde a
+     marca está — e só o ângulo e o raio mudam. */
+  bottom: 4.2%;
+  left: 50%;
+  width: 3.4rem;
+  height: 3.4rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--fg-2);
+  cursor: pointer;
+  /* Cartesiano e não polar: a aresta do hexágono é reta, então o ponto de
+     pouso vem em x/y direto. As frações multiplicam a largura, e é isso que
+     mantém os nós grudados na aresta quando a caixa escala. */
+  transform: translate(-50%, 50%)
+    translate(calc(var(--dx) * var(--arco)), calc(var(--dy) * var(--arco)));
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.orb-no svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* A marca é a origem do leque, não o centro de um círculo: fica embaixo, no
+   ponto de onde os dois arcos nascem. */
+.orb-centro {
+  position: absolute;
+  bottom: 4.2%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 4.6rem;
+  height: 4.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  /* halo em vez de segundo elemento: o anel de fora da referência é sombra */
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--fg) 4%, transparent),
+    0 0 34px color-mix(in srgb, var(--cyan) 16%, transparent);
+}
+
+.orb-centro svg {
+  width: 30px;
+  height: 30px;
+}
+
+
+/* ---------- utilidade de leitor de tela ---------- */
+
+/* Texto que existe só para quem não vê a tela. `display: none` sumiria também
+   do leitor; este recorte tira do desenho e mantém no acessível. */
+.v5 .sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- comparativo dos tipos de ponto ---------- */
+
+.cmp-wrap {
+  margin-top: clamp(2rem, 5vw, 3rem);
+  /* A tabela tem 52rem de largura mínima e, sem isto, esses 832px vazavam da
+     caixa de rolagem para a rolagem do documento: num aparelho de 390px a
+     página inteira andava 282px para o lado. `contain: paint` diz o que já é
+     verdade: nada desta caixa pinta fora dela. */
+  contain: paint;
+  /* A tabela não empilha no celular: empilhada ela vira três fichas de novo e
+     a comparação — a razão da seção existir — se perde. Rola na horizontal e
+     a coluna de rótulos fica presa na esquerda. */
+  overflow-x: auto;
+  /* espaço para o foco do teclado não ser cortado pela caixa de rolagem */
+  padding-bottom: 0.5rem;
+}
+
+.cmp {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  text-align: left;
+  /* Largura fixa por coluna: no automatico cada coluna media o proprio texto,
+     as tres imagens saiam de tamanhos diferentes e nome, resumo e botao
+     paravam em alturas diferentes. */
+  table-layout: fixed;
+}
+
+.cmp-canto {
+  /* Célula morta do canto. Fica presa junto com a coluna de rótulos, senão o
+     cabeçalho desliza por baixo dela. */
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg);
+  width: 26%;
+}
+
+.cmp-col {
+  width: 24.6%;
+  vertical-align: top;
+  padding: 0 clamp(0.85rem, 1.6vw, 1.35rem) 1.5rem;
+  border-left: 1px solid var(--hair);
+  font-weight: 400;
+  position: relative;
+}
+
+/* A coluna em destaque é uma faixa de fundo que atravessa a tabela inteira.
+   Como cada célula pinta a sua parte, a faixa continua alinhada mesmo com as
+   linhas mudando de altura. */
+.cmp-col[data-destaque],
+.cmp-cel[data-destaque] {
+  background: color-mix(in srgb, var(--cyan) 5%, transparent);
+}
+
+.cmp-col .ph {
+  margin-bottom: 1rem;
+}
+
+/* Sobre a imagem, e nao acima dela: no fluxo, o selo de uma coluna so
+   empurrava o nome dela para baixo e desalinhava as tres. */
+.cmp-selo {
+  position: absolute;
+  top: 0.7rem;
+  left: calc(clamp(0.85rem, 1.6vw, 1.35rem) + 0.7rem);
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--fg-hot);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+}
+
+.cmp-publico {
+  display: block;
+  font-size: 0.6875rem;
+  margin-bottom: 0.4rem;
+}
+
+.cmp-nome {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.cmp-nome .ico {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--hair);
+  color: var(--fg-2);
+}
+
+.cmp-nome .ico svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cmp-resumo {
+  display: block;
+  margin: 0.55rem 0 1.15rem;
+  color: var(--fg-2);
+  font-size: 0.875rem;
+}
+
+.cmp-col .cta {
+  display: inline-block;
+  font-size: 0.8125rem;
+}
+
+/* Faixa de assunto. É o agrupamento por público: em vez de dez linhas soltas,
+   três blocos que dizem sobre o que a comparação está falando. */
+.cmp-grupo {
+  position: sticky;
+  left: 0;
+  padding: 1.5rem 0 0.6rem;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--fg-2);
+  background: var(--bg);
+  border-bottom: 1px solid var(--hair);
+}
+
+.cmp-rotulo {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg);
+  padding: 0.85rem 1.25rem 0.85rem 0;
+  font-weight: 400;
+  color: var(--fg);
+  border-top: 1px solid var(--hair);
+  vertical-align: top;
+}
+
+.cmp-cel {
+  padding: 0.85rem clamp(0.85rem, 1.6vw, 1.35rem);
+  border-top: 1px solid var(--hair);
+  border-left: 1px solid var(--hair);
+  vertical-align: top;
+}
+
+.cmp-txt {
+  color: var(--fg-2);
+  font-size: 0.875rem;
+}
+
+.cmp-sim,
+.cmp-nao {
+  display: block;
+}
+
+.cmp-sim svg,
+.cmp-nao svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cmp-sim {
+  color: var(--fg-hot);
+}
+
+.cmp-nao {
+  color: color-mix(in srgb, var(--fg-2) 55%, transparent);
+}
+
+
+
+
+/* ---------- head to head: modelo tradicional × GRAVA.AI ---------- */
+
+.h2h {
+  margin-top: 1.25rem;
+}
+
+.h2h-cab,
+.h2h-linha {
+  display: grid;
+  /* O tema no meio é a coluna estreita: os dois lados são a resposta, e a
+     resposta é o que precisa de espaço. */
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 0.62fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 2.4vw, 2rem);
+  align-items: center;
+}
+
+.h2h-cab {
+  padding-bottom: 0.75rem;
+}
+
+.h2h-lado {
+  font-size: 0.6875rem;
+}
+
+/* O lado da rede é o único aceso. A hierarquia é a mensagem do bloco: um lado
+   é o que você assume, o outro é o que já vem resolvido. */
+.h2h-lado--nos {
+  grid-column: 3;
+  color: var(--fg-hot);
+}
+
+.h2h-linhas {
+  margin: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.h2h-linha {
+  padding-block: clamp(0.9rem, 2vw, 1.15rem);
+  border-bottom: 1px solid var(--hair);
+}
+
+/* O `<dt>` vem primeiro no HTML porque lista de definição exige isso; aqui a
+   grade devolve ele para o meio, entre as duas respostas. */
+.h2h-tema {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  /* fio vertical dos dois lados: é o que faz os lados se olharem em vez de
+     virarem três colunas soltas */
+  border-inline: 1px solid var(--hair);
+  padding-inline: clamp(0.5rem, 1.6vw, 1rem);
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+}
+
+.h2h-eles,
+.h2h-nos {
+  grid-row: 1;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.h2h-eles {
+  grid-column: 1;
+  color: var(--fg-2);
+  text-align: right;
+}
+
+.h2h-nos {
+  grid-column: 3;
+  color: var(--fg);
+}
+
+/* Rótulo de lado dentro da célula. Só aparece quando a coluna do cabeçalho
+   some — empilhado, "GRAVA.AI" e "tradicional" precisam vir junto da frase. */
+.h2h-tag {
+  display: none;
+  font-size: 0.625rem;
+  margin-bottom: 0.15rem;
+}
+
+.h2h-rodape {
+  margin: 1rem 0 0;
+  /* 192 caracteres por linha: o olho perde a linha na volta. */
+  max-width: 74ch;
+  font-size: 0.8125rem;
+  color: var(--fg-2);
+}
+
+@media (max-width: 860px) {
+  .h2h-cab {
+    display: none;
+  }
+
+  .h2h-cab,
+  .h2h-linha {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+
+  /* Empilhado a ordem vira tema, tradicional, GRAVA.AI — a leitura de cima
+     para baixo que a grade fazia da esquerda para a direita. */
+  .h2h-tema,
+  .h2h-eles,
+  .h2h-nos {
+    grid-column: 1;
+    grid-row: auto;
+    text-align: left;
+  }
+
+  .h2h-tema {
+    border-inline: 0;
+    padding-inline: 0;
+    place-items: start;
+    margin-bottom: 0.35rem;
+  }
+
+  .h2h-tag {
+    display: block;
+  }
+
+  .h2h-nos .h2h-tag {
+    color: var(--fg-hot);
+  }
+
+  .h2h-nos {
+    margin-top: 0.5rem;
+  }
+}
+
+/* A marca no lugar do símbolo desenhado à mão: mesmo arquivo que assina o
+   topo e o rodapé da página. */
+.orb-marca {
+  width: 26px;
+  height: auto;
+}
+
+/* Identidade do lado da rede no comparativo: símbolo do manual e o nome na
+   display angular da marca, não no mono de dado. */
+.h2h-lado--nos {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.h2h-marca {
+  width: 16px;
+  height: auto;
+}
+
+.h2h-tag--nos {
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* A barra fixa cobre o fim da página. O chão abaixo é a altura dela, só na
+   faixa em que ela existe — senão sobra um vão no desktop. */
+@media (max-width: 780px) {
+  .v5 main {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Nome de cidade comprido, e-mail sem espaço, rótulo traduzido: nada disso
+   pode estourar a célula e empurrar a tabela. */
+.cmp-txt,
+.cmp-resumo,
+.h2h-eles,
+.h2h-nos,
+.h2h-tema {
+  overflow-wrap: break-word;
+}
+
+/* A caixa rolável agora recebe foco; ele precisa aparecer. */
+.cmp-wrap:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 4px;
+}
+
+/* Modo de alto contraste do Windows descarta fundo e sombra: o selo e a
+   coluna em destaque ficariam idênticos aos vizinhos. O contorno sobrevive. */
+@media (forced-colors: active) {
+  .cmp-selo {
+    outline: 2px solid CanvasText;
+    outline-offset: 1px;
+  }
+
+  .cmp-col[data-destaque],
+  .cmp-cel[data-destaque] {
+    border-inline: 1px solid CanvasText;
+  }
+}
+
+
+/* O aviso de pop-up bloqueado. Vermelho não existe nesta paleta e inventar um
+   estado de erro colorido para uma página monocromática de marca seria trocar
+   o sistema por um reflexo: o peso vem da tinta cheia e da moldura. */
+.form-fr-resgate {
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--fg-hot);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: var(--fg);
+}
+
+.form-fr-resgate a {
+  color: var(--fg-hot);
+  font-weight: 700;
+}
+
+/* ---------- dedo, não cursor ----------
+   Não é questão de largura de tela: um notebook com toque tem 1440px e o mesmo
+   dedo. `any-pointer` e não `pointer`: num híbrido com mouse plugado o
+   ponteiro primário é fino, mas a tela continua sendo tocada. */
+@media (any-pointer: coarse) {
+  .tema-switch {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ---------- os números do contrato ----------
+   R$ 99.900 saía em corpo negrito de 15px, na linha 12 de uma tabela. É o
+   número que decide a página. Aqui ele é display, e os outros quatro vivem um
+   degrau abaixo: a diferença de tamanho é a hierarquia da decisão. */
+
+.num-topo {
+  max-width: 52ch;
+}
+
+.num-topo p {
+  margin: 0.85rem 0 0;
+  color: var(--fg-2);
+}
+
+.num-destaque {
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding-block: clamp(1.5rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  display: grid;
+  gap: 0.35rem;
+  align-items: end;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "rot   rot"
+    "valor inclui";
+}
+
+@media (max-width: 780px) {
+  .num-destaque {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "rot"
+      "valor"
+      "inclui";
+  }
+
+}
+
+.num-destaque .num-rot {
+  grid-area: rot;
+}
+
+.num-destaque .num-val {
+  grid-area: valor;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  /* A escala é o argumento: este número precisa ser lido antes de qualquer
+     outra coisa da seção. */
+  font-size: clamp(3.25rem, 9vw, 6rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  /* algarismos de mesma largura: número de contrato não dança */
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+
+.num-inclui {
+  grid-area: inclui;
+  margin: 0 0 0.35rem;
+  padding-inline-start: clamp(1rem, 2.5vw, 2rem);
+  max-width: 40ch;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+}
+
+.num-inclui strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+/* Depois da regra base, não antes: empilhado não existe coluna à esquerda da
+   qual se afastar, e as duas regras têm a mesma especificidade — quem vem por
+   último vence. */
+@media (max-width: 780px) {
+  .num-inclui {
+    padding-inline-start: 0;
+    margin-top: 0.6rem;
+  }
+}
+
+.num-grade {
+  margin-inline: -1rem;
+  margin-block: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
+
+@media (max-width: 860px) {
+  .num-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .num-grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .num-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Numa coluna só, rótulo e valor na mesma linha leem como extrato: o olho
+     desce pelos rótulos à esquerda e encontra o número sempre no mesmo lugar
+     à direita. */
+  .num-grade .num-val {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+.num-item {
+  background: var(--bg);
+  padding: clamp(1rem, 2.4vw, 1.4rem) 1rem;
+}
+
+.num-rot {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--fg-2);
+}
+
+.num-grade .num-val {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.0625rem, 2vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+
+.num-nota {
+  margin: 1.15rem 0 0;
+  max-width: 64ch;
+  font-size: 0.875rem;
+  color: var(--fg-2);
+}
+
+/* ---------- saída que não compete com a conversão ----------
+   Os dois destinos institucionais usavam a mesma cápsula do botão do
+   WhatsApp. A página tem uma métrica só; eles continuam existindo, como
+   link. */
+
+.link-saida {
+  color: var(--fg);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--hair);
+  transition: text-decoration-color 160ms ease;
+}
+
+.link-saida:hover,
+.link-saida:focus-visible {
+  text-decoration-color: var(--fg-hot);
+}
+
+/* ---------- sinais de celular ---------- */
+
+/* Quanto falta. O índice lateral só cabe acima de 1400px — abaixo disso ele
+   cobriria o texto. No celular a página tem ~9 telas e nada dizia onde a
+   pessoa estava; esta é a mesma informação em 2px, sem marcação nova e sem
+   JavaScript.
+
+   Presa ao `main` e não ao `.corpo`: o `.corpo` só existe na landing, e as
+   três rotas precisam do mesmo sinal. */
+@media (max-width: 1399px) {
+  @supports (animation-timeline: scroll()) {
+    .v5 main::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      z-index: 30;
+      background: var(--fg-hot);
+      transform-origin: 0 50%;
+      animation: barraProgresso linear both;
+      animation-timeline: scroll();
+    }
+  }
+}
+
+/* Sem `prefers-reduced-motion` aqui de propósito: a barra não é animação
+   decorativa, é a posição da própria rolagem desenhada. Quem reduz movimento
+   continua precisando saber onde está. */
+@keyframes barraProgresso {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* A tabela desliza e não dizia isso: sem seta, sem fade, só a barra nativa
+   que o toque esconde. O esmaecer na borda direita mostra que há mais coluna
+   ali, e some quando a rolagem chega ao fim. */
+.cmp-wrap {
+  position: relative;
+}
+
+@supports (animation-timeline: scroll(self inline)) {
+  .cmp-wrap::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: clamp(2rem, 8vw, 4rem);
+    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--bg));
+    animation: bordaSome linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: contain 70% contain 100%;
+  }
+}
+
+@keyframes bordaSome {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- as quatro frentes, listadas ----------
+   O número casa com o do nó no desenho: quem olhou a figura primeiro
+   reencontra cada ponta aqui, sem precisar decorar posição. */
+
+@media (max-width: 900px) {
+  .orbita {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.orb-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--hair);
+  border-block: 1px solid var(--hair);
+}
+
+.orb-lista li {
+  background: var(--bg);
+  padding: clamp(0.9rem, 2.2vw, 1.25rem) 0;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+}
+
+.orb-lista .orb-n {
+  grid-row: span 2;
+}
+
+.orb-n {
+  font-style: normal;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: var(--fg-hot);
+}
+
+/* No desenho o número fica na borda do nó, pequeno, para amarrar a figura à
+   lista sem virar rótulo dentro do círculo. */
+.orb-no .orb-n {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  background: var(--bg);
+  border-radius: 999px;
+  padding: 0 0.2rem;
+  line-height: 1.3;
+}
+
+.orb-lista .orb-rotulo {
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.orb-lista h3 {
+  grid-column: 2;
+  margin: 0;
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+/* ---------- par flutuante, canto inferior direito ----------
+   Cor, tipografia e estados vêm de `.cta` e `.cta--out`, os mesmos botões do
+   resto da página: é o que faz os dois seguirem o tema claro e o escuro sem
+   uma única cor escrita aqui. O que segue abaixo é só forma e posição. */
+
+.flut {
+  position: fixed;
+  right: clamp(0.85rem, 2vw, 1.5rem);
+  bottom: clamp(0.85rem, 2vw, 1.5rem);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Deslocamento e desfoque de verdade: halo sem offset é adesivo, não
+   profundidade. */
+.flut a {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 12px 28px -12px rgba(0, 0, 0, 0.5);
+}
+
+.flut-falar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 52px;
+  padding-inline: 1.35rem;
+  border-radius: 999px;
+  /* 16px: numa cápsula de 52px o texto de 15px ficava pequeno para o corpo do
+     botão. É a mesma medida do `.cta--lg`, que é o botão desta altura. */
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.flut-falar svg {
+  width: 21px;
+  height: 21px;
+}
+
+.flut-topo {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 999px;
+  /* Sólido, e não o transparente que o `.cta--out` usa em fluxo: aqui ele
+     flutua sobre o conteúdo, e sem chão próprio o ícone ficaria solto em cima
+     do texto que estiver passando por baixo. */
+  background: var(--bg);
+}
+
+/* A seta ocupa 22 dos 52px do círculo. A 19 ela nadava no meio, e num ícone
+   de traço fino o tamanho é o que dá presença — engrossar o traço quebraria a
+   família.
+
+   O tamanho vive na caixa e não no : dentro do botão em grid o ícone não
+   tem tamanho intrínseco, e nem a regra em  nem um width em linha o
+   moviam do mínimo. Com um bloco de 22px em volta, ele preenche. */
+.flut-seta {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.flut-seta svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Só aparece quando existe página atrás para voltar. O gatilho é a própria
+   posição da rolagem, então não há ouvinte de scroll nem estado em React. Sem
+   suporte a `scroll()`, ele fica sempre visível — que é o comportamento
+   correto para degradar. */
+@supports (animation-timeline: scroll()) {
+  .flut-topo {
+    animation: flutSurge linear both;
+    animation-timeline: scroll();
+    animation-range: 0 90vh;
+  }
+}
+
+@keyframes flutSurge {
+  0%,
+  60% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+  }
+}
+
+/* No celular a barra fixa já leva o WhatsApp na largura toda, dentro do
+   alcance do polegar. Um terceiro botão para o mesmo destino, em cima dela,
+   seria repetição — sobe só o de voltar ao topo, acima da barra. */
+@media (max-width: 780px) {
+  .flut-falar {
+    display: none;
+  }
+
+  .flut {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* O botão de topo salta nove telas de uma vez. Sem transição, quem clica não
+   entende se voltou ao começo ou trocou de página — o deslizar é o que amarra
+   o antes e o depois. Quem pede menos movimento continua com o salto seco,
+   que aí é o comportamento desejado e não um defeito. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Herói de uma coluna. A landing tem painel à direita e precisa dos 80svh;
+   a galeria e qualquer página que abra só com texto não precisam da mesma
+   altura — o vazio à direita viraria buraco, e a altura cheia empurraria o
+   conteúdo para fora da primeira tela sem nada em troca. */
+.hero--curto {
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  padding-bottom: clamp(3rem, 8vh, 6rem);
+}
+
+.hero--curto h1 {
+  max-width: 18ch;
+}
+
+.herowrap:has(.hero--curto) {
+  min-height: calc(58svh + var(--nav-gap) + 58px);
+}

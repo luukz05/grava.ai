@@ -1,0 +1,241 @@
+/* Forma e fundo da landing.
+
+   Este arquivo já carregou dois eixos de estudo — duas formas e dez fundos —
+   mais o painel do estúdio e a barra de comparação. A decisão saiu: forma
+   arredondada, fundo topográfico. O que não pode mais ser escolhido foi
+   removido, porque CSS de opção morta é a coisa que mais engana quem lê o
+   projeto depois. O estado completo está no commit `f5b1214`.
+
+   O atributo `data-forma` continua no elemento raiz: a base do `v5.css` é
+   reta, e é aqui que ela vira arredondada. */
+
+/* ============ FORMA ARREDONDADA ============ */
+
+.v5[data-forma="oblongo"] {
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+}
+
+/* Botões em pílula. É a marca mais visível da forma e a primeira coisa que se
+   nota na página. */
+.v5[data-forma="oblongo"] .cta {
+  border-radius: var(--r-pill);
+  padding-inline: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* O botão redondo de voltar ao topo é `.cta` para herdar tinta, borda e
+   estados, mas não pode herdar a folga lateral da cápsula: com 1,35rem de cada
+   lado, sobravam 6,8px de caixa de conteúdo dentro dos 52px do círculo — a
+   seta encolhia e ainda saía do centro. A exceção vive aqui porque é a regra
+   acima, com três níveis de especificidade, que ela precisa vencer. */
+.v5[data-forma="oblongo"] .flut-topo {
+  padding: 0;
+}
+
+.v5[data-forma="oblongo"] .cta--lg {
+  padding: 1.05rem 2.25rem;
+}
+
+/* Canto generoso e borda mais discreta: o canto arredondado já faz o trabalho
+   que a borda fazia na versão reta. */
+.v5[data-forma="oblongo"] .scope,
+.v5[data-forma="oblongo"] .loja,
+.v5[data-forma="oblongo"] .form-fr,
+.v5[data-forma="oblongo"] .ph {
+  border-radius: var(--r-lg);
+}
+
+
+.v5[data-forma="oblongo"] .ico {
+  border-radius: var(--r-md);
+}
+
+/* A display angular do wordmark briga com canto redondo: nesta forma as
+   manchetes voltam para o grotesco do corpo. */
+.v5[data-forma="oblongo"] .hero h1,
+.v5[data-forma="oblongo"] .sec h2,
+.v5[data-forma="oblongo"] .close h2,
+.v5[data-forma="oblongo"] .sobre-card h3 {
+  font-family: var(--f-txt), system-ui, sans-serif;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+/* ============ HERÓI ============ */
+
+/* O retângulo do herói é o contexto de posicionamento da carta, e o conteúdo
+   sobe acima dela. */
+.herowrap--plano {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.herowrap--plano > .hero {
+  position: relative;
+  z-index: 1;
+}
+
+/* O painel do herói fica translúcido: opaco, ele apagaria a carta justamente
+   na área central. */
+.herowrap--plano .scope {
+  background: rgba(11, 18, 25, 0.72);
+  border-color: rgba(102, 205, 255, 0.18);
+  backdrop-filter: blur(2px);
+}
+
+/* A camada da carta dissolve embaixo, para não deixar emenda com a seção
+   seguinte. */
+.fundo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+}
+
+/* ============ CARTA TOPOGRÁFICA ============ */
+
+.fundo--topo {
+  background: linear-gradient(180deg, #071018 0%, #05090d 82%);
+  color: #3ba5e8;
+}
+
+.fundo--topo svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A luz impede a carta de virar textura uniforme. Concentra onde a manchete
+   não está. */
+.fundo--topo .topo-luz {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 70% at 76% 30%, rgba(102, 205, 255, 0.14), transparent 66%);
+}
+
+/* ============ TRAÇADO E APAGAMENTO ============
+
+     entrada    cada curva se risca do começo ao fim pelo `stroke-dashoffset`,
+                com atraso escalonado — as mestras primeiro, as intermediárias
+                depois. É a carta sendo plotada.
+     rolagem    máscara horizontal apaga da esquerda para a direita conforme o
+                herói sai, no mesmo sentido do traçado.
+
+   Os dois gestos vão para o mesmo lado de propósito: apagar no sentido
+   contrário leria como cortina fechando, e não como o desenho sendo desfeito.
+
+   `--tp-apaga` precisa de `@property`: sem tipo declarado o navegador
+   interpola porcentagem dentro de máscara como troca discreta, e a varredura
+   vira pulo. */
+
+@property --tp-apaga {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.fundo--topo svg {
+  --tp-apaga: 0%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0 var(--tp-apaga),
+    #000 calc(var(--tp-apaga) + 10%)
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0 var(--tp-apaga),
+    #000 calc(var(--tp-apaga) + 10%)
+  );
+}
+
+@keyframes tpRiscar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tpApagar {
+  from {
+    --tp-apaga: 0%;
+  }
+  to {
+    --tp-apaga: 120%;
+  }
+}
+
+@keyframes tpLuz {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .topo-curva {
+    stroke-dasharray: 1;
+    animation: tpRiscar 2.1s cubic-bezier(0.32, 0.9, 0.26, 1) both;
+  }
+
+  .fundo--topo .topo-luz {
+    animation: tpLuz 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* `view()` mede o próprio elemento contra a viewport, e a faixa `exit` cobre
+   exatamente o trecho em que o herói está saindo. Sem listener de rolagem.
+   Onde não houver suporte, a carta aparece inteira e estática: herói correto,
+   só sem o gesto. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fundo--topo svg {
+      animation: tpApagar linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+
+    .fundo--topo .topo-luz {
+      animation: tpLuz 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
+        tpLuz linear reverse both;
+      animation-timeline: auto, view();
+      animation-range: normal, exit 0% exit 90%;
+    }
+  }
+}
+
+/* ============ placeholder de visualização ============
+   Provisório: substitui a arte ASCII enquanto o layout está sendo lido. Cinza
+   neutro de propósito, sem ciano e sem textura, para não parecer conteúdo. */
+
+.ph {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background: #1b2027;
+  border: 1px dashed #39424c;
+  color: #7c8794;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.ph span {
+  max-width: 90%;
+}
