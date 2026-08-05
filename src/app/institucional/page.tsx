@@ -75,12 +75,17 @@ export default function Institucional() {
       </Heroi>
 
       <section className="hold sec" id="marca">
-        <h2>O mercado mudou. E nossa marca acompanhou.</h2>
-        <p>
-          Hoje as pessoas buscam produtos exclusivos, experiências
-          personalizadas e soluções rápidas. A Inteligência Artificial está
-          transformando como criamos, compramos e nos conectamos com as marcas.
-        </p>
+        {/* O apoio listava três desejos e depois explicava a IA em abstrato —
+            190 caracteres para dizer o que a frase abaixo diz em 67. O credo,
+            logo em seguida, é quem carrega o peso desta seção. */}
+        <div className="sec-cab">
+          <h2>O mercado mudou. A marca acompanhou.</h2>
+          <p>Exclusivo, personalizado e na hora: é o que a IA passou a permitir.</p>
+        </div>
+        {/* O credo fica fora do cabeçalho: é a frase de propósito da marca, não
+            linha de apoio da manchete. Tem fio próprio, corpo médio e medida
+            mais estreita — se entrasse no `.sec-cab`, herdaria a medida larga do
+            apoio e deixaria de ser citação. */}
         <p className="creed">
           Uma marca que coloca o cliente no centro da criação e usa tecnologia
           para transformar cada momento em um produto que carrega uma história.
@@ -88,11 +93,10 @@ export default function Institucional() {
       </section>
 
       <section className="hold sec" id="pilares">
-        <h2>Três pilares sustentam a empresa.</h2>
-        <p>
-          Não são valores de parede. São as três coisas que precisam funcionar
-          juntas para a marca existir de verdade.
-        </p>
+        <div className="sec-cab">
+          <h2>Três pilares sustentam a empresa.</h2>
+          <p>Não são valores de parede: são o que precisa funcionar junto.</p>
+        </div>
         <div className="cells cells--3">
           <div className="cellart">
             <span className="ico">
@@ -128,11 +132,10 @@ export default function Institucional() {
       </section>
 
       <section className="hold sec" id="produto">
-        <h2>Da ideia ao produto, em 3 passos.</h2>
-        <p>
-          O caminho inteiro acontece no ponto, na frente do cliente, sem
-          encomenda e sem espera de dias.
-        </p>
+        <div className="sec-cab">
+          <h2>Da ideia ao produto, em 3 passos.</h2>
+          <p>Tudo acontece no ponto, na frente do cliente, sem encomenda.</p>
+        </div>
         <div className="steps">
           <div className="step">
             <figure>
@@ -176,11 +179,10 @@ export default function Institucional() {
       </section>
 
       <section className="hold sec" id="ia">
-        <h2>Movidos por Inteligência Artificial.</h2>
-        <p>
-          A IA é o coração da GRAVA.AI — da criação da arte à experiência do
-          cliente no totem.
-        </p>
+        <div className="sec-cab">
+          <h2>Movidos por Inteligência Artificial.</h2>
+          <p>Da criação da arte ao atendimento, tudo passa por ela.</p>
+        </div>
         <div className="cells cells--3">
           <div className="cellart">
             <span className="ico">
@@ -210,11 +212,10 @@ export default function Institucional() {
       </section>
 
       <section className="hold sec" id="onde">
-        <h2>Onde a GRAVA.AI pode estar?</h2>
-        <p>
-          Onde já existe fluxo de gente: a unidade ocupa pouca área e vive da
-          circulação do ponto.
-        </p>
+        <div className="sec-cab">
+          <h2>Onde a GRAVA.AI pode estar?</h2>
+          <p>Ocupa pouca área e vive do fluxo que o ponto já tem.</p>
+        </div>
         <div className="cells cells--3">
           <div className="cellart">
             <span className="ico">
@@ -241,11 +242,10 @@ export default function Institucional() {
       </section>
 
       <footer className="hold close" id="falar">
-        <h2>Leve a GRAVA.AI para a sua região.</h2>
-        <p>
-          A conversa começa no WhatsApp e segue com quem opera a rede, não com
-          um formulário.
-        </p>
+        <div className="sec-cab">
+          <h2>Leve a GRAVA.AI para a sua região.</h2>
+          <p>A conversa começa no WhatsApp, com quem opera a rede.</p>
+        </div>
         <div className="row" style={{ marginTop: 0 }}>
           <a className="cta cta--lg" href={WHATSAPP}>
             Fale conosco no WhatsApp

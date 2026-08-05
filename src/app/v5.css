@@ -870,7 +870,6 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(1rem, 2.5vw, 1.75rem);
-  margin-top: clamp(1.75rem, 4vw, 2.75rem);
 }
 
 @media (max-width: 880px) {
@@ -899,7 +898,7 @@
 
 .steps {
   list-style: none;
-  margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+  margin: 0;
   padding: 0;
   border-top: 1px solid var(--hair);
 }
@@ -939,27 +938,71 @@
   border-bottom: 1px solid var(--hair);
 }
 
-.sec h2 {
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
-  font-size: clamp(1.5rem, 4vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 0 0 1rem;
-  max-width: 20ch;
+/* ---------- cabeçalho de seção ----------
+   Manchete e linha de apoio, uma receita só para as treze seções das três
+   rotas. Antes eram quatro receitas concorrentes, e o desenho denunciava:
+
+   — nove seções empilhavam manchete e apoio direto no `.sec`;
+   — a de abertura ("O que a rede vende…") jogava o apoio numa segunda coluna,
+     ao lado da manchete, e era a única da página a fazer isso;
+   — a dos números embrulhava tudo num contêiner de 52ch e usava 0,85rem de
+     respiro onde as outras usavam 1rem;
+   — os três rodapés tinham manchete maior (3rem contra 2,75), quebra mais cedo
+     (17ch contra 20) e apoio mais estreito (44ch contra 56).
+
+   Nada disso decorria de uma diferença de conteúdo: são todos manchete curta
+   mais uma linha de contexto. Eram quatro decisões tomadas em quatro momentos,
+   e o que o olho lê ao rolar a página é o cabeçalho mudando de tamanho e de
+   lugar a cada seção. Agora é `.sec-cab` nas treze, e mudar o degrau muda em
+   todas de uma vez.
+
+   As medidas, e por que estas:
+
+   `2.125rem` de teto    A manchete estava em 2,75rem e o apoio embaixo dela
+                         ocupava três ou quatro linhas: o bloco de apoio pesava
+                         mais na tela que a própria manchete, invertendo a
+                         hierarquia que o tamanho tentava criar. Baixar o teto
+                         resolve metade; a outra metade é o texto, e está no
+                         conteúdo — apoio de uma linha só.
+
+                         Impacto não vem de corpo grande. Vem de frase curta,
+                         peso 700, entrelinha fechada e espaço em volta. Uma
+                         manchete de 34px sobre uma linha de apoio é mais forte
+                         que uma de 44px sobre um parágrafo, porque ali existe
+                         uma coisa dominando e aqui existem duas competindo.
+
+   `24ch` na manchete    Com o corpo menor e a frase mais curta, é o que segura
+                         quase todas em uma ou duas linhas.
+   `72ch` no apoio       Largo o bastante para as frases novas caberem em uma
+                         linha no desktop, que é o formato pedido.
+   `0.85rem` de respiro  Entre os dois. Com a manchete menor, 1rem começava a
+                         soltar o apoio dela. */
+
+.sec-cab {
+  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
 }
 
-.sec > p {
+.sec-cab > h2 {
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.375rem, 2.9vw, 2.125rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
   margin: 0;
-  color: var(--fg-2);
-  max-width: 56ch;
+  max-width: 24ch;
 }
+
+.sec-cab > p {
+  margin: 0.85rem 0 0;
+  color: var(--fg-2);
+  max-width: 72ch;
+}
+
 
 .cells {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2.5vw, 1.75rem);
-  margin-top: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 @media (max-width: 900px) {
@@ -1100,23 +1143,11 @@
   margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
 }
 
-.close h2 {
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
-  font-size: clamp(1.75rem, 5vw, 3rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  /* faltava: sem isto a manchete de fechamento herdava o 1,62 do corpo e
-     abria um vão de linha que nenhuma outra display da página tem */
-  line-height: 1.05;
-  margin: 0 0 1rem;
-  max-width: 17ch;
-}
-
-.close p {
-  margin: 0 0 1.5rem;
-  color: var(--fg-2);
-  max-width: 44ch;
-}
+/* O fechamento usa o mesmo `.sec-cab` das seções. Ele tinha manchete um degrau
+   maior, tracking mais apertado e quebra em 17ch — três diferenças que faziam
+   dele outra família tipográfica no fim da mesma página. A ênfase de "este é o
+   último bloco" já vem do dobro de respiro embaixo, da marca empilhada assinando
+   em cima e do formulário ao lado; não precisa também de outro corpo de letra. */
 
 /* O rodapé perdeu a classe mono: a linha institucional tem 58 caracteres
    e caixa alta em frase inteira é ilegível. Os links ficam em caixa mista. */
@@ -1629,34 +1660,15 @@
 }
 
 /* ---------- sobre a GRAVA.AI ----------
-   Estrutura do bloco `about-3`: cabeçalho em duas colunas, uma peça grande ao
-   lado de uma coluna com cartão e peça menor, e o painel de números embaixo.
-   A adaptação troca as imagens de banco por slots rotulados e a vitrine de
-   métricas por fatos que a rede confirmou. */
+   Estrutura do bloco `about-3`: uma peça grande ao lado de uma coluna com
+   cartão e peça menor. A adaptação troca as imagens de banco por slots
+   rotulados e a vitrine de métricas por fatos que a rede confirmou.
 
-.sobre-topo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(1rem, 4vw, 3rem);
-  align-items: start;
-  margin-bottom: clamp(1.75rem, 4vw, 3rem);
-}
-
-@media (max-width: 860px) {
-  .sobre-topo {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.sobre-topo h2 {
-  margin: 0;
-}
-
-.sobre-topo p {
-  margin: 0;
-  color: var(--fg-2);
-  max-width: 52ch;
-}
+   O cabeçalho em duas colunas do original saiu. Ele era do bloco importado, não
+   do sistema desta página: era a única seção das treze em que a linha de apoio
+   ficava ao lado da manchete em vez de embaixo dela, e no meio de uma página
+   inteira de cabeçalhos empilhados isso não lia como variação, lia como
+   desalinhamento. Passou a usar o `.sec-cab`, como as outras. */
 
 .sobre-grid {
   display: grid;
@@ -1833,7 +1845,6 @@
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   gap: clamp(1.75rem, 5vw, 4rem);
   align-items: center;
-  margin-top: clamp(2rem, 5vw, 3.5rem);
 }
 
 @media (max-width: 900px) {
@@ -1967,7 +1978,6 @@
 /* ---------- comparativo dos tipos de ponto ---------- */
 
 .cmp-wrap {
-  margin-top: clamp(2rem, 5vw, 3rem);
   /* A tabela tem 52rem de largura mínima e, sem isto, esses 832px vazavam da
      caixa de rolagem para a rolagem do documento: num aparelho de 390px a
      página inteira andava 282px para o lado. `contain: paint` diz o que já é
@@ -2149,7 +2159,6 @@
 /* ---------- head to head: modelo tradicional × GRAVA.AI ---------- */
 
 .h2h {
-  margin-top: 1.25rem;
 }
 
 .h2h-cab,
@@ -2425,14 +2434,8 @@
    número que decide a página. Aqui ele é display, e os outros quatro vivem um
    degrau abaixo: a diferença de tamanho é a hierarquia da decisão. */
 
-.num-topo {
-  max-width: 52ch;
-}
-
-.num-topo p {
-  margin: 0.85rem 0 0;
-  color: var(--fg-2);
-}
+/* O cabeçalho desta seção era o `.num-topo`, com contêiner de 52ch e 0,85rem de
+   respiro. Virou `.sec-cab`, como o das outras doze. */
 
 /* ---------- o quadro do investimento ----------
    O número de um lado, a composição dele do outro. O layout é o argumento: o
@@ -2446,10 +2449,8 @@
    detalhe é lido. */
 
 .num-quadro {
-  margin-top: clamp(2rem, 5vw, 3rem);
-  padding-block: clamp(1.5rem, 4vw, 2.5rem);
+  padding-block: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 3vw, 2rem);
   border-top: 1px solid var(--hair);
-  border-bottom: 1px solid var(--hair);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
   gap: clamp(1.5rem, 5vw, 4rem);
@@ -2504,10 +2505,25 @@
   font-weight: 400;
 }
 
-/* O segundo título respira mais: é a virada de assunto do quadro, de "quanto
+/* O título da faixa precisa de mais ar em cima que o do quadro: ali ele abre
+   uma coluna, aqui ele marca a virada de assunto do bloco inteiro — de "quanto
    custa cada parte" para "o que não é cobrado". */
-.num-parcelas + .num-titulo {
-  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+.num-juntos-bloco .num-titulo {
+  margin-top: clamp(0.5rem, 1.6vw, 1rem);
+  margin-bottom: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+/* A faixa do que já vem junto. Ocupa a largura inteira porque é aqui que a
+   seção para de ser uma coluna: cinco itens curtos empilhados dentro de meia
+   largura somavam mais altura que o resto do bloco todo, e nenhum deles tem
+   texto que justifique uma linha própria na página.
+
+   O fio de baixo fechando o quadro do investimento mudou de lugar junto — ele
+   estava no `.num-quadro` e agora fecha embaixo desta faixa, senão haveria uma
+   régua cortando entre as parcelas e o que continua sendo o mesmo assunto. */
+.num-juntos-bloco {
+  padding-block: 0 clamp(1.5rem, 4vw, 2.5rem);
+  border-bottom: 1px solid var(--hair);
 }
 
 .num-parcelas {
@@ -2578,22 +2594,61 @@
   text-transform: uppercase;
 }
 
+/* Cinco colunas numa linha só na largura cheia: em 82rem dá ~15rem por item, e
+   o mais longo destes textos ocupa duas linhas nessa medida. É o item que
+   define quantas colunas cabem, não o contrário.
+
+   As quebras evitam órfã sempre que dá: cinco itens em três colunas fazem 3+2,
+   que é a divisão mais equilibrada possível com esse número. Abaixo disso a
+   tela não tem horizontal para aproveitar, e empilhar é a leitura certa. */
 .num-juntos {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.9rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(1rem, 2.4vw, 1.75rem);
+}
+
+@media (max-width: 1180px) {
+  .num-juntos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .num-juntos {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .num-juntos li {
   display: grid;
-  gap: 0.1rem;
-  /* O fio à esquerda amarra o grupo e o separa das parcelas: ali cada linha é
-     uma quantia, aqui nenhuma é. Dois grupos com o mesmo desenho leriam como a
-     mesma lista, e a soma pararia de fechar na cabeça de quem lê. */
-  padding-left: clamp(0.85rem, 2vw, 1.15rem);
-  border-left: 2px solid var(--hair-hot);
+  gap: 0.2rem;
+  align-content: start;
+  /* O fio mudou da esquerda para o topo quando a lista virou faixa. Numa
+     coluna, fio à esquerda é o que amarra os itens; numa fileira, ele viraria
+     cinco riscos verticais brigando com a leitura horizontal. Em cima, os cinco
+     fios formam uma régua tracejada que diz "estes são pares" — que é
+     exatamente a informação.
+
+     O que ele não pode deixar de fazer é separar este grupo das parcelas: ali
+     cada linha é uma quantia, aqui nenhuma é. Dois grupos com o mesmo desenho
+     leriam como a mesma lista, e a soma pararia de fechar na cabeça de quem lê.
+     Fio na horizontal, na cor de realce, continua dizendo isso. */
+  padding-top: clamp(0.7rem, 1.6vw, 0.9rem);
+  border-top: 2px solid var(--hair-hot);
+}
+
+/* Empilhado o fio volta para a esquerda: cinco réguas horizontais uma embaixo
+   da outra leriam como cinco seções, não como cinco itens de uma lista. */
+@media (max-width: 760px) {
+  .num-juntos li {
+    padding-top: 0;
+    padding-left: clamp(0.85rem, 2vw, 1.15rem);
+    border-top: 0;
+    border-left: 2px solid var(--hair-hot);
+  }
 }
 
 .num-junto-tit {
@@ -2631,8 +2686,12 @@
 
 /* Os benefícios entram todos depois do pouso da contagem, então precisam de
    escalonamento próprio — as parcelas ganham o delas da própria contagem, que
-   as revela em momentos diferentes. 60ms entre linhas: o suficiente para ler
-   como cascata, pouco para não virar espera. */
+   as revela em momentos diferentes. 60ms entre itens: o suficiente para ler
+   como cascata, pouco para não virar espera.
+
+   Em fileira o escalonamento ganhou sentido que não tinha na coluna: ele varre
+   da esquerda para a direita, no sentido da leitura. Empilhado era só uma lista
+   aparecendo devagar. */
 .num-juntos li:nth-child(2) {
   transition-delay: 60ms;
 }
@@ -3114,16 +3173,11 @@
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     /* ---- cabeçalho de seção: manchete e o parágrafo de apoio ---- */
-    .v5 .sec > h2,
-    .v5 .sobre-topo > h2,
-    .v5 .num-topo > h2,
-    /* Filho direto, e nunca descendente: o fechamento carrega o formulário
-       inteiro dentro dele, e `.close p` pegava também o texto de apoio do
-       formulário, o aviso de privacidade e a confirmação de envio — esta
-       última tem entrada própria, disparada por um clique, e perderia ela
-       para uma animação de rolagem. */
-    .v5 .close > h2,
-    .v5 .close-duo > div > h2 {
+    /* Cinco seletores viraram um: o cabeçalho é uma peça só agora, e o
+       problema que exigia `>` em cada caso — `.close p` pegando o texto do
+       formulário inteiro — deixou de existir junto, porque o `.sec-cab`
+       delimita exatamente o que é cabeçalho. */
+    .v5 .sec-cab > h2 {
       animation: sobe linear both;
       animation-timeline: view();
       animation-range: entry 8% cover 26%;
@@ -3133,10 +3187,7 @@
        faixa começando mais tarde, que é o mesmo escalonamento medido em
        rolagem em vez de em tempo. Escalonar em segundos aqui daria resultado
        diferente conforme a velocidade da rolagem. */
-    .v5 .sec > p,
-    .v5 .sobre-topo > p,
-    .v5 .num-topo > p,
-    .v5 .close p {
+    .v5 .sec-cab > p {
       animation: sobe linear both;
       animation-timeline: view();
       animation-range: entry 14% cover 32%;

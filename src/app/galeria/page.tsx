@@ -69,11 +69,10 @@ export default function Galeria() {
       </section>
 
       <footer className="hold close" id="falar">
-        <h2>Quer ver de perto?</h2>
-        <p>
-          A apresentação completa da franquia sai pelo WhatsApp, com as peças
-          que a rede já produz.
-        </p>
+        <div className="sec-cab">
+          <h2>Quer ver de perto?</h2>
+          <p>A apresentação completa da franquia sai pelo WhatsApp.</p>
+        </div>
         <div className="row" style={{ marginTop: 0 }}>
           <a className="cta cta--lg" href={WHATSAPP}>
             Falar no WhatsApp

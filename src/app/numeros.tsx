@@ -32,7 +32,7 @@ const LINHAS: { rotulo: string; valor: string }[] = [
 export function Numeros() {
   return (
     <section className="hold sec num" id="numeros">
-      <div className="num-topo">
+      <div className="sec-cab">
         {/* O título dizia "o que custa e em quanto tempo volta", e a seção
             respondia bem a segunda metade e mal a primeira: o número aparecia
             sozinho, com uma frase de rodapé citando duas quantias soltas. A
@@ -40,10 +40,11 @@ export function Numeros() {
             dentro. O título passou a fazer a pergunta que o bloco responde, e o
             payback continua logo abaixo, na grade. */}
         <h2>O que custa e o que vem dentro.</h2>
-        <p>
-          Um valor só, pago uma vez. Abaixo dele está a composição do que a rede
-          detalha, e o que já vem junto sem custo à parte.
-        </p>
+        {/* O apoio descrevia a estrutura do bloco — "abaixo está a composição
+            e o que vem junto". O bloco já tem dois títulos dizendo isso, cada
+            um em cima do grupo que ele nomeia. Legenda de layout não é apoio de
+            manchete; o que sobra é o fato que a manchete não cabe. */}
+        <p>Um valor só, pago uma vez — e tudo que ele já cobre.</p>
       </div>
 
       <NumerosQuadro />

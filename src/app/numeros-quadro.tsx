@@ -184,6 +184,7 @@ export function NumerosQuadro() {
   }, []);
 
   return (
+    <>
     <div className="num-quadro" ref={quadroRef}>
       <div className="num-face">
         <span className="num-rot mono">Investimento total</span>
@@ -220,17 +221,30 @@ export function NumerosQuadro() {
             </li>
           ))}
         </ol>
-
-        <h3 className="num-titulo mono">E o que já vem junto, sem custo à parte</h3>
-        <ul className="num-juntos" data-visivel={pousou ? "1" : undefined}>
-          {JUNTOS.map((j) => (
-            <li key={j.titulo}>
-              <span className="num-junto-tit">{j.titulo}</span>
-              <span className="num-junto-txt">{j.texto}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
+
+    {/* Fora do quadro de duas colunas, e é uma decisão de leitura, não de
+        arrumação. Estas cinco não são parcelas do preço: são o que a rede já
+        entrega sem cobrar à parte. Dentro da coluna da direita elas viravam a
+        continuação da lista de cima — mesma largura, mesmo empilhamento, e a
+        pessoa lia dez itens de um assunto só, sendo que a virada de assunto é o
+        argumento inteiro do bloco.
+
+        Aqui embaixo, na largura da página e lado a lado, elas leem como o que
+        são: uma faixa de cinco coisas de mesmo peso, nenhuma delas com preço. E
+        a seção deixa de ser uma coluna de dez itens de altura. */}
+    <div className="num-juntos-bloco">
+      <h3 className="num-titulo mono">E o que já vem junto, sem custo à parte</h3>
+      <ul className="num-juntos" data-visivel={pousou ? "1" : undefined}>
+        {JUNTOS.map((j) => (
+          <li key={j.titulo}>
+            <span className="num-junto-tit">{j.titulo}</span>
+            <span className="num-junto-txt">{j.texto}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    </>
   );
 }

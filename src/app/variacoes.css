@@ -65,8 +65,7 @@
    negativo. A regra base do `v5.css` já fazia isso; era esta camada que
    achatava tudo de volta num valor. */
 .v5[data-forma="oblongo"] .hero h1,
-.v5[data-forma="oblongo"] .sec h2,
-.v5[data-forma="oblongo"] .close h2,
+.v5[data-forma="oblongo"] .sec-cab > h2,
 .v5[data-forma="oblongo"] .sobre-card h3 {
   font-family: var(--f-txt), system-ui, sans-serif;
   font-weight: 600;
@@ -77,9 +76,10 @@
   letter-spacing: -0.042em;
 }
 
-/* Manchete de seção e de fechamento, um degrau abaixo. */
-.v5[data-forma="oblongo"] .sec h2,
-.v5[data-forma="oblongo"] .close h2 {
+/* Manchete de seção, um degrau abaixo — e é um degrau só agora: o fechamento
+   usava -0,035em contra os -0,03em das seções, diferença que só existia porque
+   ele também era maior. Com um corpo só, um tracking só. */
+.v5[data-forma="oblongo"] .sec-cab > h2 {
   letter-spacing: -0.03em;
 }
 

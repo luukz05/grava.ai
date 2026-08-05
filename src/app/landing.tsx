@@ -90,15 +90,13 @@ export function Landing({ tema }: { tema?: Tema }) {
               número de vitrine aqui é exatamente o que esta página se recusa a
               fazer, e o slot está montado esperando o dado real. */}
         <section className="hold sec sobre" id="esperar">
-          <div className="sobre-topo">
+          {/* O apoio tinha quatro linhas e dizia três coisas — o que a marca é,
+              o que o cliente faz e o que o franqueado compra. As duas primeiras
+              a página conta nas seções seguintes, com mais espaço e melhor. O
+              que resta aqui é a única que a manchete não diz sozinha. */}
+          <div className="sec-cab">
             <h2>O que a rede vende não é a máquina.</h2>
-            <p>
-              Uma marca de personalização de produtos com inteligência
-              artificial, operando por quiosques automatizados em locais de alto
-              fluxo. O cliente participa da criação e leva um item personalizado
-              na hora. O que a rede vende ao franqueado é essa operação inteira,
-              montada e assistida.
-            </p>
+            <p>É a operação inteira: quiosque, IA e abastecimento, já montados.</p>
           </div>
 
           <div className="sobre-grid">
@@ -140,11 +138,10 @@ export function Landing({ tema }: { tema?: Tema }) {
         </section>
 
         <section className="hold sec" id="diferenciais">
-          <h2>De quem é cada tarefa da operação.</h2>
-          <p>
-            Numa loja de gravação comum, tudo abaixo é problema do dono. Aqui, a
-            maior parte já chega resolvida.
-          </p>
+          <div className="sec-cab">
+            <h2>De quem é cada tarefa da operação.</h2>
+            <p>Numa loja comum, tudo isto é problema do dono. Aqui, quase nada é.</p>
+          </div>
           {/* A galeria de seis cartões saiu: dizia, em uma linha cada, o mesmo
               que a coluna da direita do comparativo diz — e o comparativo diz
               contra o quê. */}
@@ -160,11 +157,13 @@ export function Landing({ tema }: { tema?: Tema }) {
             projeto — o original depende de Tailwind e shadcn, que não existem
             neste código. */}
         <section className="hold sec" id="ia">
-          <h2>A IA trabalha em quatro lugares. Todos com nome.</h2>
-          <p>
-            Não é enfeite de apresentação: são quatro funções operando a unidade
-            todos os dias, cada uma com nome e com endereço na operação.
-          </p>
+          {/* "Todos com nome" saiu da manchete e virou o trabalho do apoio: na
+              manchete era promessa, no apoio é a informação que a órbita logo
+              abaixo comprova nome por nome. */}
+          <div className="sec-cab">
+            <h2>A IA trabalha em quatro lugares.</h2>
+            <p>Quatro funções operando a unidade todo dia, cada uma com nome.</p>
+          </div>
 
           <Orbita />
         </section>
@@ -177,12 +176,13 @@ export function Landing({ tema }: { tema?: Tema }) {
             qualitativos de propósito: o cliente não forneceu número por tipo de
             ponto, e o slot de dado fica preparado para receber o real depois. */}
         <section className="hold sec" id="pontos">
-          <h2>Gente em movimento, gente em busca de algo especial.</h2>
-          <p>
-            A unidade ocupa pouca área e vive do fluxo que já existe no ponto. O
-            que muda de um tipo de loja para outro é o tempo que a pessoa tem e
-            o motivo pelo qual ela está ali.
-          </p>
+          {/* A manchete é a frase da própria franqueadora — fica. O que encurtou
+              foi a repetição do "gente", e o apoio ficou só com a informação que
+              a tabela abaixo desenvolve: o que muda de um ponto para o outro. */}
+          <div className="sec-cab">
+            <h2>Gente em movimento, em busca de algo especial.</h2>
+            <p>O que muda de um ponto para o outro é o tempo que a pessoa tem.</p>
+          </div>
 
           <LojasComparativo />
         </section>
@@ -206,15 +206,15 @@ export function Landing({ tema }: { tema?: Tema }) {
         />
         <div className="close-duo">
           <div>
-            <h2>Leve a unidade para a sua região.</h2>
-            {/* A frase antiga dizia "não com um formulário". Com o formulário
-                  ao lado, ela passou a contradizer a própria página: o que se
-                  promete agora é que do outro lado tem gente, não que não
-                  existe campo para preencher. */}
-            <p>
-              Quem responde é quem opera a rede. Chame direto ou preencha ao
-              lado e a conversa já começa com o seu contexto.
-            </p>
+            <div className="sec-cab">
+              <h2>Leve a unidade para a sua região.</h2>
+              {/* A frase antiga dizia "não com um formulário". Com o formulário
+                    ao lado, ela passou a contradizer a própria página: o que se
+                    promete agora é que do outro lado tem gente, não que não
+                    existe campo para preencher. A instrução de como usar o
+                    formulário saiu daqui — ela já está escrita dentro dele. */}
+              <p>Quem responde é quem opera a rede, não um atendente.</p>
+            </div>
             <div className="row" style={{ marginTop: 0 }}>
               <a className="cta cta--lg" href={WHATSAPP}>
                 Falar no WhatsApp
