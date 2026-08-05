@@ -6,7 +6,7 @@
    piscada de tema errado ao carregar. Este componente só lê e escreve o mesmo
    atributo, mais o localStorage. */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Tema = "dark" | "light";
 
@@ -34,15 +34,32 @@ export function TemaSwitch() {
      real chega no efeito, logo depois da hidratação. */
   const [tema, setTema] = useState<Tema>("dark");
   const [pronto, setPronto] = useState(false);
+  /* A janela em que a página tem permissão de esmaecer de um tema para o
+     outro. Vive fora do React de propósito: é sinal para o CSS, ninguém
+     re-renderiza por causa dela. */
+  const janela = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     setTema(lerTema());
     setPronto(true);
+    return () => window.clearTimeout(janela.current);
   }, []);
 
   function trocar() {
     const novo: Tema = tema === "dark" ? "light" : "dark";
-    document.documentElement.dataset.tema = novo;
+    const raiz = document.documentElement;
+
+    /* Abre a janela de transição antes de trocar o atributo do tema, senão o
+       navegador já pintou o novo valor quando a regra chega. Os 280ms cobrem
+       os 240ms da transição do CSS com folga; cliques seguidos reiniciam a
+       contagem em vez de fechar a janela no meio do esmaecimento. */
+    raiz.dataset.trocandoTema = "";
+    window.clearTimeout(janela.current);
+    janela.current = window.setTimeout(() => {
+      delete raiz.dataset.trocandoTema;
+    }, 280);
+
+    raiz.dataset.tema = novo;
     try {
       localStorage.setItem("grava:tema", novo);
     } catch {

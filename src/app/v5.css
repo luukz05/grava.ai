@@ -21,18 +21,111 @@
      bloco dela, o `top` do sticky e a margem negativa da chapa. */
   --nav-gap: clamp(0.75rem, 1.6vw, 1.25rem);
 
+  /* ---------- movimento ----------
+     A página tinha oito durações e cinco curvas diferentes, cada uma escolhida
+     no momento em que o componente nasceu. Isso não é sistema: é acúmulo. São
+     três tempos e duas curvas agora, e cada valor tem uma razão de existir.
+
+     Os tempos vêm da distinção que a Apple faz entre responder e se deslocar:
+
+     --t-press  resposta ao dedo. Precisa acontecer dentro do quadro em que a
+                pessoa ainda está apertando, senão o botão lê como morto. Abaixo
+                de 100ms o olho não percebe como animação, só como resposta.
+     --t-ui     mudança de estado sem deslocamento: cor, borda, sublinhado.
+     --t-mov    algo que muda de lugar ou de tamanho. É o `response` de 0,34s da
+                mola padrão da Apple, escrito como duração.
+
+     As curvas:
+
+     --e-ui     saída padrão. Sai rápido e chega devagar, sem passar do ponto.
+     --e-mola   a mesma mola criticamente amortecida que a Apple usa como base
+                (damping 1.0, response 0.34s), amostrada em treze pontos e
+                escrita em `linear()`. `x(t) = 1 − (1 + ωt)·e^⁻ωt`, ω = 2π/0.34.
+                É mola de verdade — o mesmo perfil de chegada —, sem carregar
+                uma biblioteca de animação numa página que não tem gesto para
+                interromper. Onde `linear()` não existe, o fallback logo abaixo
+                mantém a curva padrão. */
+  --t-press: 90ms;
+  --t-ui: 180ms;
+  --t-mov: 340ms;
+  --e-ui: cubic-bezier(0.32, 0.72, 0, 1);
+  --e-mola: var(--e-ui);
+
   background: var(--bg);
   color: var(--fg);
   font-family: var(--f-txt), system-ui, sans-serif;
   /* Bricolage Grotesque: largura e terminais irregulares de propósito.
-     Geist saiu por estar na lista de faces saturadas do detector. */
-  font-size: 15.5px;
+     Geist saiu por estar na lista de faces saturadas do detector.
+
+     0.96875rem e não 15.5px: em px o corpo do texto ignora o tamanho de fonte
+     que a pessoa configurou no navegador, enquanto todo o resto da página —
+     que é escrito em rem — cresce junto com ele. O valor é o mesmo 15,5px na
+     configuração padrão; a diferença é que agora ele escala.
+
+     `font-optical-sizing`: a Bricolage tem eixo óptico (opsz 12–96) e o
+     `casca.tsx` carrega ele. Com isto o desenho da letra muda com o corpo —
+     hastes mais finas e contraforma mais aberta na manchete, o oposto no
+     texto miúdo. É o que a Apple faz nativamente com a San Francisco. */
+  font-size: 0.96875rem;
+  font-optical-sizing: auto;
   line-height: 1.62;
+  /* O retângulo cinza que o WebKit pinta sobre qualquer elemento tocado. Ele
+     aparece depois do toque, com atraso e no formato errado, e briga com o
+     `:active` desenhado logo abaixo. Quem dá a resposta ao dedo é o CSS da
+     página, não o navegador. */
+  -webkit-tap-highlight-color: transparent;
   /* `clip` e não `hidden`: `hidden` faz deste elemento um contêiner de
      rolagem, e contêiner de rolagem mata o `position: sticky` de todo
      descendente — era por isso que o índice e a barra não acompanhavam.
      `clip` corta o transbordo lateral sem criar o contêiner. */
   overflow-x: clip;
+}
+
+/* A mola, onde `linear()` existe (Chrome 113, Safari 17.2, Firefox 112). O
+   teste é a própria função: se o navegador não sabe interpolar, a declaração
+   inteira é descartada e `--e-mola` continua valendo `--e-ui`. */
+@supports (transition-timing-function: linear(0, 1)) {
+  .v5 {
+    --e-mola: linear(
+      0,
+      0.0974,
+      0.2816,
+      0.4655,
+      0.619,
+      0.7359,
+      0.8211,
+      0.8807,
+      0.9213,
+      0.9487,
+      0.9668,
+      0.9787,
+      1
+    );
+  }
+}
+
+/* ---------- resposta ao toque ----------
+   Regra de base, e não de componente: qualquer coisa clicável nesta página
+   responde no `pointerdown`, não no `click`. Esperar o dedo sair para dar
+   sinal é o que faz uma interface parecer lenta mesmo quando é rápida.
+
+   `touch-action: manipulation` desliga a espera de duplo-toque do navegador
+   móvel — são ~300ms de latência entre o toque e o clique, cobrados em todo
+   botão de uma página cujo público chega de campanha, no celular. */
+.v5 a,
+.v5 button,
+.v5 [role="button"],
+.v5 label,
+.v5 summary {
+  touch-action: manipulation;
+}
+
+/* O anel de foco valia só para `a`. O botão de envio do formulário e a chave
+   de tema são `button` e ficavam sem nenhum sinal de foco de teclado — em
+   navegação por Tab, o formulário inteiro tinha um passo invisível. */
+.v5 :focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 3px;
 }
 
 /* O reset que zerava o raio de tudo saiu: a página é arredondada por inteiro
@@ -103,8 +196,11 @@
   padding: 0.55rem 1rem;
   text-decoration: none;
   white-space: nowrap;
-  /* propriedades nomeadas, nunca `all` */
-  transition: background-color 150ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  /* propriedades nomeadas, nunca `all`.
+     A volta é a mola: o botão solta como coisa com massa, não como valor
+     interpolado. A ida está logo abaixo, e é outra história. */
+  transition: background-color var(--t-ui) var(--e-ui),
+    transform var(--t-mov) var(--e-mola);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -120,9 +216,17 @@
 }
 
 /* O botão precisa dizer que ouviu o clique. É o CTA do WhatsApp,
-   a única métrica desta página. */
+   a única métrica desta página.
+
+   Assimétrico de propósito: a ida em 90ms lineares e a volta em 340ms de
+   mola. Apertar precisa ser instantâneo — é a resposta ao dedo, e resposta
+   com curva de saída chega atrasada. Soltar é o botão voltando ao lugar, e
+   aí a física é bem-vinda. Uma duração só para os dois sentidos escolhe
+   entre parecer lento e parecer duro. */
 .cta:active {
   transform: scale(0.97);
+  transition-duration: var(--t-press), var(--t-press);
+  transition-timing-function: linear, linear;
 }
 
 .cta--lg {
@@ -136,15 +240,26 @@
   color: var(--fg);
 }
 
-.cta--out:hover,
+/* ---------- hover é do cursor, não do dedo ----------
+   O `.cta` já nascia atrás deste portão e o resto da página não: `.cta--out`,
+   a pílula, a chave de tema, os canais do rodapé e os campos acendiam no
+   `:hover` também no celular. Em toque o `:hover` não existe como estado
+   passageiro — ele gruda no elemento tocado e só sai quando outro é tocado.
+   Resultado: a pessoa aperta a chave de tema, a página troca, e a chave fica
+   acesa pelo resto da visita como se ainda estivesse sendo apontada.
+
+   `:focus-visible` fica de fora do portão de propósito: teclado existe em
+   qualquer aparelho, e é o único caminho de quem não usa nem cursor nem dedo. */
+@media (hover: hover) and (pointer: fine) {
+  .cta--out:hover {
+    background: rgba(59, 165, 232, 0.12);
+    color: var(--fg);
+  }
+}
+
 .cta--out:focus-visible {
   background: rgba(59, 165, 232, 0.12);
   color: var(--fg);
-}
-
-.v5 a:focus-visible {
-  outline: 2px solid var(--fg-hot);
-  outline-offset: 3px;
 }
 
 /* A chapa sobe por trás da barra até o topo da página. A margem negativa é
@@ -495,21 +610,26 @@
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   color: var(--fg-2);
-  transition: color 180ms ease;
+  transition: color var(--t-ui) var(--e-ui);
 }
 
 .indice-n {
   opacity: 0.55;
 }
 
-/* O traço mostra o percurso: cresce na seção atual e fica curto nas outras. */
+/* O traço mostra o percurso: cheio no que já passou e na seção atual, curto no
+   que ainda vem. A mola aqui importa mais que em qualquer outro lugar da
+   página — é o único elemento que se move sozinho enquanto a pessoa rola, e
+   uma linha que cresce com curva de mola lê como coisa acompanhando a leitura,
+   não como valor sendo interpolado. */
 .indice-traco {
   height: 1px;
   width: 100%;
   background: currentColor;
   opacity: 0.3;
   transform-origin: left;
-  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease;
+  transition: transform var(--t-mov) var(--e-mola),
+    opacity var(--t-mov) var(--e-ui);
   transform: scaleX(0.45);
 }
 
@@ -519,17 +639,23 @@
   white-space: nowrap;
 }
 
-.indice li[data-estado="passou"] a {
-  opacity: 0.45;
+/* O estado morava na opacidade do item inteiro: 0,45 no que já passou, 0,7 no
+   que vem. Em mono de 11px sobre o fundo da página isso dava 2,1:1 de
+   contraste — abaixo até do mínimo de conteúdo decorativo, num texto que é
+   navegação. O rótulo agora fica sempre em `--fg-2` (6:1) e quem carrega o
+   estado é o traço: ele fica cheio no trecho já percorrido e curto no que
+   falta, que é a mesma informação desenhada em vez de apagada. */
+.indice li[data-estado="passou"] .indice-traco {
+  transform: scaleX(1);
+  opacity: 0.28;
 }
 
-.indice li[data-estado="adiante"] a {
-  opacity: 0.7;
+.indice li[data-estado="passou"] .indice-n {
+  opacity: 0.4;
 }
 
 .indice li[data-estado="atual"] a {
   color: var(--fg-hot);
-  opacity: 1;
 }
 
 .indice li[data-estado="atual"] .indice-traco {
@@ -546,10 +672,12 @@
   color: var(--fg);
 }
 
+/* Movimento reduzido não é transição zero: cor e opacidade continuam, porque
+   são elas que explicam a mudança de estado. O que sai é o traço crescendo —
+   a única parte que é deslocamento. */
 @media (prefers-reduced-motion: reduce) {
-  .indice a,
   .indice-traco {
-    transition: none;
+    transition: opacity var(--t-ui) var(--e-ui);
   }
 }
 
@@ -849,9 +977,10 @@
 .cellart {
   border: 1px solid var(--hair);
   padding: clamp(1rem, 2.4vw, 1.4rem);
-  /* 150ms, não 260ms: hover é visto dezenas de vezes por sessão e
+  /* `--t-ui`, não `--t-mov`: hover é visto dezenas de vezes por sessão e
      reação a hover deve ser reduzida, não coreografada. */
-  transition: border-color 150ms ease, background-color 150ms ease;
+  transition: border-color var(--t-ui) var(--e-ui),
+    background-color var(--t-ui) var(--e-ui);
 }
 
 /* Gate de hover: em toque o :hover gruda no tap e fica aceso depois
@@ -869,8 +998,10 @@
   width: 26px;
   height: 26px;
   color: var(--fg-2);
-  /* 180ms no transform: hover tem que responder, não coreografar */
-  transition: color 150ms ease, transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  /* O deslocamento do ícone é o único movimento do bloco: vai na mola, e a cor
+     acompanha no tempo curto de estado. */
+  transition: color var(--t-ui) var(--e-ui),
+    transform var(--t-mov) var(--e-mola);
 }
 
 .ico svg {
@@ -886,30 +1017,57 @@
   }
 }
 
-/* Entrada dos ícones: 600ms e escalonada por bloco. Oito ícones
-   desenhando ao mesmo tempo lê como glitch; em cascata lê como intenção. */
-@media (prefers-reduced-motion: no-preference) {
-  .ico svg path,
-  .ico svg rect {
-    stroke-dasharray: 90;
-    stroke-dashoffset: 90;
-    animation: trace 600ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  }
-  .cells > *:nth-child(1) .ico svg * {
-    animation-delay: 0ms;
-  }
-  .cells > *:nth-child(2) .ico svg * {
-    animation-delay: 60ms;
-  }
-  .cells > *:nth-child(3) .ico svg * {
-    animation-delay: 120ms;
-  }
-  .cells > *:nth-child(4) .ico svg * {
-    animation-delay: 180ms;
+/* Quem pediu menos movimento continua recebendo o realce — o ícone acende,
+   que é o que diz "este bloco está sob o cursor". O que sai é o deslocamento. */
+@media (prefers-reduced-motion: reduce) {
+  .cellart:hover .ico {
+    transform: none;
   }
 }
 
+/* Entrada dos ícones, escalonada por bloco. Oito ícones desenhando ao mesmo
+   tempo lê como glitch; em cascata lê como intenção.
+
+   O gatilho mudou de tempo para posição, e essa é a correção que importa: o
+   traço rodava 600ms a partir do carregamento da página, com atraso de até
+   180ms. As `.cells` da institucional estão a duas telas da dobra, então a
+   animação inteira acontecia e terminava antes de qualquer pessoa ver aquele
+   pedaço da página. Era enfeite pago e nunca entregue.
+
+   Com `view()` o desenho acontece quando o bloco chega, que é a única hora em
+   que ele significa alguma coisa. A cascata continua existindo, medida em
+   faixa de rolagem em vez de em milissegundos — e assim ela não muda de
+   sensação conforme a velocidade da rolagem. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ico svg path,
+    .ico svg rect {
+      stroke-dasharray: 90;
+      animation: trace linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 34%;
+    }
+    .cells > *:nth-child(2) .ico svg * {
+      animation-range: entry 16% cover 38%;
+    }
+    .cells > *:nth-child(3) .ico svg * {
+      animation-range: entry 20% cover 42%;
+    }
+    .cells > *:nth-child(4) .ico svg * {
+      animation-range: entry 24% cover 46%;
+    }
+  }
+}
+
+/* O `from` é explícito agora. Antes o quadro inicial vinha do
+   `stroke-dashoffset: 90` declarado na regra, e a regra deixou de declarar ele
+   — sem tirar da regra, o ícone ficaria apagado para quem não tem linha do
+   tempo de rolagem. Com `from` no keyframe, o estado de repouso do ícone é o
+   ícone desenhado, e o traçado só existe onde ele pode acontecer. */
 @keyframes trace {
+  from {
+    stroke-dashoffset: 90;
+  }
   to {
     stroke-dashoffset: 0;
   }
@@ -1007,13 +1165,30 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--fg) 4%, transparent);
   color: var(--fg-2);
-  transition: color 160ms ease, background-color 160ms ease;
+  transition: color var(--t-ui) var(--e-ui),
+    background-color var(--t-ui) var(--e-ui),
+    transform var(--t-mov) var(--e-mola);
 }
 
-.rodape-redes a:hover,
+@media (hover: hover) and (pointer: fine) {
+  .rodape-redes a:hover {
+    color: var(--fg);
+    background: color-mix(in srgb, var(--fg) 9%, transparent);
+  }
+}
+
 .rodape-redes a:focus-visible {
   color: var(--fg);
   background: color-mix(in srgb, var(--fg) 9%, transparent);
+}
+
+/* O mesmo aperto do `.cta`, pelo mesmo motivo: são botões, e botão que não
+   afunda no toque não diz que ouviu. Estes ficam no rodapé, onde o dedo chega
+   depois de nove telas — é o pior lugar possível para um controle mudo. */
+.rodape-redes a:active {
+  transform: scale(0.92);
+  transition-duration: var(--t-press);
+  transition-timing-function: linear;
 }
 
 .rodape-redes svg {
@@ -1115,10 +1290,43 @@
      colada no rodapé; sem isto o botão encosta nela. */
   padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
   /* Token e não valor cru: no tema claro a cor fixa deixava uma tarja preta
-     colada no rodapé de uma página de papel. */
-  background: color-mix(in srgb, var(--bg) 95%, transparent);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid var(--hair);
+     colada no rodapé de uma página de papel.
+
+     95% de opacidade com 10px de desfoque era desfoque decorativo: a essa
+     densidade nada do conteúdo atravessa, e o que se via era uma tarja opaca
+     pagando o custo de repintar o fundo a cada quadro de rolagem. Ou é
+     material — o conteúdo passa por baixo e se lê que ele continua ali —, ou é
+     tarja sólida e o desfoque sai. Aqui é material: 76%, desfoque de 20px e
+     saturação, que é o que impede a cor por trás de virar cinza ao ser
+     borrada. A superfície é grande, então o desfoque é forte: peça maior lê
+     como material mais espesso. */
+  background: color-mix(in srgb, var(--bg) 76%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* Fio de luz, não divisória: é a quina do material pegando a claridade da
+     página, do mesmo jeito que a borda superior de uma barra translúcida da
+     Apple. Quem separa a barra do conteúdo é o esmaecido logo abaixo. */
+  border-top: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+}
+
+/* Onde o conteúdo encontra a barra flutuante, a página desvanece em vez de
+   bater numa linha. Divisória de 1px sobre conteúdo que rola corta a frase no
+   meio; o esmaecido diz a mesma coisa — daqui para baixo é chrome — sem cortar
+   nada. Só existe na faixa em que a barra existe, e só sobre a área que ela
+   cobre. */
+.dock::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 1.75rem;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg) 62%, transparent),
+    transparent
+  );
 }
 
 .dock a {
@@ -1238,7 +1446,8 @@
   padding: 0.72rem 0.85rem;
   /* Herda o eixo da forma: reto no boxy, macio no arredondado. */
   border-radius: inherit;
-  transition: border-color 160ms ease, background-color 160ms ease;
+  transition: border-color var(--t-ui) var(--e-ui),
+    background-color var(--t-ui) var(--e-ui);
 }
 
 .v5[data-forma="oblongo"] .campo input,
@@ -1251,9 +1460,11 @@
   opacity: 0.72;
 }
 
-.campo input:hover,
-.campo select:hover {
-  border-color: var(--fg-2);
+@media (hover: hover) and (pointer: fine) {
+  .campo input:hover,
+  .campo select:hover {
+    border-color: var(--fg-2);
+  }
 }
 
 .campo input:focus-visible,
@@ -1695,14 +1906,16 @@
   border-radius: 999px;
   background: var(--bg-2);
   color: var(--fg-2);
-  cursor: pointer;
+  /* Sem `cursor: pointer` e sem transição de estado: os dois sobraram de
+     quando o nó era botão do carrossel. O ciclo saiu, o nó virou desenho, e
+     mão de clique sobre coisa que não clica é a promessa mais barata que uma
+     interface pode quebrar — a pessoa tenta, nada acontece, e a partir dali
+     ela desconfia de todo o resto da página. */
   /* Cartesiano e não polar: a aresta do hexágono é reta, então o ponto de
      pouso vem em x/y direto. As frações multiplicam a largura, e é isso que
      mantém os nós grudados na aresta quando a caixa escala. */
   transform: translate(-50%, 50%)
     translate(calc(var(--dx) * var(--arco)), calc(var(--dy) * var(--arco)));
-  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease,
-    box-shadow 220ms ease;
 }
 
 .orb-no svg {
@@ -1764,6 +1977,12 @@
      a comparação — a razão da seção existir — se perde. Rola na horizontal e
      a coluna de rótulos fica presa na esquerda. */
   overflow-x: auto;
+  /* Quando a tabela chega no fim, a rolagem para nela e não vaza para a
+     página. Sem isto, o gesto que empurra a última coluna continua no
+     documento: a pessoa tenta ver a coluna do aeroporto, a tabela acaba, e
+     quem anda é a página inteira — um limite que ninguém entende porque nada
+     na tela indicou que ele existia. */
+  overscroll-behavior-x: contain;
   /* espaço para o foco do teclado não ser cortado pela caixa de rolagem */
   padding-bottom: 0.5rem;
 }
@@ -2151,12 +2370,51 @@
   font-weight: 700;
 }
 
+/* Confirmação, não aviso — e o desenho precisa dizer qual dos dois é. O aviso
+   de pop-up bloqueado tem moldura inteira em ciano porque exige uma ação; este
+   aqui informa que deu certo, então fica num fio só, à esquerda, no peso de
+   uma nota. Dois retângulos idênticos com textos opostos treinam a pessoa a
+   não ler nenhum dos dois. */
+.form-fr-status {
+  margin: 0.9rem 0 0;
+  padding: 0.15rem 0 0.15rem 0.85rem;
+  border-left: 2px solid var(--fg-hot);
+  font-size: 0.875rem;
+  color: var(--fg);
+  max-width: 46ch;
+}
+
+/* Ela chega depois de um toque, no lugar onde a pessoa está olhando: entra
+   esmaecendo e subindo um passo curto, na mola da página. Sem isso ela
+   simplesmente existe no quadro seguinte, e conteúdo que aparece do nada é
+   lido como pulo de layout, não como resposta. */
+@media (prefers-reduced-motion: no-preference) {
+  .form-fr-status {
+    animation: statusEntra var(--t-mov) var(--e-mola) both;
+  }
+}
+
+@keyframes statusEntra {
+  from {
+    opacity: 0;
+    translate: 0 0.4rem;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
 /* ---------- dedo, não cursor ----------
    Não é questão de largura de tela: um notebook com toque tem 1440px e o mesmo
    dedo. `any-pointer` e não `pointer`: num híbrido com mouse plugado o
    ponteiro primário é fino, mas a tela continua sendo tocada. */
 @media (any-pointer: coarse) {
-  .tema-switch {
+  .tema-switch,
+  /* Os botões de canal do rodapé são o mesmo material e o mesmo papel da chave
+     de tema — e estavam ficando em 42px enquanto ela crescia. Alvo de dedo é
+     regra do controle, não do componente. */
+  .rodape-redes a {
     width: 44px;
     height: 44px;
   }
@@ -2176,70 +2434,231 @@
   color: var(--fg-2);
 }
 
-.num-destaque {
+/* ---------- o quadro do investimento ----------
+   O número de um lado, a composição dele do outro. O layout é o argumento: o
+   valor sozinho é uma objeção, o valor ao lado do que ele cobre é uma
+   explicação. Antes eram duas quantias soltas numa frase de rodapé embaixo do
+   número, que é onde a informação vai para não ser lida.
+
+   O lado do valor gruda: ele fica na tela enquanto a lista da direita passa,
+   então cada linha da composição é lida com o total ainda à vista. É a mesma
+   ideia do índice na margem — a referência não pode sair de cena enquanto o
+   detalhe é lido. */
+
+.num-quadro {
   margin-top: clamp(2rem, 5vw, 3rem);
   padding-block: clamp(1.5rem, 4vw, 2.5rem);
   border-top: 1px solid var(--hair);
   border-bottom: 1px solid var(--hair);
   display: grid;
-  gap: 0.35rem;
-  align-items: end;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    "rot   rot"
-    "valor inclui";
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
 }
 
-@media (max-width: 780px) {
-  .num-destaque {
+@media (max-width: 900px) {
+  .num-quadro {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "rot"
-      "valor"
-      "inclui";
+    gap: clamp(1.5rem, 5vw, 2.25rem);
   }
-
 }
 
-.num-destaque .num-rot {
-  grid-area: rot;
+@media (min-width: 901px) {
+  .num-face {
+    position: sticky;
+    /* Barra do topo mais o respiro que o resto dos sticky da página usa. */
+    top: 6rem;
+  }
 }
 
-.num-destaque .num-val {
-  grid-area: valor;
+.num-conta {
+  display: block;
+  margin-top: 0.35rem;
   font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
   /* A escala é o argumento: este número precisa ser lido antes de qualquer
      outra coisa da seção. */
-  font-size: clamp(3.25rem, 9vw, 6rem);
+  font-size: clamp(3.25rem, 8vw, 5.5rem);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.04em;
-  /* algarismos de mesma largura: número de contrato não dança */
+  /* Algarismos de mesma largura: número de contrato não dança — e enquanto ele
+     conta, cada dígito troca dezenas de vezes. Sem isto a linha inteira
+     respira de largura a cada quadro. */
   font-variant-numeric: tabular-nums;
   color: var(--fg);
+  /* Reserva a caixa do valor final desde o primeiro quadro. Durante a contagem
+     o texto é mais curto ("R$ 0" contra "R$ 99.900") e, sem piso de largura, o
+     bloco inteiro se reacomodaria enquanto o número cresce. */
+  min-width: 8ch;
 }
 
-.num-inclui {
-  grid-area: inclui;
-  margin: 0 0 0.35rem;
-  padding-inline-start: clamp(1rem, 2.5vw, 2rem);
-  max-width: 40ch;
+.num-face-nota {
+  margin: 0.9rem 0 0;
+  max-width: 34ch;
   color: var(--fg-2);
   font-size: 0.9375rem;
 }
 
-.num-inclui strong {
-  color: var(--fg);
-  font-weight: 700;
+.num-titulo {
+  margin: 0 0 0.75rem;
+  font-weight: 400;
 }
 
-/* Depois da regra base, não antes: empilhado não existe coluna à esquerda da
-   qual se afastar, e as duas regras têm a mesma especificidade — quem vem por
-   último vence. */
-@media (max-width: 780px) {
-  .num-inclui {
-    padding-inline-start: 0;
-    margin-top: 0.6rem;
+/* O segundo título respira mais: é a virada de assunto do quadro, de "quanto
+   custa cada parte" para "o que não é cobrado". */
+.num-parcelas + .num-titulo {
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.num-parcelas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.num-parcelas li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.1rem 1rem;
+  padding-block: clamp(0.85rem, 2vw, 1.1rem);
+  border-bottom: 1px solid var(--hair);
+}
+
+.num-parcela-rot {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+
+.num-parcela-val {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-hot);
+  white-space: nowrap;
+}
+
+.num-parcela-nota {
+  grid-column: 1 / -1;
+  color: var(--fg-2);
+  font-size: 0.875rem;
+  max-width: 46ch;
+}
+
+/* A parcela que a rede ainda não detalhou.
+
+   O material da franqueadora fecha R$ 50.000 dos R$ 99.900 e para aí. Esta
+   linha existe porque a subtração é pública — qualquer pessoa que leia as duas
+   quantias faz a conta — e um bloco que se propõe a explicar o preço não pode
+   ser justamente o que esconde metade dele.
+
+   Veste a mesma roupa dos placeholders de imagem da página: tracejado, tinta
+   apagada. É o vocabulário que este projeto já usa para dizer "aqui entra dado
+   real, e ele ainda não chegou". */
+.num-parcelas li[data-pendente] .num-parcela-val,
+.num-parcelas li[data-pendente] .num-parcela-rot {
+  color: var(--fg-2);
+}
+
+.num-parcelas li[data-pendente] .num-parcela-nota {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px dashed color-mix(in srgb, var(--fg) 26%, transparent);
+  border-radius: 999px;
+  font-family: var(--f-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.num-juntos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.num-juntos li {
+  display: grid;
+  gap: 0.1rem;
+  /* O fio à esquerda amarra o grupo e o separa das parcelas: ali cada linha é
+     uma quantia, aqui nenhuma é. Dois grupos com o mesmo desenho leriam como a
+     mesma lista, e a soma pararia de fechar na cabeça de quem lê. */
+  padding-left: clamp(0.85rem, 2vw, 1.15rem);
+  border-left: 2px solid var(--hair-hot);
+}
+
+.num-junto-tit {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.num-junto-txt {
+  color: var(--fg-2);
+  font-size: 0.875rem;
+  max-width: 48ch;
+}
+
+/* ---------- a entrada das linhas ----------
+   Transição e não keyframe: o atributo `data-visivel` é ligado pela contagem em
+   pontos que dependem da velocidade dela, e transição retoma do valor atual em
+   vez de reiniciar do zero se algo chegar antes do esperado.
+
+   O passo é curto e vem da direita, não de baixo: a linha entra no sentido em
+   que ela é lida a partir do número, que está à esquerda. */
+.num-parcelas li,
+.num-juntos li {
+  opacity: 0;
+  translate: 0.6rem 0;
+  transition: opacity var(--t-mov) var(--e-ui),
+    translate var(--t-mov) var(--e-mola);
+}
+
+.num-parcelas li[data-visivel],
+.num-juntos[data-visivel] li {
+  opacity: 1;
+  translate: none;
+}
+
+/* Os benefícios entram todos depois do pouso da contagem, então precisam de
+   escalonamento próprio — as parcelas ganham o delas da própria contagem, que
+   as revela em momentos diferentes. 60ms entre linhas: o suficiente para ler
+   como cascata, pouco para não virar espera. */
+.num-juntos li:nth-child(2) {
+  transition-delay: 60ms;
+}
+
+.num-juntos li:nth-child(3) {
+  transition-delay: 120ms;
+}
+
+.num-juntos li:nth-child(4) {
+  transition-delay: 180ms;
+}
+
+.num-juntos li:nth-child(5) {
+  transition-delay: 240ms;
+}
+
+/* Sem JavaScript, com movimento reduzido, ou antes da hidratação: tudo visível.
+   O componente devolve os atributos ligados no primeiro render justamente para
+   isto, e estas regras são a rede embaixo — se algo impedir o efeito de rodar,
+   o conteúdo está lá, e não numa página em branco. */
+@media (prefers-reduced-motion: reduce) {
+  .num-parcelas li,
+  .num-juntos li {
+    opacity: 1;
+    translate: none;
+    transition: none;
   }
 }
 
@@ -2318,7 +2737,7 @@
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-color: var(--hair);
-  transition: text-decoration-color 160ms ease;
+  transition: text-decoration-color var(--t-ui) var(--e-ui);
 }
 
 .link-saida:hover,
@@ -2550,17 +2969,43 @@
   }
 }
 
+/* `translate` e `scale` como propriedades próprias, e não dentro de um
+   `transform`: a animação de rolagem e o aperto do `:active` precisam do mesmo
+   elemento ao mesmo tempo, e animação vence declaração normal. Escrito em
+   `transform`, o botão surgia da rolagem e deixava de afundar no toque — o
+   único controle da página sem resposta ao dedo, justamente o que flutua sobre
+   o conteúdo. Em propriedades separadas os dois convivem: uma faz o botão
+   nascer, a outra faz ele responder. */
 @keyframes flutSurge {
   0%,
   60% {
     opacity: 0;
-    transform: translateY(6px) scale(0.9);
+    translate: 0 6px;
+    scale: 0.9;
     visibility: hidden;
   }
   100% {
     opacity: 1;
-    transform: none;
+    translate: none;
+    scale: 1;
     visibility: visible;
+  }
+}
+
+/* Quem reduz movimento continua precisando do botão aparecendo na hora certa —
+   é wayfinding, não enfeite. O que sai é o deslocamento: ele aparece e
+   desaparece por opacidade, no lugar onde já estava. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes flutSurge {
+    0%,
+    60% {
+      opacity: 0;
+      visibility: hidden;
+    }
+    100% {
+      opacity: 1;
+      visibility: visible;
+    }
   }
 }
 
@@ -2603,4 +3048,318 @@
 
 .herowrap:has(.hero--curto) {
   min-height: calc(58svh + var(--nav-gap) + 58px);
+}
+
+/* ---------- as seções reagindo à rolagem ----------
+
+   A página tinha nove telas de conteúdo que simplesmente existiam. A rolagem é
+   o único gesto que ela pede e não devolvia nada: quem desce vinte segundos
+   recebe exatamente o mesmo quadro que quem chegou.
+
+   Três regras que valem para tudo o que está abaixo:
+
+   1. A linha do tempo é `view()` — a posição do próprio elemento contra a
+      viewport. Não é delay de carregamento. A diferença importa: metade destas
+      seções está abaixo da dobra, e animação com delay em conteúdo fora da
+      tela termina antes de alguém ver, o que é animação jogada fora. Era
+      exatamente o que acontecia com o traço dos ícones.
+
+   2. As faixas são curtas — o movimento fecha logo depois do elemento entrar,
+      não acompanha a rolagem inteira. Faixa longa vira scrub: o conteúdo fica
+      meio transparente enquanto a pessoa lê, e aí a animação atrapalha o que
+      deveria estar apresentando.
+
+   3. Nada nasce de `scale(0)` nem de opacidade zero com deslocamento grande.
+      Um passo de 1,25rem e um scale de 0,86 são o suficiente para o olho ler
+      "isto chegou agora"; mais que isso é o elemento vindo de outro lugar.
+
+   O `@supports` em volta de tudo não é detalhe: sem ele, num navegador sem
+   linha do tempo de rolagem, o `both` deixaria a página inteira parada em
+   `opacity: 0`. Com ele, o conteúdo aparece normalmente e ninguém perde nada
+   além do gesto. */
+
+@keyframes sobe {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* Passo menor para lista densa: numa lista de sete linhas, 1,25rem em cada uma
+   soma um movimento de página inteira. */
+@keyframes sobeCurto {
+  from {
+    opacity: 0;
+    translate: 0 0.7rem;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+@keyframes risca {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* ---- cabeçalho de seção: manchete e o parágrafo de apoio ---- */
+    .v5 .sec > h2,
+    .v5 .sobre-topo > h2,
+    .v5 .num-topo > h2,
+    /* Filho direto, e nunca descendente: o fechamento carrega o formulário
+       inteiro dentro dele, e `.close p` pegava também o texto de apoio do
+       formulário, o aviso de privacidade e a confirmação de envio — esta
+       última tem entrada própria, disparada por um clique, e perderia ela
+       para uma animação de rolagem. */
+    .v5 .close > h2,
+    .v5 .close-duo > div > h2 {
+      animation: sobe linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 26%;
+    }
+
+    /* O parágrafo entra logo atrás da manchete. O atraso não é `delay` — é a
+       faixa começando mais tarde, que é o mesmo escalonamento medido em
+       rolagem em vez de em tempo. Escalonar em segundos aqui daria resultado
+       diferente conforme a velocidade da rolagem. */
+    .v5 .sec > p,
+    .v5 .sobre-topo > p,
+    .v5 .num-topo > p,
+    .v5 .close p {
+      animation: sobe linear both;
+      animation-timeline: view();
+      animation-range: entry 14% cover 32%;
+    }
+
+    /* ---- blocos com superfície própria ---- */
+    .v5 .sobre-peca,
+    .v5 .sobre-card,
+    .v5 .lojas > .loja {
+      animation: sobe linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+
+    /* Escalonamento dentro da grade de peças: cada cartão tem a própria linha
+       do tempo, então dois cartões da mesma fileira entrariam juntos. O
+       deslocamento de faixa devolve a cascata. */
+    .v5 .lojas > .loja:nth-child(3n + 2) {
+      animation-range: entry 14% cover 34%;
+    }
+
+    .v5 .lojas > .loja:nth-child(3n + 3) {
+      animation-range: entry 18% cover 38%;
+    }
+
+    /* ---- comparativo tradicional × rede ---- */
+    .v5 .h2h-linha {
+      animation: sobeCurto linear both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 24%;
+    }
+
+    /* ---- a órbita das quatro frentes ----
+       Os arcos se riscam, os nós saem da marca e a lista acompanha do lado. É
+       a seção que promete "quatro lugares, todos com nome": ela se montando é
+       a própria explicação. */
+    .v5 .orb-arcos path {
+      stroke-dasharray: 1;
+      animation: risca linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 44%;
+    }
+
+    /* O `scale` como propriedade própria compõe com o `transform` que põe o nó
+       na aresta — e compõe da maneira certa por acidente feliz: a escala
+       encolhe junto o vetor que afasta o nó da origem, então em 0,86 ele está
+       a 86% do caminho entre a marca e o lugar dele. Os quatro nós nascem de
+       dentro da marca e se abrem para as pontas, que é de onde eles deveriam
+       vir mesmo. */
+    .v5 .orb-no {
+      animation: noEntra linear both;
+      animation-timeline: view();
+      animation-range: entry 18% cover 46%;
+    }
+
+    .v5 .orb-no:nth-of-type(2) {
+      animation-range: entry 21% cover 49%;
+    }
+
+    .v5 .orb-no:nth-of-type(3) {
+      animation-range: entry 24% cover 52%;
+    }
+
+    .v5 .orb-no:nth-of-type(4) {
+      animation-range: entry 27% cover 55%;
+    }
+
+    /* A marca do centro só acende. Escalar ela arrastaria o `translate` de
+       centragem junto e o desenho inteiro sairia do lugar — e a origem de um
+       diagrama é justamente o que não pode se mexer. */
+    .v5 .orb-centro {
+      animation: acende linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 34%;
+    }
+
+    /* Na lista quem anima é o conteúdo da linha, não a linha. O `.orb-lista`
+       desenha as divisórias com `gap: 1px` sobre um fundo — mover o item
+       deixaria a tira de 1px aparecendo por baixo, e a lista pareceria
+       desmontando em vez de entrando. */
+    .v5 .orb-lista li > * {
+      animation: sobeCurto linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+
+    /* ---- os números ----
+       O quadro do investimento saiu daqui. Ele tem entrada própria, disparada
+       por observador e não por posição de rolagem, porque o número conta e
+       contagem raspada pela rolagem exibe valores que não são o preço. As
+       regras que existiam aqui para `.num-destaque` e `.num-inclui` foram
+       removidas junto com as classes: CSS apontando para marcação que não
+       existe mais é a pior pista falsa que se deixa para o próximo leitor.
+
+       O que continua sendo rolagem é a grade dos quatro percentuais, que é
+       texto parado. */
+
+    /* Mesmo motivo da lista da órbita: a grade dos quatro números é feita de
+       `gap: 1px` sobre fundo, então quem sobe é o texto dentro da célula. */
+    .v5 .num-item > * {
+      animation: sobeCurto linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+
+    .v5 .num-grade > .num-item:nth-child(2) > * {
+      animation-range: entry 13% cover 33%;
+    }
+
+    .v5 .num-grade > .num-item:nth-child(3) > * {
+      animation-range: entry 16% cover 36%;
+    }
+
+    .v5 .num-grade > .num-item:nth-child(4) > * {
+      animation-range: entry 19% cover 39%;
+    }
+  }
+}
+
+@keyframes noEntra {
+  from {
+    opacity: 0;
+    scale: 0.86;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes acende {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* A tabela comparativa não entra na lista acima, e é decisão e não esquecimento:
+   `transform` em célula de tabela é terreno instável entre navegadores, a
+   coluna de rótulos é `position: sticky` dentro de uma caixa que rola na
+   horizontal, e uma tabela de dados densos deslizando não explica nada que ela
+   já não diga parada. A pergunta "isto deveria animar?" às vezes tem "não"
+   como resposta. */
+
+/* ---------- transparência reduzida ----------
+   A página trata `prefers-reduced-motion` desde o começo e ignorava os outros
+   dois sinais do sistema. Eles não são variações de gosto: quem liga
+   "Reduzir transparência" no iOS ou no Windows normalmente liga porque texto
+   sobre material translúcido não se lê — vestibular, baixa visão, tela ruim
+   sob sol. A resposta certa não é tirar o material: é engrossá-lo. As
+   superfícies ficam opacas e o desfoque sai, porque desfoque atrás de fundo
+   sólido é só custo de repintura sem nada em troca. */
+@media (prefers-reduced-transparency: reduce) {
+  .v5 .dock {
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Sem o material, o esmaecido também sai: ele existia para amaciar a quina
+     de uma barra que se via através. Sobre barra sólida, o fio da borda já é
+     a separação. */
+  .v5 .dock::before {
+    display: none;
+  }
+
+  .v5 .scope,
+  .v5 .herowrap .scope,
+  .v5 .herowrap--plano .scope {
+    background: var(--bg-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* A carta topográfica e o brilho do arco NÃO entram na regra acima, e vale
+   escrever por quê: a primeira versão deste bloco escondia os dois, e no
+   Windows 11 — onde o interruptor "Efeitos de transparência" é justamente o
+   que aciona esta media query, e onde muita gente desliga ele por desempenho —
+   isso apagava o herói inteiro. Some a carta, some junto a animação de plotter
+   que é a abertura da página.
+
+   O erro foi de leitura: transparência reduzida é sobre superfície que se lê
+   através — painel, barra, cápsula —, para o texto por cima não competir com o
+   que passa por baixo. A carta é traço opaco sobre fundo sólido e o brilho é
+   uma lavagem de cor; nenhum dos dois é material atravessável, e nenhum dos
+   dois some. */
+
+/* ---------- contraste alto ----------
+   O sistema desta página se define por fios de 1px a 10% de opacidade e por
+   superfícies que são o fundo mais 4%. É um sistema de baixo contraste por
+   escolha estética, e ele desaparece inteiro para quem pede mais contraste:
+   sem os fios, a tabela comparativa vira uma parede de texto e os cartões
+   deixam de ter borda. Aqui os mesmos elementos continuam onde estavam, com a
+   tinta que eles precisam ter. */
+@media (prefers-contrast: more) {
+  .v5 {
+    --hair: color-mix(in srgb, var(--fg) 42%, transparent);
+    --hair-hot: var(--fg-hot);
+    /* O cinza do texto secundário sobe para a tinta cheia: é ele que pinta
+       parágrafo de apoio, rótulo de campo e célula de tabela — metade do texto
+       da página. */
+    --fg-2: color-mix(in srgb, var(--fg) 82%, var(--bg));
+  }
+
+  /* Superfície com borda declarada em vez de superfície por diferença de
+     luminância: 4% de mistura não sobrevive a nenhum ajuste de contraste. */
+  .v5 .rodape-redes a {
+    background: var(--bg-2);
+    border: 1px solid var(--hair);
+  }
+
+  .v5 .dock {
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* O foco fica mais grosso: com tudo em alto contraste, um anel de 2px deixa
+     de ser o elemento mais forte da tela, que é justamente o trabalho dele. */
+  .v5 :focus-visible {
+    outline-width: 3px;
+  }
 }

@@ -14,11 +14,20 @@ import { Bricolage_Grotesque, Space_Mono, Rajdhani } from "next/font/google";
 import { NavBar, type Pagina } from "./navbar";
 import { AplicarTema } from "./tema-switch";
 import { Flutuante } from "./flutuante";
-import { FundoTopo } from "./fundos";
+import { FundoTopo, TrilhaTopo } from "./fundos";
 
+/* `axes: ["opsz"]` carrega o eixo óptico da Bricolage (12–96) junto com o peso.
+   Sem ele o navegador recebe um único desenho de letra, congelado no valor
+   padrão do eixo (14), e usa esse mesmo desenho da manchete de 76px ao rótulo
+   de 11px. Com ele, o `font-optical-sizing: auto` do `v5.css` passa a valer: a
+   letra afina e abre a contraforma conforme cresce, engrossa e respira mais
+   quando encolhe. É o mesmo trabalho que a San Francisco faz sozinha nos
+   sistemas da Apple, e é a diferença entre uma tipografia dimensionada e uma
+   escalada. */
 const grotesk = Bricolage_Grotesque({
   variable: "--f-txt",
   subsets: ["latin"],
+  axes: ["opsz"],
   display: "swap",
 });
 
@@ -59,6 +68,11 @@ export function Casca({
     >
       {tema ? <AplicarTema tema={tema} /> : null}
       <main>
+        {/* Primeiro filho e atrás de tudo: o terreno é chão da página inteira,
+            não de uma seção. Vale nas três rotas pelo mesmo motivo que a carta
+            do herói vale — uma segunda textura de fundo em outra página seria
+            uma segunda marca. */}
+        <TrilhaTopo />
         <NavBar atual={atual} />
         {children}
         <Flutuante />

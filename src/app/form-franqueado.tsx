@@ -25,16 +25,22 @@ const PRAZOS = [
 ];
 
 export function FormFranqueado() {
-  const [enviando, setEnviando] = useState(false);
   /* A conversa que não abriu. Bloqueador de pop-up, WebView de rede social e
      navegador em modo restrito engolem `window.open` sem erro nenhum: o clique
      acontece, nada aparece e a pessoa acha que enviou. Como esta é a única
      conversão da página, o destino vira um link visível em vez de sumir. */
   const [resgate, setResgate] = useState<string | null>(null);
+  /* E a conversa que abriu. Antes daqui existia um estado `enviando` que ligava
+     e desligava dentro do mesmo `onSubmit` síncrono: o React agrupa as duas
+     escritas, o botão nunca chegava a renderizar desabilitado e o formulário
+     não dava sinal nenhum de que algo tinha acontecido. Quem envia num celular
+     com o WhatsApp abrindo em outro aplicativo volta para uma página idêntica
+     à de antes do clique — e reenvia. Ação que importa termina em confirmação;
+     é a única coisa que este formulário faz, e ele estava terminando em nada. */
+  const [aberto, setAberto] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setEnviando(true);
 
     const d = new FormData(e.currentTarget);
     const linhas = [
@@ -56,7 +62,7 @@ export function FormFranqueado() {
       aba = null;
     }
     setResgate(aba ? null : url);
-    setEnviando(false);
+    setAberto(Boolean(aba));
   }
 
   return (
@@ -116,7 +122,7 @@ export function FormFranqueado() {
       </div>
 
       <div className="form-fr-pe">
-        <button className="cta cta--lg" type="submit" disabled={enviando}>
+        <button className="cta cta--lg" type="submit">
           Receber material no WhatsApp
         </button>
         <p className="form-fr-aviso">
@@ -124,6 +130,17 @@ export function FormFranqueado() {
           cadastro em lista.
         </p>
       </div>
+
+      {/* `role="status"` e não `alert`: é confirmação, não interrupção — o
+          leitor de tela anuncia quando terminar o que está lendo. A frase diz
+          onde a conversa está, porque no celular ela abriu em outro
+          aplicativo e a pessoa continua olhando para esta tela. */}
+      {aberto ? (
+        <p className="form-fr-status" role="status">
+          Pronto — a conversa abriu no WhatsApp com os seus dados. Se ela não
+          apareceu, procure o aplicativo.
+        </p>
+      ) : null}
 
       {resgate ? (
         <p className="form-fr-resgate" role="alert">

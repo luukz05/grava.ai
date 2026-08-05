@@ -86,9 +86,14 @@ export function Orbita() {
 
             Caixa de coordenadas 440×240, origem em (220, 230). Raio 196 no de
             fora e 116 no de dentro; a altura de cada um é raio × √3/2. */}
+        {/* `pathLength={1}` normaliza o comprimento dos dois arcos: eles têm
+            tamanhos diferentes e, sem isso, riscariam em velocidades
+            diferentes na mesma faixa de rolagem — o de dentro chegando ao fim
+            enquanto o de fora ainda está na metade. Mesma razão pela qual as
+            quinze curvas da carta do herói usam o mesmo atributo. */}
         <svg className="orb-arcos" viewBox="0 0 440 240" aria-hidden="true">
-          <path d="M24 230L122 60H318L416 230" />
-          <path d="M104 230L162 130H278L336 230" />
+          <path d="M24 230L122 60H318L416 230" pathLength={1} />
+          <path d="M104 230L162 130H278L336 230" pathLength={1} />
         </svg>
 
         {/* Os nós são o desenho, não controle: nada acontece ao clicar neles

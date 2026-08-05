@@ -55,14 +55,38 @@
 }
 
 /* A display angular do wordmark briga com canto redondo: nesta forma as
-   manchetes voltam para o grotesco do corpo. */
+   manchetes voltam para o grotesco do corpo.
+
+   O tracking saiu daqui e virou três valores. Uma regra só entregava -0,03em
+   para tudo — da manchete de 4,75rem ao título de cartão de 1,25rem —, e
+   tracking é grandeza que depende do corpo: a mesma distância entre letras que
+   fecha uma display de 76px abre buraco numa de 20px, e a que serve a de 20px
+   deixa a display parecendo digitada com espaço. Quanto maior a letra, mais
+   negativo. A regra base do `v5.css` já fazia isso; era esta camada que
+   achatava tudo de volta num valor. */
 .v5[data-forma="oblongo"] .hero h1,
 .v5[data-forma="oblongo"] .sec h2,
 .v5[data-forma="oblongo"] .close h2,
 .v5[data-forma="oblongo"] .sobre-card h3 {
   font-family: var(--f-txt), system-ui, sans-serif;
-  letter-spacing: -0.03em;
   font-weight: 600;
+}
+
+/* Manchete do herói: o maior corpo da página, o mais apertado. */
+.v5[data-forma="oblongo"] .hero h1 {
+  letter-spacing: -0.042em;
+}
+
+/* Manchete de seção e de fechamento, um degrau abaixo. */
+.v5[data-forma="oblongo"] .sec h2,
+.v5[data-forma="oblongo"] .close h2 {
+  letter-spacing: -0.03em;
+}
+
+/* Título de cartão vive perto do corpo do texto: quase sem aperto, senão as
+   letras encostam no tamanho em que ele é lido. */
+.v5[data-forma="oblongo"] .sobre-card h3 {
+  letter-spacing: -0.015em;
 }
 
 /* ============ HERÓI ============ */
@@ -106,13 +130,95 @@
 .fundo--topo {
   background: linear-gradient(180deg, #071018 0%, #05090d 82%);
   color: #3ba5e8;
+
+  /* Publicadas pelo `SeguirPonteiro`. Os valores aqui são o estado sem cursor —
+     e como `--tp-on` começa em 0, a lanterna nasce apagada e a posição inicial
+     nunca chega a ser vista. */
+  --tp-on: 0;
+  --tp-x: 0px;
+  --tp-y: 0px;
+  --tp-dx: 0;
+  --tp-dy: 0;
 }
 
-.fundo--topo svg {
+/* As duas cartas passam do alto e do fundo da caixa de propósito: elas se
+   deslocam na rolagem, e sem essa folga o parallax abriria faixa vazia na
+   borda. 18% de sobra para deslocamentos de no máximo 5,5%. */
+.fundo--topo .topo-camada {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: -9%;
   width: 100%;
-  height: 100%;
+  height: 118%;
+}
+
+/* Perspectiva aérea: o que está longe perde contraste na direção da cor do
+   fundo e perde nitidez. Aqui isso é levado ao extremo de propósito — as duas
+   cartas ocupam a mesma faixa vertical e suas curvas se cruzam, e curva de
+   nível cruzando outra o olho lê como hachura, não como relevo. Com a de trás
+   reduzida a névoa, o cruzamento vira adensamento e some como linha. */
+.fundo--topo .topo-camada--longe {
+  color: color-mix(in oklab, #3ba5e8 40%, #071018);
+  filter: blur(0.9px);
+}
+
+/* O deslocamento do ponteiro entra por `translate`, e não por `transform`,
+   porque `transform` já está tomado pelo parallax de rolagem. São propriedades
+   separadas e o navegador compõe as duas — o mesmo elemento anda na rolagem e
+   se inclina no cursor sem que uma regra apague a outra.
+
+   A transição é o amortecedor: ela reinicia a cada quadro e o que sobra é um
+   atraso exponencial atrás do cursor. Sentidos opostos e amplitudes diferentes
+   entre as duas camadas, que é a mesma regra do parallax de rolagem. */
+.fundo--topo .topo-camada--perto {
+  translate: calc(var(--tp-dx) * -10px) calc(var(--tp-dy) * -7px);
+  transition: translate 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fundo--topo .topo-camada--longe {
+  translate: calc(var(--tp-dx) * 5px) calc(var(--tp-dy) * 3px);
+  transition: translate 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Marcos hexagonais: o único ponto do fundo em que a marca aparece. Entram
+   depois da carta plotada — marco antes da curva seria marco pousado no nada. */
+.topo-marco {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .topo-marco {
+    animation: tpMarco 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* O percurso pelas curvas. Os quadros são gerados no servidor — cada destino
+     é o valor exato de `cota()` naquela curva — e chegam num `<style>` junto do
+     SVG; aqui só se liga a animação.
+
+     É esta media query que justifica a variável em vez de `animation` no estilo
+     em linha: com movimento reduzido a regra inteira desaparece e cada marco
+     fica parado na cota em que foi desenhado, que é um estado correto e não um
+     defeito.
+
+     A curva quase reta no meio com freio nas pontas dá o salto: o marco arranca
+     de uma cota, atravessa e assenta na outra. Sai da parede e chega na parede,
+     que é como coisa colocada se move — o resto do tempo ele está parado, e a
+     parada é o que faz o salto ler como troca de cota em vez de deriva. */
+  .topo-marco-rota {
+    animation: var(--tp-rota) var(--tp-volta) cubic-bezier(0.7, 0, 0.25, 1) infinite both;
+  }
+}
+
+@keyframes tpMarco {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* A luz impede a carta de virar textura uniforme. Concentra onde a manchete
@@ -121,6 +227,50 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(60% 70% at 76% 30%, rgba(102, 205, 255, 0.14), transparent 66%);
+}
+
+/* A caixa de luz do ponteiro. Tamanho fixo, deslocada por `translate` — mover a
+   caixa é composição; mover a posição do gradiente dentro dela repintaria a
+   camada inteira a cada quadro. A margem negativa centra a caixa no cursor.
+
+   Larga e fraca, não pequena e forte: o que se quer é que a carta pareça mais
+   presente por perto, não que exista um holofote acompanhando o cursor. Três
+   paradas e queda até 100% da caixa, porque parada final antes da borda deixa
+   um anel visível — que é justamente o que faz a luz virar objeto em vez de
+   ambiente.
+
+   A última parada é `rgba(...,0)` e não `transparent`: `transparent` é preto
+   transparente, e interpolar até ele suja o meio do degradê de cinza. */
+.fundo--topo .topo-lente {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 620px;
+  height: 620px;
+  margin: -310px 0 0 -310px;
+  background: radial-gradient(
+    closest-side,
+    rgba(102, 205, 255, 0.05) 0%,
+    rgba(102, 205, 255, 0.022) 42%,
+    rgba(102, 205, 255, 0) 100%
+  );
+  opacity: var(--tp-on);
+  translate: var(--tp-x) var(--tp-y);
+  transition: opacity 420ms ease-out;
+}
+
+/* O grão não entra no parallax e por isso não leva a folga das camadas: filme
+   está na lente, não no terreno. É ele parado, com as duas cartas andando por
+   baixo, que faz a diferença de velocidade ler como profundidade.
+
+   Opacidade baixa é o ponto: grão que se percebe como grão virou ruído. O que
+   ele tem que fazer é tirar o achatamento do degradê de fundo, não aparecer. */
+.fundo--topo .topo-grao {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.13;
 }
 
 /* ============ TRAÇADO E APAGAMENTO ============
@@ -144,7 +294,10 @@
   initial-value: 0%;
 }
 
-.fundo--topo svg {
+/* A máscara vai nas duas camadas, não no `.fundo`: assim a varredura é uma só
+   para as duas cartas, e o grão fica de fora dela. Que a camada de trás esteja
+   deslocada no eixo Y não desalinha nada, porque este gradiente só varia em X. */
+.fundo--topo .topo-camada {
   --tp-apaga: 0%;
   -webkit-mask-image: linear-gradient(
     90deg,
@@ -176,12 +329,35 @@
   }
 }
 
-@keyframes tpLuz {
+/* Era `tpLuz`, mas agora a luz e a carta de trás usam o mesmo par de quadros.
+   Nome pelo que ele faz, não por quem o usava primeiro. */
+@keyframes tpAparecer {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Longe desce, perto sobe. O que dá profundidade é a diferença de velocidade
+   entre as duas, não o deslocamento em si — daí os percentuais pequenos:
+   parallax que se percebe como parallax já passou do ponto. */
+@keyframes tpLonge {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 5.5%, 0);
+  }
+}
+
+@keyframes tpPerto {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -4%, 0);
   }
 }
 
@@ -191,8 +367,14 @@
     animation: tpRiscar 2.1s cubic-bezier(0.32, 0.9, 0.26, 1) both;
   }
 
+  /* A carta de trás clareia inteira, e mais rápido que o plotter da frente: é
+     o terreno que já estava lá antes de alguém desenhar por cima. */
+  .fundo--topo .topo-camada--longe {
+    animation: tpAparecer 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
   .fundo--topo .topo-luz {
-    animation: tpLuz 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: tpAparecer 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
 
@@ -202,40 +384,172 @@
    só sem o gesto. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .fundo--topo svg {
-      animation: tpApagar linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 100%;
+    .fundo--topo .topo-camada--perto {
+      animation: tpApagar linear both, tpPerto linear both;
+      animation-timeline: view(), view();
+      animation-range: exit 0% exit 100%, exit 0% exit 100%;
+    }
+
+    /* A de trás repete aqui o `tpAparecer` do bloco acima porque a lista de
+       `animation` substitui a anterior por inteiro — omitir apagaria a entrada
+       dela. Três animações, duas linhas do tempo: a primeira no relógio, as
+       outras na rolagem. */
+    .fundo--topo .topo-camada--longe {
+      animation: tpAparecer 1.5s cubic-bezier(0.22, 1, 0.36, 1) both,
+        tpApagar linear both, tpLonge linear both;
+      animation-timeline: auto, view(), view();
+      animation-range: normal, exit 0% exit 100%, exit 0% exit 100%;
     }
 
     .fundo--topo .topo-luz {
-      animation: tpLuz 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
-        tpLuz linear reverse both;
+      animation: tpAparecer 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
+        tpAparecer linear reverse both;
       animation-timeline: auto, view();
       animation-range: normal, exit 0% exit 90%;
     }
   }
 }
 
-/* ============ placeholder de visualização ============
-   Provisório: substitui a arte ASCII enquanto o layout está sendo lido. Cinza
-   neutro de propósito, sem ciano e sem textura, para não parecer conteúdo. */
+/* ============ A TRILHA, ATRÁS DA PÁGINA INTEIRA ============
 
-.ph {
+   Camada de chão: ocupa toda a altura do `main` e fica atrás de tudo. O `main`
+   vira contexto de posicionamento para isso, e os blocos de conteúdo sobem um
+   degrau — está logo abaixo, e o porquê está escrito lá.
+
+   `z-index: 0` e não `-1`: com valor negativo a camada cairia atrás do fundo
+   do `.v5`, que é quem pinta a cor da página, e sumiria por completo. */
+.v5 main {
+  position: relative;
+}
+
+/* Só os blocos que realmente existem nas três rotas. Uma regra em `main > *`
+   pegaria também a barra fixa e o par flutuante — os dois são `position:
+   fixed` com z-index próprio, e reescrever isso arrancaria eles da tela. */
+.v5 main > .herowrap,
+.v5 main > .corpo,
+.v5 main > header,
+.v5 main > section,
+.v5 main > footer {
+  position: relative;
+  z-index: 1;
+}
+
+.trilha {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  color: var(--blue);
+  /* O terreno nasce depois do herói e morre antes do rodapé: em cima ele
+     encostaria na carta do herói e as duas texturas somariam densidade
+     justamente onde está a manchete; embaixo, o fechamento é onde a página
+     assina, e assinatura não quer chão desenhado. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 9%,
+    #000 88%,
+    transparent 99%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 9%,
+    #000 88%,
+    transparent 99%
+  );
+}
+
+.trilha svg {
   width: 100%;
-  display: grid;
-  place-items: center;
-  background: #1b2027;
-  border: 1px dashed #39424c;
-  color: #7c8794;
-  font-family: var(--f-mono), monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 0.5rem;
+  height: 100%;
+  display: block;
 }
 
-.ph span {
-  max-width: 90%;
+/* Atrás de nove telas de texto, e não atrás de uma manchete: o terreno do
+   corpo vive num degrau de presença abaixo do herói. Este 0,45 sobre as
+   opacidades já baixas de cada traço é o que separa textura de ruído. */
+.trilha-nivel {
+  opacity: 0.45;
 }
+
+/* A trilha é a única linha acesa da camada — é ela que carrega significado, e
+   por isso é a única que ganha a tinta de realce. */
+.trilha-linha--fio {
+  color: var(--fg-hot);
+  opacity: 0.5;
+}
+
+.trilha-linha--halo {
+  color: var(--cyan);
+  opacity: 0.1;
+}
+
+/* O halo é a segunda repintura da camada a cada quadro de rolagem. No celular
+   ele sai: a tela é menor, o traço fino já lê, e o aparelho é o que menos tem
+   sobra para gastar em brilho de fundo. */
+@media (max-width: 900px) {
+  .trilha-linha--halo {
+    display: none;
+  }
+}
+
+/* No claro o azul da marca sobre papel precisa recuar mais: o mesmo traço que
+   é discreto sobre quase-preto vira sujeira sobre quase-branco. */
+[data-tema="light"] .v5 .trilha {
+  color: #2c78a8;
+}
+
+[data-tema="light"] .v5 .trilha-nivel {
+  opacity: 0.32;
+}
+
+[data-tema="light"] .v5 .trilha-linha--fio {
+  opacity: 0.42;
+}
+
+[data-tema="light"] .v5 .trilha-linha--halo {
+  opacity: 0.07;
+}
+
+/* O traçado. `pathLength="1"` no elemento normaliza o comprimento do caminho,
+   então `stroke-dashoffset` vai de 1 a 0 sem ninguém precisar saber quantos
+   pixels a trilha tem — e ela muda de tamanho com a altura da página.
+
+   A linha do tempo é `scroll()`, a rolagem do documento inteiro, de 0 a 100%:
+   é literalmente o percurso da pessoa desenhado. Sem `@supports`, ou com
+   movimento reduzido, o `stroke-dasharray` nunca é aplicado e a trilha aparece
+   inteira — o caminho marcado no mapa, parado. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .trilha-linha {
+      stroke-dasharray: 1;
+      animation: trilhaRiscar linear both;
+      animation-timeline: scroll();
+      animation-range: 0% 100%;
+    }
+  }
+}
+
+@keyframes trilhaRiscar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Transparência reduzida desliga a camada inteira: aqui, ao contrário da carta
+   do herói, o desenho passa por trás de nove telas de texto corrido. É o caso
+   exato que o ajuste existe para resolver. */
+@media (prefers-reduced-transparency: reduce) {
+  .v5 .trilha {
+    display: none;
+  }
+}
+
+/* O bloco `.ph` que existia aqui era cópia palavra por palavra do que está no
+   `v5.css`, e as duas versões ainda eram sobrescritas por `.v5 .ph` mais
+   abaixo no mesmo arquivo. Três declarações para um placeholder é a receita
+   para alguém mudar a errada. Ficou uma, no `v5.css`. */

@@ -28,7 +28,10 @@
 
 .step {
   border: 1px solid var(--hair);
-  transition: border-color 150ms ease;
+  /* Os tempos e as curvas vêm dos tokens do `v5.css`: uma página institucional
+     com o próprio 150ms escrito à mão é uma segunda gramática de movimento na
+     mesma marca. */
+  transition: border-color var(--t-ui) var(--e-ui);
 }
 
 @media (hover: hover) and (pointer: fine) {

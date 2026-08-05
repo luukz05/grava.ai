@@ -13,7 +13,14 @@
 
    O que está escrito aqui é o que o material da franqueadora libera, e nada
    além. Os dois fatos do bloco "o que já está dentro" são os que fazem o
-   número encolher na cabeça de quem lê, e estavam fora da página inteira. */
+   número encolher na cabeça de quem lê, e estavam fora da página inteira.
+
+   O bloco do valor virou componente próprio (`numeros-quadro.tsx`): ele conta o
+   número e revela a composição junto, e para isso precisa de cliente. O que
+   ficou aqui é a moldura da seção — cabeçalho, a grade dos quatro percentuais
+   e a nota — que continua servidor. */
+
+import { NumerosQuadro } from "./numeros-quadro";
 
 const LINHAS: { rotulo: string; valor: string }[] = [
   { rotulo: "Payback estimado", valor: "6 a 12 meses" },
@@ -26,23 +33,20 @@ export function Numeros() {
   return (
     <section className="hold sec num" id="numeros">
       <div className="num-topo">
-        <h2>O que custa e em quanto tempo volta.</h2>
+        {/* O título dizia "o que custa e em quanto tempo volta", e a seção
+            respondia bem a segunda metade e mal a primeira: o número aparecia
+            sozinho, com uma frase de rodapé citando duas quantias soltas. A
+            pergunta que trava a conversa não é quanto custa — é o que vem
+            dentro. O título passou a fazer a pergunta que o bloco responde, e o
+            payback continua logo abaixo, na grade. */}
+        <h2>O que custa e o que vem dentro.</h2>
         <p>
-          Um valor só, com o que já vem dentro dele. Nada aqui é cobrado
-          depois, e a plataforma de IA que opera a unidade está inclusa na
-          operação — não é assinatura à parte.
+          Um valor só, pago uma vez. Abaixo dele está a composição do que a rede
+          detalha, e o que já vem junto sem custo à parte.
         </p>
       </div>
 
-      <div className="num-destaque">
-        <span className="num-rot mono">Investimento total</span>
-        <strong className="num-val">R$ 99.900</strong>
-        <p className="num-inclui">
-          A taxa de franquia de <strong>R$ 35.000</strong> já está aí dentro, e
-          com ela cerca de <strong>R$ 15.000</strong> em equipamentos e no
-          estoque inicial da unidade.
-        </p>
-      </div>
+      <NumerosQuadro />
 
       <dl className="num-grade">
         {LINHAS.map((l) => (

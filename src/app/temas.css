@@ -13,6 +13,33 @@
    O terceiro tema que existia aqui — o misto, escuro com seções brancas — saiu
    junto com as variações de estudo. Está no commit `f5b1214`. */
 
+/* ============ A TROCA ============
+   Trocar de tema aqui é ir de #05090d para #f7f9fb — quase preto para quase
+   branco, a tela inteira, num quadro. Salto de brilho dessa amplitude é
+   desconfortável de olhar e ainda esconde o que mudou: sem transição, a página
+   não parece a mesma página com outra roupa, parece outra página.
+
+   A janela dura o tempo da troca e só existe durante ela. A chave marca o
+   `<html>` ao clicar e desmarca ~280ms depois; fora desse intervalo nenhuma
+   destas regras está no documento, então hover, foco e aperto continuam com os
+   tempos que cada componente escolheu.
+
+   `*` e `!important` porque `background-color` não herda: quem tem superfície
+   própria — cartão, cápsula, campo, célula de tabela — precisa da regra em si
+   mesmo, e cada um deles já declara a própria transição. Isto vale por 280ms.
+
+   Sem exceção para `prefers-reduced-motion`: um esmaecimento de cor é
+   exatamente o que aquele ajuste pede no lugar de uma mudança abrupta de
+   brilho — não há deslocamento nenhum aqui para reduzir. */
+[data-trocando-tema] .v5,
+[data-trocando-tema] .v5 *,
+[data-trocando-tema] .v5 *::before,
+[data-trocando-tema] .v5 *::after {
+  transition: background-color 240ms ease, color 240ms ease,
+    border-color 240ms ease, box-shadow 240ms ease, fill 240ms ease,
+    stroke 240ms ease !important;
+}
+
 /* ============ CLARO ============ */
 
 [data-tema="light"] .v5 {
@@ -55,7 +82,13 @@
   border-color: rgba(11, 17, 22, 0.28);
 }
 
-[data-tema="light"] .v5 .cta--out:hover,
+@media (hover: hover) and (pointer: fine) {
+  [data-tema="light"] .v5 .cta--out:hover {
+    background: rgba(44, 120, 168, 0.1);
+    color: var(--fg);
+  }
+}
+
 [data-tema="light"] .v5 .cta--out:focus-visible {
   background: rgba(44, 120, 168, 0.1);
   color: var(--fg);
@@ -88,6 +121,40 @@
 
 [data-tema="light"] .v5 .fundo--topo .topo-luz {
   background: radial-gradient(60% 70% at 76% 30%, rgba(59, 165, 232, 0.1), transparent 66%);
+}
+
+/* Perspectiva aérea no claro desbota para o papel, não para o breu. Mesma
+   regra de sempre: o que está longe caminha para a cor do fundo. E vai mais
+   longe que no escuro: traço azul sobre papel tem contraste muito maior que
+   traço azul sobre preto, então a mesma névoa pesa mais aqui. */
+[data-tema="light"] .v5 .fundo--topo .topo-camada--longe {
+  color: color-mix(in oklab, #2c78a8 26%, #eff5fa);
+}
+
+/* A carta da frente também recua no claro, pelo mesmo motivo. Estes dois
+   multiplicadores são o botão de volume do fundo inteiro no tema claro. */
+[data-tema="light"] .v5 .fundo--topo .topo-camada--perto {
+  color: color-mix(in oklab, #2c78a8 62%, #eff5fa);
+}
+
+/* No claro a lente pesa mais que no escuro com o mesmo alfa: papel já está
+   perto do branco, e qualquer luz sobre ele estoura em vez de acender. */
+[data-tema="light"] .v5 .fundo--topo .topo-lente {
+  background: radial-gradient(
+    closest-side,
+    rgba(43, 120, 168, 0.028) 0%,
+    rgba(43, 120, 168, 0.012) 42%,
+    rgba(43, 120, 168, 0) 100%
+  );
+}
+
+/* O grão é feito de pontos brancos, e ponto branco em papel é invisível. O
+   `invert` vira só o RGB — o alfa do ruído continua o mesmo, então o que muda
+   é a cor do grão, não a distribuição dele. E papel aguenta menos grão que
+   sombra: ponto escuro sobre claro salta, ponto claro sobre escuro afunda. */
+[data-tema="light"] .v5 .fundo--topo .topo-grao {
+  filter: invert(1);
+  opacity: 0.07;
 }
 
 [data-tema="light"] .v5 .herowrap--plano {
@@ -167,4 +234,38 @@
    especificidade que uma classe sozinha não alcança. */
 [data-tema="light"] .v5 .flut-topo {
   background: var(--bg);
+}
+
+/* ============ os dois ajustes de sistema, no claro ============
+   Os blocos de `prefers-contrast` e `prefers-reduced-transparency` vivem no
+   `v5.css`, escritos em token, e funcionariam nos dois temas se não fosse a
+   cascata: tudo neste arquivo é `[data-tema="light"] .v5` — três níveis de
+   especificidade — contra os dois níveis de lá. No escuro os ajustes valiam;
+   no claro o tema simplesmente reescrevia por cima e a pessoa que pediu mais
+   contraste continuava com o cinza de baixo contraste na tela.
+
+   Não é duplicação de decisão: a decisão é a mesma e está documentada lá. O
+   que muda aqui é só o alcance do seletor. */
+
+@media (prefers-contrast: more) {
+  [data-tema="light"] .v5 {
+    --hair: color-mix(in srgb, var(--fg) 46%, transparent);
+    --hair-hot: var(--fg-hot);
+    --fg-2: color-mix(in srgb, var(--fg) 84%, var(--bg));
+  }
+
+  [data-tema="light"] .v5 .rodape-redes a {
+    background: var(--bg-2);
+    border: 1px solid var(--hair);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-tema="light"] .v5 .scope,
+  [data-tema="light"] .v5 .herowrap .scope,
+  [data-tema="light"] .v5 .herowrap--plano .scope {
+    background: var(--bg-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
