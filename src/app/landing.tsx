@@ -226,6 +226,7 @@ export function Landing({ tema }: { tema?: Tema }) {
         </div>
         <Rodape
           links={[
+            { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/institucional", rotulo: "A marca" },
             { href: "#ia", rotulo: "A IA" },
             { href: "#pontos", rotulo: "Tipos de loja" },

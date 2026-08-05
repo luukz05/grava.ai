@@ -34,6 +34,7 @@ export const metadata: Metadata = {
   title: "GRAVA.AI — transformando ideias em produtos personalizados",
   description:
     "A GRAVA.AI une Inteligência Artificial e personalização para criar produtos exclusivos na hora — onde tem gente em movimento em busca de algo especial.",
+  alternates: { canonical: "/institucional" },
   openGraph: {
     title: "GRAVA.AI — transformando ideias em produtos personalizados",
     description:
@@ -260,6 +261,7 @@ export default function Institucional() {
             { href: "#marca", rotulo: "Quem somos" },
             { href: "#produto", rotulo: "O produto" },
             { href: "#onde", rotulo: "Onde atuamos" },
+            { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/", rotulo: "Seja um franqueado" },
           ]}
         />

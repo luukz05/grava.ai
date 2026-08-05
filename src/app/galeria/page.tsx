@@ -17,6 +17,7 @@ import { Rodape } from "../rodape";
 export const metadata = {
   title: "GRAVA.AI — galeria de peças",
   description: "O que sai do totem: peças gravadas com arte criada na hora.",
+  alternates: { canonical: "/galeria" },
 };
 
 /* Os materiais que a apresentação do cliente cita. Nada além deles: inventar
@@ -81,6 +82,7 @@ export default function Galeria() {
         <Rodape
           links={[
             { href: "/", rotulo: "Seja um franqueado" },
+            { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/institucional", rotulo: "A marca" },
           ]}
         />
