@@ -540,12 +540,66 @@
   }
 }
 
-/* Transparência reduzida desliga a camada inteira: aqui, ao contrário da carta
-   do herói, o desenho passa por trás de nove telas de texto corrido. É o caso
-   exato que o ajuste existe para resolver. */
+/* Transparência reduzida some com o CAMPO de curvas, não com a camada inteira.
+
+   A regra antes era `display: none` no `.trilha` e isso apagava tudo. O
+   problema não é a media query estar errada — o desenho passa mesmo por trás de
+   nove telas de texto corrido, e é para esse caso que o ajuste existe. O
+   problema é ela não significar no Windows o que significa no macOS.
+
+   No macOS, "Reduzir transparência" é um ajuste de acessibilidade que a pessoa
+   liga de propósito. No Windows, o Chrome reporta `reduce` quando "Efeitos de
+   transparência" está desligado — e ele desliga sozinho na economia de bateria,
+   em sessão de Área de Trabalho Remota e em fallback de GPU, além de ser a
+   primeira coisa que muita gente desmarca por desempenho. O mesmo sinal, de um
+   lado é intenção e do outro é estado da máquina.
+
+   Como o sinal não é confiável, ele passa a mexer só no halo — que é a única
+   coisa nesta camada que de fato é véu translúcido: sete pixels de traço a 0,1
+   de opacidade por baixo da linha, para dar brilho. O campo de curvas não é
+   véu, é traço fino, e não é o que "transparência reduzida" quer resolver.
+
+   Nada aqui pode mexer na tinta do `.trilha-nivel`. Esta regra já foi
+   `display: none` no `.trilha` inteiro; a primeira tentativa de conserto só
+   mudou o alvo para o `.trilha-nivel`, que é exatamente o campo que sumiu no
+   Windows. E baixar a opacidade dele aqui seria o mesmo erro por outro caminho:
+   `.v5 .trilha-nivel` tem especificidade maior que o `.trilha-nivel` do bloco
+   de 1x logo abaixo, então venceria justamente na máquina onde o traço já está
+   no limite de ser visto. */
 @media (prefers-reduced-transparency: reduce) {
-  .v5 .trilha {
+  .v5 .trilha-linha--halo {
     display: none;
+  }
+}
+
+/* Traço fino em tela de 1x.
+
+   A trilha é o único SVG da página com `preserveAspectRatio="none"` e
+   `vector-effect="non-scaling-stroke"` ao mesmo tempo: o traço fica travado em
+   0,9px de CSS enquanto a caixa estica cinco vezes na vertical. Com 0,16 de
+   opacidade no traço e 0,45 na camada, a tinta efetiva é 0,072 — em tela 2x
+   isso ainda cobre quase dois pixels de aparelho e aparece; em 1x cai abaixo de
+   um pixel, o antisserrilhado dilui o que sobrou e a linha some sobre um fundo
+   quase preto.
+
+   Por isso ela aparece no macOS (Retina) e não no Windows (monitor comum), e
+   por isso a carta do herói aparece nos dois — ela escala junto e não tem essa
+   combinação. A correção é devolver tinta onde não há subpixel para gastar. */
+@media (max-resolution: 1.5dppx) {
+  .trilha-nivel {
+    opacity: 0.78;
+  }
+
+  .trilha-linha--fio {
+    opacity: 0.72;
+  }
+
+  [data-tema="light"] .v5 .trilha-nivel {
+    opacity: 0.5;
+  }
+
+  [data-tema="light"] .v5 .trilha-linha--fio {
+    opacity: 0.6;
   }
 }
 
