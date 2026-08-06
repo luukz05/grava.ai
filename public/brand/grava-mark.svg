@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 522 628" role="img" aria-label="GRAVA.AI">
+  <!--
+    Marca GRAVA.AI — hexágono de topo-ponta com o G vazado.
+
+    RECONSTRUÍDA a partir do PNG de referência, não exportada do original. A
+    geometria foi medida no pixel: as arestas saíram de ajuste por mínimos
+    quadrados sobre a imagem (116 pontos só na diagonal do corte), e o resultado
+    bate 99,71% com a referência. O que sobra é a borda de antisserrilhado de um
+    pixel, que é o piso do método.
+
+    Duas coisas que a medição desmentiu e que um traçado no olho erraria:
+
+    1. O hexágono NÃO é regular. Meia-largura 261 contra meia-altura 313,8 — razão
+       0,834, e não os 0,866 de um hexágono regular. O `grava-mark.png` confirma:
+       108/128 = 0,844. Usar o `hexVerts()` de `assets.tsx`, que gera hexágono
+       regular, produziria uma marca 4% larga demais.
+
+    2. O corte diagonal NÃO é paralelo à aresta do hexágono. Inclinação do corte
+       1,727 contra 1,669 da aresta. São 3,5% de diferença — invisível parado,
+       visível quando a marca cresce na tela do totem.
+
+    O `fill-rule="evenodd"` é o que vaza o G: um subcaminho para o hexágono,
+    outro para a contra-forma, e a interseção fica furada. Serve igualmente como
+    `mask-image`, que é o uso na gravação dos produtos.
+
+    `currentColor` para o tom vir do CSS: a mesma marca precisa sair clara sobre
+    aço (laser oxida e clareia) e escura sobre cerâmica e lona (a tinta fixa e
+    escurece).
+
+    SUBSTITUIR pelo vetor original assim que ele aparecer. Isto é uma
+    reconstrução fiel, não a fonte da verdade.
+  -->
+  <path fill="currentColor" fill-rule="evenodd" d="M261 0 522 156.4 522 471.2 261 627.6 0 471.2 0 156.4Z M261 170.8 147 238.8 147 388.8 261 456.8 375 388.8 375 315.3 257 315.3 522 159.8 522 156.4 486 134.8 341 217.8Z"/>
+</svg>

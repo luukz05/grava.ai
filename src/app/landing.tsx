@@ -17,8 +17,8 @@ import { Indice, type Secao } from "./indice";
 import { Ph } from "./ph";
 import { LojasComparativo } from "./lojas-comparativo";
 import { Numeros } from "./numeros";
-import { HeadToHead } from "./head-to-head";
-import { Orbita } from "./orbita";
+import { FrentesLista } from "./orbita";
+import { Estudio } from "./estudio";
 import { FormFranqueado } from "./form-franqueado";
 import { Rodape } from "./rodape";
 
@@ -26,7 +26,6 @@ import { Rodape } from "./rodape";
    nascer ou mudar de lugar, ela entra nesta lista junto. */
 const SECOES: Secao[] = [
   { id: "esperar", rotulo: "Sobre" },
-  { id: "diferenciais", rotulo: "Diferenciais" },
   { id: "ia", rotulo: "A IA" },
   { id: "pontos", rotulo: "Tipos de loja" },
   { id: "numeros", rotulo: "Números" },
@@ -137,35 +136,41 @@ export function Landing({ tema }: { tema?: Tema }) {
           </div>
         </section>
 
-        <section className="hold sec" id="diferenciais">
-          <div className="sec-cab">
-            <h2>De quem é cada tarefa da operação.</h2>
-            <p>Numa loja comum, tudo isto é problema do dono. Aqui, quase nada é.</p>
-          </div>
-          {/* A galeria de seis cartões saiu: dizia, em uma linha cada, o mesmo
-              que a coluna da direita do comparativo diz — e o comparativo diz
-              contra o quê. */}
-          <HeadToHead />
-        </section>
+        {/* A seção "Diferenciais" foi extinta, e não movida.
 
-        {/* A IA e o totem numa seção só. Eram duas paradas do índice dizendo o
-            mesmo assunto de ângulos diferentes: onde a IA trabalha, e o que
-            acontece na máquina onde ela trabalha.
+           Ela era o comparativo `HeadToHead`: a operação de uma loja comum de
+           gravação contra a da unidade. O problema não era o desenho, era a
+           premissa — não existe hoje no Brasil uma rede de franquia de gravação
+           a laser para comparar. A seção inventava um concorrente e, ao inventá-
+           lo, ensinava o visitante que aquela categoria existe e que ele poderia
+           procurá-la. Custava atenção para criar consciência de uma alternativa
+           que ninguém tinha pedido.
 
-            A órbita substitui as quatro células e o circuito que existiam
-            aqui. Base visual do bloco integrations-5, portada para o CSS do
-            projeto — o original depende de Tailwind e shadcn, que não existem
-            neste código. */}
+           O que ela tentava provar — que aqui o dono não opera quase nada — quem
+           prova agora é a cena abaixo, mostrando a máquina fazendo o trabalho em
+           vez de afirmar que ela faz. O componente segue em `head-to-head.tsx`,
+           sem referência: se a comparação voltar a fazer sentido, está pronta. */}
+
+        {/* A IA e o totem numa seção só, e agora numa cena só.
+
+            Aqui já houve duas paradas de índice dizendo o mesmo assunto de
+            ângulos diferentes, depois um hexágono com quatro nós e uma lista.
+            O hexágono nomeava as frentes; ele não mostrava nenhuma acontecendo.
+
+            A cena mostra uma unidade indo do pedido escrito à peça pronta, presa
+            na tela enquanto a pessoa rola. Os quatro nomes ficam logo abaixo, em
+            texto: eles provam que a IA não para no desenho da arte, e é papel de
+            texto provar isso — não de um segundo desenho competindo com o
+            primeiro. O hexágono está em `orbita.tsx`, agora sem referência. */}
         <section className="hold sec" id="ia">
-          {/* "Todos com nome" saiu da manchete e virou o trabalho do apoio: na
-              manchete era promessa, no apoio é a informação que a órbita logo
-              abaixo comprova nome por nome. */}
           <div className="sec-cab">
-            <h2>A IA trabalha em quatro lugares.</h2>
-            <p>Quatro funções operando a unidade todo dia, cada uma com nome.</p>
+            <h2>O totem atende, entende e entrega.</h2>
+            <p>Do que a cliente escreve até a peça na mão dela. Role para ver.</p>
           </div>
 
-          <Orbita />
+          <Estudio />
+
+          <FrentesLista />
         </section>
 
         {/* O sistema fechando o circuito. Reativo à rolagem: a arte fica presa

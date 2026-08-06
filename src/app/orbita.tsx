@@ -127,17 +127,31 @@ export function Orbita() {
         </span>
       </div>
 
-      {/* Os quatro nomes, de uma vez. A numeração casa com a do desenho: quem
-          olhou a figura primeiro reencontra cada ponta aqui. */}
-      <ol className="orb-lista">
-        {FRENTES.map((x, i) => (
-          <li key={x.id}>
-            <span className="orb-n mono">{String(i + 1).padStart(2, "0")}</span>
-            <span className="orb-rotulo">{x.rotulo}</span>
-            <h3>{x.titulo}</h3>
-          </li>
-        ))}
-      </ol>
+      <FrentesLista />
     </div>
+  );
+}
+
+/* Os quatro nomes, sem a figura.
+
+   Separada porque a seção da IA passou a ser a cena do totem: lá a história é
+   uma unidade operando do pedido à peça pronta, e o hexágono ao lado dela seria
+   um segundo desenho disputando a mesma atenção. Os nomes continuam — são eles
+   que provam que a IA não é só o desenho da arte —, mas entram como texto, no
+   degrau de presença que texto tem.
+
+   A numeração existia para casar com a do hexágono. Ela fica: numerar quatro
+   frentes as torna uma lista de coisas que a rede faz, e não quatro adjetivos. */
+export function FrentesLista() {
+  return (
+    <ol className="orb-lista">
+      {FRENTES.map((x, i) => (
+        <li key={x.id}>
+          <span className="orb-n mono">{String(i + 1).padStart(2, "0")}</span>
+          <span className="orb-rotulo">{x.rotulo}</span>
+          <h3>{x.titulo}</h3>
+        </li>
+      ))}
+    </ol>
   );
 }
