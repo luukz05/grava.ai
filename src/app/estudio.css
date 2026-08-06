@@ -1,15 +1,14 @@
-/* A cena do totem.
+/* A cena do totem — dois vídeos e a conversa viva no meio.
 
-   DOIS LAYOUTS NO MESMO MARCA-ÇÃO. O padrão é fluxo normal: a interface, e os
-   produtos embaixo dela. É o que o servidor manda e o que fica de pé sem
-   JavaScript, com movimento reduzido ou se o GSAP não carregar — uma seção que
-   se lê rolando, sem gesto nenhum.
+   DOIS LAYOUTS NO MESMO MARCADO. O padrão é fluxo normal — é o que o servidor
+   manda e o que fica de pé sem JavaScript, com movimento reduzido ou se o GSAP
+   não carregar. A classe `est-vivo` só entra quando a animação vai mesmo rodar,
+   e é ela que troca para o layout de palco. Sem essa separação, o estado sem
+   script herdaria posicionamento absoluto e apareceria tudo empilhado.
 
-   A classe `est-live` só entra quando a animação vai de fato rodar, e é ela que
-   troca para o layout de palco: altura de uma tela, interface e produtos
-   empilhados na mesma célula de grade para que um substitua o outro. Sem essa
-   separação, o estado sem script herdaria posicionamento absoluto e a seção
-   apareceria com os produtos por cima da interface. */
+   A CENA TEM FUNDO PRETO PRÓPRIO, NOS DOIS TEMAS. Os dois vídeos foram gerados
+   sobre vazio preto; qualquer outro fundo deixaria a borda do quadro visível.
+   É também a leitura certa — isto é uma tomada, e tomada tem o próprio fundo. */
 
 .estudio {
   position: relative;
@@ -19,351 +18,219 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   justify-content: center;
 }
 
-.est-live .est-palco {
+.est-vivo .est-palco {
   height: 100vh;
-  overflow: hidden;
-  padding: 24px 0;
+  padding: 18px 0;
 }
 
 .est-cena {
   position: relative;
+  border-radius: 14px;
+  background: #000;
+  overflow: hidden;
+}
+
+.est-vivo .est-cena {
   flex: 1;
   min-height: 0;
+  border-radius: 0;
 }
 
-/* O vidro do totem. Esta variável é a fonte única da posição: a moldura usa
-   como `inset` e o recorte da interface usa como `inset()`. Duas constantes
-   separadas divergiriam na primeira vez que alguém ajustasse o enquadramento, e
-   a interface apareceria desencaixada do vidro. */
-.est-cena {
-  --est-tela: 8% 34% 12% 34%;
+/* ============ OS VÍDEOS ============ */
+
+.est-vid {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-@media (max-width: 900px) {
-  .est-cena {
-    --est-tela: 6% 12% 10% 12%;
-  }
-}
-
-/* ============ O TOTEM ============
-
-   Só a moldura e o pedestal. O conteúdo do vidro não é filho do totem — é a
-   interface, que vive em cima e recortada. */
-
-.est-totem {
+/* No palco os dois ocupam a mesma caixa e se revezam. `object-fit: cover`
+   porque a cena raramente terá a proporção exata do arquivo, e barra preta em
+   cima de fundo preto ainda é um corte visível na composição. */
+.est-vivo .est-vid {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.est-moldura {
-  position: absolute;
-  inset: var(--est-tela);
-  border: 2px solid color-mix(in oklab, var(--blue) 55%, transparent);
-  border-radius: 16px;
-  box-shadow:
-    0 0 0 10px color-mix(in oklab, var(--blue) 10%, transparent),
-    0 30px 80px -20px rgb(0 0 0 / 0.7);
-  /* Escondida por padrão: o estado sem script é a interface aberta, e uma
-     moldura de totem flutuando no meio de uma tela cheia não significa nada. */
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+/* Sem script, o segundo vídeo fica escondido: dois players empilhados em fluxo
+   normal seriam dois retângulos pretos sem explicação. */
+.estudio:not(.est-vivo) .est-vid--pecas {
+  display: none;
 }
 
-/* O pedestal, logo abaixo do vidro. Um trapézio simples — o totem não é o
-   assunto, é o lugar onde o assunto acontece. */
-.est-totem-base {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 22%;
-  height: 10%;
-  translate: -50% 0;
-  background: linear-gradient(180deg, color-mix(in oklab, var(--blue) 16%, transparent), transparent);
-  clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%);
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* ============ A INTERFACE ============ */
+/* ============ A CONVERSA ============ */
 
 .est-ui {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  background: color-mix(in oklab, var(--panel, #0b1219) 92%, transparent);
-  border-radius: 14px;
-  padding: 28px;
+  padding: 26px;
 }
 
-/* Layout de palco: a interface ocupa a cena inteira e os dois blocos dividem a
-   mesma célula, um por cima do outro. */
-.est-live .est-ui {
+.est-vivo .est-ui {
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template: 1fr / 1fr;
-  border-radius: 0;
-  padding: clamp(24px, 5vh, 56px) clamp(20px, 6vw, 90px);
-}
-
-.est-live .est-ui-trabalho,
-.est-live .est-produtos {
-  grid-area: 1 / 1;
-}
-
-.est-ui-trabalho {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(16px, 3vh, 30px);
-  min-height: 0;
-}
-
-/* ---- o pedido ---- */
-
-.est-prompt {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid color-mix(in oklab, var(--blue) 22%, transparent);
-  padding-bottom: 14px;
-}
-
-.est-prompt-rot {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0.55;
-}
-
-.est-digitado {
-  font-size: clamp(20px, 3.4vw, 38px);
-  line-height: 1.15;
-  font-weight: 600;
-}
-
-/* O cursor pisca no lugar em que a digitação parou. Ele é o único movimento da
-   cena que não depende da rolagem — cursor parado lê como campo desativado. */
-.est-cursor {
-  width: 2px;
-  height: clamp(20px, 3.4vw, 38px);
-  background: var(--fg-hot);
-  translate: -8px 4px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .est-cursor {
-    animation: estPiscar 1.1s steps(1, end) infinite;
-  }
-}
-
-@keyframes estPiscar {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  50.01%,
-  100% {
-    opacity: 0;
-  }
-}
-
-/* ---- a leitura ---- */
-
-.est-passos {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.est-passo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: clamp(13px, 1.5vw, 16px);
-}
-
-.est-passo-de {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--blue) 18%, transparent);
-  border: 1px solid color-mix(in oklab, var(--blue) 30%, transparent);
-  color: var(--fg-hot);
-}
-
-.est-passo-seta {
-  width: 26px;
-  height: 1px;
-  background: color-mix(in oklab, var(--blue) 45%, transparent);
-  position: relative;
-}
-
-.est-passo-seta::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: -2px;
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid color-mix(in oklab, var(--blue) 60%, transparent);
-  border-right: 1px solid color-mix(in oklab, var(--blue) 60%, transparent);
-  rotate: 45deg;
-}
-
-.est-passo-para {
-  opacity: 0.82;
-}
-
-/* ---- a arte ---- */
-
-.est-arte {
-  display: flex;
-  justify-content: center;
-  min-height: 0;
-  flex: 1;
-}
-
-.est-arte-svg {
-  width: auto;
-  height: 100%;
-  max-height: clamp(140px, 26vh, 260px);
-  color: var(--fg-hot);
-}
-
-/* ---- o arquivo ---- */
-
-.est-arquivo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  padding: 16px 18px;
-  border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--blue) 26%, transparent);
-  background: color-mix(in oklab, var(--blue) 8%, transparent);
-}
-
-.est-arquivo-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.est-arquivo-info strong {
-  font-size: 15px;
-  color: var(--fg-hot);
-}
-
-.est-arquivo-info span {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-/* Não é `<button>`: nada aqui é acionável de verdade, e um botão que não faz
-   nada entra na ordem de tabulação e mente para quem navega por teclado. */
-.est-aprovar {
-  display: inline-block;
-  padding: 12px 22px;
-  border-radius: 999px;
-  background: var(--fg-hot);
-  color: #05090d;
-  font-weight: 600;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-/* ---- os produtos ---- */
-
-.est-produtos {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(12px, 2vw, 28px);
   align-content: center;
+  padding: clamp(20px, 4vh, 44px) clamp(18px, 9vw, 170px);
+  /* Véu escuro sob a conversa: o quadro do vídeo por baixo tem brilho de tela e
+     o texto precisa de contraste garantido, não de sorte. */
+  background: linear-gradient(180deg, rgba(4, 8, 12, 0.82), rgba(4, 8, 12, 0.92));
 }
 
-@media (max-width: 700px) {
-  .est-produtos {
-    grid-template-columns: 1fr;
-  }
-}
-
-.est-produto {
-  margin: 0;
+.est-conversa {
   display: flex;
   flex-direction: column;
+  gap: clamp(8px, 1.5vh, 16px);
+}
+
+.est-fala {
+  display: flex;
+  align-items: flex-end;
   gap: 10px;
+  max-width: 76%;
 }
 
-.est-produto figcaption {
-  font-size: 13px;
-  opacity: 0.7;
+.est-fala--cliente {
+  margin-left: auto;
+  flex-direction: row-reverse;
 }
 
-/* ---- o ponteiro ---- */
+.est-avatar {
+  flex: none;
+  width: clamp(22px, 2.4vw, 32px);
+  display: grid;
+  place-items: center;
+  color: #3ba5e8;
+}
 
-.est-mouse {
+.est-avatar svg {
+  width: 100%;
+}
+
+/* Gramática de aplicativo de mensagem, na linguagem da marca — não o verde de
+   ninguém. O formato é o que qualquer pessoa lê sem aprender nada; a cor é o que
+   impede a cena de virar captura de tela de outro produto. */
+.est-balao {
+  margin: 0;
+  padding: clamp(9px, 1.4vh, 14px) clamp(13px, 1.6vw, 19px);
+  border-radius: 16px;
+  font-size: clamp(12px, 1.35vw, 17px);
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(102, 205, 255, 0.15);
+  color: #dbe6ee;
+  border-bottom-left-radius: 5px;
+}
+
+.est-fala--cliente .est-balao {
+  background: rgba(59, 165, 232, 0.2);
+  border-color: rgba(102, 205, 255, 0.32);
+  color: #eaf5fd;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 5px;
+}
+
+/* ============ O FEIXE E O ESTOURO ============ */
+
+.est-feixe {
   position: absolute;
-  left: 58%;
-  top: 74%;
-  color: #fff;
-  opacity: 0;
-  visibility: hidden;
+  top: -20%;
+  bottom: -20%;
+  left: 50%;
+  width: clamp(90px, 12vw, 190px);
+  margin-left: -6vw;
   pointer-events: none;
+  opacity: 0;
+  transform: rotate(8deg);
+  background: linear-gradient(
+    90deg,
+    rgba(102, 205, 255, 0) 0%,
+    rgba(102, 205, 255, 0.35) 42%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(102, 205, 255, 0.35) 58%,
+    rgba(102, 205, 255, 0) 100%
+  );
+  filter: blur(1.5px);
 }
 
-/* ---- as legendas ---- */
+/* O estouro não é só efeito: é atrás dele que os dois vídeos trocam. Corte seco
+   entre dois arquivos apareceria como falha; coberto pelo branco, lê como o
+   próprio laser cegando a cena. */
+.est-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(120% 90% at 50% 50%, #fff 0%, #eaf6ff 55%, #cfe9ff 100%);
+}
 
-/* Sem script, todas as legendas ficam visíveis e empilhadas: viram a lista do
-   que acontece na máquina, que é a informação da seção. Com script, elas se
-   revezam na mesma linha. */
+/* ============ A ASSINATURA ============ */
+
+.est-assina {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 18px 24px;
+  font-size: clamp(13px, 1.5vw, 18px);
+  color: #cfdae4;
+}
+
+.est-vivo .est-assina {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(16px, 5vh, 48px);
+  padding: 0 24px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
+}
+
+.est-assina-marca {
+  width: clamp(20px, 2vw, 28px);
+  color: #3ba5e8;
+}
+
+/* ============ AS LEGENDAS ============ */
+
+/* Sem script todas ficam visíveis e empilhadas: viram a lista do que a máquina
+   faz, que é a informação da seção. Com script, se revezam na mesma linha. */
 .est-legendas {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.est-live .est-legendas {
+.est-vivo .est-legendas {
   display: grid;
   grid-template: 1fr / 1fr;
   min-height: 3.2em;
   align-items: center;
 }
 
-.est-live .est-legenda {
+.est-vivo .est-legenda {
   grid-area: 1 / 1;
   opacity: 0;
 }
 
 .est-legenda {
-  margin: 0;
+  margin: 0 auto;
+  max-width: 60ch;
   font-size: clamp(14px, 1.8vw, 19px);
   text-align: center;
   opacity: 0.85;
-  max-width: 62ch;
-  margin-inline: auto;
 }
 
-/* ============ TEMA CLARO ============ */
+/* ============ TEMA CLARO ============
 
-[data-tema="light"] .v5 .est-aprovar {
-  color: #f7f9fb;
-}
-
-[data-tema="light"] .v5 .est-mouse {
-  color: #0b1219;
-}
-
-[data-tema="light"] .v5 .est-moldura {
-  box-shadow:
-    0 0 0 10px color-mix(in oklab, #2c78a8 8%, transparent),
-    0 30px 80px -20px rgb(20 40 60 / 0.18);
+   A cena continua escura: os vídeos foram feitos sobre vazio preto e a tomada
+   tem o próprio fundo. Só o texto de fora acompanha o tema. */
+[data-tema="light"] .v5 .est-legenda {
+  color: #33414c;
 }

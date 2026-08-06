@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# brutos dos videos da cena: entram no pipeline de scripts/videos.mjs,
+# nao no bundle. Os finais (public/cena/*.mp4) sao versionados.
+public/cena/bruto/
