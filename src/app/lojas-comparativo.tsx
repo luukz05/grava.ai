@@ -1,136 +1,114 @@
-/* Os três tipos de ponto, lado a lado.
+/* Os três modelos de unidade, lado a lado — com o preço de cada um.
 
-   Estrutura do bloco `pricing-section-with-comparison`: uma coluna de rótulos
-   à esquerda, uma coluna por opção, linhas agrupadas por assunto e um selo na
-   opção destacada. O que mudou na adaptação, e por quê:
+   ───────────────────────────────────────────────────────────────────────────
+   O QUE MUDOU, E POR QUÊ
 
-   — sem Tailwind, sem shadcn, sem `class-variance-authority` e sem
-     `@radix-ui/react-slot`: nenhum dos quatro existe neste projeto, e instalar
-     o conjunto para uma seção reescreveria o sistema visual da página;
-   — sem preço: aqui as colunas não são planos à venda. O investimento é o
-     mesmo nos três pontos e vive na faixa de números, logo abaixo;
-   — sem `<Check/>` verde e `<Minus/>` cinza da lucide: o traço do projeto é
-     autoral e o "não" é um traço, não um X — X leria como defeito do ponto;
-   — a tabela é um `<table>` de verdade, e não uma grade de `<div>` como no
-     original. É dado comparativo com cabeçalho de linha e de coluna: em
-     leitor de tela, a grade de div vira uma fila de textos soltos.
+   Antes eram DUAS seções. "Gente em movimento" comparava três LOCAIS (shopping,
+   supermercado, aeroporto) sem preço nenhum, e "O que custa e o que vem dentro"
+   mostrava um valor único, porque o investimento era o mesmo em qualquer ponto.
 
-   Os atributos são qualitativos porque a franqueadora não forneceu número por
-   tipo de ponto. O único número aqui é o ticket, que veio do material. */
+   A franqueadora confirmou que passa a ter preço POR MODELO. Isso derruba a
+   premissa das duas: o eixo da comparação deixa de ser onde a unidade fica e
+   passa a ser qual unidade se compra — e aí o valor volta para dentro da
+   tabela, que é onde ele compara.
+
+   As duas viraram uma. `numeros.tsx` e `numeros-quadro.tsx` seguem no repo sem
+   referência: o quadro do valor único com a contagem animada não sobrevive a
+   três preços, mas está pronto se um dia houver de novo um número só.
+
+   A FOTO PASSOU A LIDERAR. Antes ela era uma tarja de 4/3 espremida acima de
+   sete linhas de texto. Quem escolhe entre quiosque aberto e fechado escolhe
+   por como a coisa É, não por adjetivo — a imagem virou o topo de cada coluna,
+   e as linhas de dado caíram de sete para cinco para não competir com ela.
+
+   ───────────────────────────────────────────────────────────────────────────
+   OS VALORES SÃO PROVISÓRIOS
+
+   Estão em `MODELOS`, e em nenhum outro lugar. A franqueadora vai informar os
+   definitivos — inclusive o nome do terceiro modelo, que aqui está como "Loja
+   compacta" porque ela ainda não nomeou.
+
+   A mesma regra de sempre: número de vitrine inventado nesta página é candidato
+   tomando decisão com dado falso. Estes estão marcados para serem trocados, não
+   para serem exibidos. */
 
 import { Ph } from "./ph";
-import {
-  IcoShopping,
-  IcoMercado,
-  IcoAeroporto,
-  IcoSim,
-  IcoNao,
-} from "./icons";
+import { IcoShopping, IcoMercado, IcoAeroporto, IcoSim, IcoNao } from "./icons";
 
-type Loja = {
+type Modelo = {
   id: string;
   nome: string;
-  publico: string;
   resumo: string;
+  /* PROVISÓRIO — aguardando a franqueadora. */
+  investimento: string;
   imagem: string;
   Icone: (p: { className?: string }) => React.ReactElement;
 };
 
-/* Qual coluna leva o selo. O texto dele diz o que a própria tabela prova
-   duas linhas abaixo — "alto e constante, com pico no fim de semana". O selo
-   anterior dizia "Mais escolhido", que é afirmação sobre a distribuição da
-   rede: número que a franqueadora nunca forneceu e que a página não pode
-   inventar. */
-const DESTAQUE = "shopping";
+/* Qual coluna leva o selo. "Menor investimento" é um fato que a própria linha de
+   preço prova duas linhas abaixo — e não uma afirmação sobre a rede, como seria
+   "o mais escolhido", que exigiria um dado de distribuição que ninguém forneceu. */
+const DESTAQUE = "aberto";
 
-const LOJAS: Loja[] = [
+const MODELOS: Modelo[] = [
   {
-    id: "shopping",
-    nome: "Shopping center",
-    publico: "Quem está passeando",
-    resumo: "No corredor de maior circulação, entre as âncoras.",
-    imagem: "Quiosque no corredor do shopping",
+    id: "aberto",
+    nome: "Quiosque aberto",
+    resumo: "Ilha no corredor, atendimento pelos quatro lados.",
+    investimento: "R$ 99.900",
+    imagem: "Quiosque aberto no corredor",
     Icone: IcoShopping,
   },
   {
-    id: "mercado",
-    nome: "Supermercado",
-    publico: "Quem mora no bairro",
-    resumo: "De grande porte, perto das frentes de caixa.",
-    imagem: "Quiosque na frente de caixa",
+    id: "fechado",
+    nome: "Quiosque fechado",
+    resumo: "Cabine com vitrine, estoque e balcão próprios.",
+    investimento: "R$ 139.900",
+    imagem: "Quiosque fechado com vitrine",
     Icone: IcoMercado,
   },
   {
-    id: "aeroporto",
-    nome: "Aeroporto",
-    publico: "Quem está de passagem",
-    resumo: "Na área de espera, onde o tempo sobra.",
-    imagem: "Quiosque na sala de embarque",
+    id: "compacta",
+    /* NOME PROVISÓRIO: a franqueadora ainda não batizou o terceiro modelo. */
+    nome: "Loja compacta",
+    resumo: "Ponto com porta, para praça de maior permanência.",
+    investimento: "R$ 189.900",
+    imagem: "Loja compacta com fachada",
     Icone: IcoAeroporto,
   },
 ];
 
-/* `true`/`false` viram marca e traço; string entra como texto. Um tipo só
-   para os dois casos evita duas tabelas paralelas saindo de sincronia. */
+/* `true`/`false` viram marca e traço; string entra como texto. Um tipo só para
+   os dois casos evita duas tabelas paralelas saindo de sincronia. */
 type Valor = string | boolean;
+type Linha = { rotulo: string; valores: Valor[]; forte?: boolean };
 
-/* Cada linha tem um valor por coluna. O que não muda de ponto para ponto —
-   investimento, payback, royalties — saiu daqui para a seção de números: valor
-   igual nas três colunas não é comparação, e ainda sumia de tela quando a
-   tabela deslizava. */
-type Linha = { rotulo: string; valores: Valor[] };
+/* Cinco linhas, e não as sete de antes: com a foto liderando, cada linha a mais
+   empurra a imagem para fora da primeira leitura. O que sobrou é o que muda de
+   modelo para modelo e pesa na decisão.
 
-const GRUPOS: { titulo: string; linhas: Linha[] }[] = [
+   `forte` marca a linha do investimento — é a única que ganha escala, porque é
+   a pergunta que trava a conversa. */
+const LINHAS: Linha[] = [
   {
-    titulo: "Quem passa ali",
-    linhas: [
-      {
-        rotulo: "Fluxo",
-        valores: [
-          "Alto e constante, com pico no fim de semana",
-          "Recorrente, a mesma pessoa volta toda semana",
-          "Alto, com público de fora da cidade",
-        ],
-      },
-      {
-        rotulo: "Perfil",
-        valores: [
-          "Família e casal em passeio",
-          "Morador do bairro em compra de rotina",
-          "Viajante a trabalho e a lazer",
-        ],
-      },
-    ],
+    rotulo: "Investimento",
+    valores: MODELOS.map((m) => m.investimento),
+    forte: true,
   },
   {
-    titulo: "O tempo da pessoa",
-    linhas: [
-      {
-        rotulo: "Tempo no ponto",
-        valores: [
-          "Passeio, sem pressa",
-          "Espera de fila, curta e repetida",
-          "Longo e ocioso, esperando embarque",
-        ],
-      },
-      {
-        rotulo: "Motivo da compra",
-        valores: [
-          "Presente e lembrança",
-          "Impulso e data comemorativa",
-          "Souvenir e presente de viagem",
-        ],
-      },
-    ],
+    rotulo: "Área ocupada",
+    valores: ["≈ 4 m²", "≈ 9 m²", "≈ 18 m²"],
   },
   {
-    titulo: "O que muda na operação",
-    linhas: [
-      { rotulo: "O mesmo cliente volta", valores: [false, true, false] },
-      { rotulo: "Público de fora da cidade", valores: [false, false, true] },
-      { rotulo: "A espera vira vitrine", valores: [false, true, true] },
+    rotulo: "Onde costuma ficar",
+    valores: [
+      "Corredor de shopping e frente de caixa",
+      "Shopping, aeroporto e rodoviária",
+      "Rua e praça de alimentação",
     ],
   },
+  { rotulo: "Estoque no próprio ponto", valores: [false, true, true] },
+  { rotulo: "Vitrine fechada", valores: [false, true, true] },
 ];
 
 function Celula({ v }: { v: Valor }) {
@@ -143,75 +121,69 @@ function Celula({ v }: { v: Valor }) {
   ) : (
     <span className="cmp-nao">
       <IcoNao />
-      <span className="sr">não se aplica</span>
+      <span className="sr">não</span>
     </span>
   );
 }
 
 export function LojasComparativo() {
   return (
-    <div
-      className="cmp-wrap"
-      /* Uma caixa que rola precisa ser alcançável pelo teclado: sem `tabIndex`
-         e `role`, quem não usa mouse nem toque não chega nas colunas que
-         ficaram fora da tela. */
-      tabIndex={0}
-      role="region"
-      aria-label="Comparação dos tipos de ponto — rolável na horizontal"
-    >
-      {/* Mais larga que o celular, rola na horizontal em vez de empilhar:
-          empilhada ela deixa de ser comparação, que é a única razão desta
-          seção existir. A coluna de rótulos fica grudada na esquerda para a
-          linha continuar identificada durante a rolagem. */}
-      <table className="cmp">
-        <caption className="sr">
-          Comparação dos três tipos de ponto: quem passa ali, quanto tempo a
-          pessoa tem e o que muda na operação.
-        </caption>
-        <thead>
-          <tr>
-            <td className="cmp-canto" />
-            {LOJAS.map((l) => (
-              <th
-                key={l.id}
-                scope="col"
-                className="cmp-col"
-                data-destaque={l.id === DESTAQUE ? "1" : undefined}
-              >
-                <Ph ratio="4 / 3" label={l.imagem} />
-                {l.id === DESTAQUE ? (
-                  <span className="cmp-selo">Maior fluxo</span>
-                ) : null}
-                <span className="cmp-publico mono">{l.publico}</span>
-                <span className="cmp-nome">
-                  <span className="ico">
-                    <l.Icone />
-                  </span>
-                  {l.nome}
-                </span>
-                <span className="cmp-resumo">{l.resumo}</span>
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        {GRUPOS.map((g) => (
-          <tbody key={g.titulo}>
+    <>
+      <div
+        className="cmp-wrap"
+        /* Uma caixa que rola precisa ser alcançável pelo teclado: sem `tabIndex`
+           e `role`, quem não usa mouse nem toque não chega nas colunas que
+           ficaram fora da tela. */
+        tabIndex={0}
+        role="region"
+        aria-label="Comparação dos modelos de unidade — rolável na horizontal"
+      >
+        {/* Mais larga que o celular, rola na horizontal em vez de empilhar:
+            empilhada ela deixa de ser comparação, que é a única razão desta
+            seção existir. A coluna de rótulos fica grudada na esquerda para a
+            linha continuar identificada durante a rolagem. */}
+        <table className="cmp cmp--foto">
+          <caption className="sr">
+            Comparação dos três modelos de unidade: investimento, área, onde
+            costuma ficar e o que muda na operação.
+          </caption>
+          <thead>
             <tr>
-              <th scope="colgroup" colSpan={4} className="cmp-grupo mono">
-                {g.titulo}
-              </th>
+              <td className="cmp-canto" />
+              {MODELOS.map((m) => (
+                <th
+                  key={m.id}
+                  scope="col"
+                  className="cmp-col"
+                  data-destaque={m.id === DESTAQUE ? "1" : undefined}
+                >
+                  <Ph ratio="5 / 4" label={m.imagem} />
+                  {m.id === DESTAQUE ? (
+                    <span className="cmp-selo">Menor investimento</span>
+                  ) : null}
+                  <span className="cmp-nome">
+                    <span className="ico">
+                      <m.Icone />
+                    </span>
+                    {m.nome}
+                  </span>
+                  <span className="cmp-resumo">{m.resumo}</span>
+                </th>
+              ))}
             </tr>
-            {g.linhas.map((linha) => (
-              <tr key={linha.rotulo}>
+          </thead>
+
+          <tbody>
+            {LINHAS.map((linha) => (
+              <tr key={linha.rotulo} data-forte={linha.forte ? "1" : undefined}>
                 <th scope="row" className="cmp-rotulo">
                   {linha.rotulo}
                 </th>
                 {linha.valores.map((v, i) => (
                   <td
-                    key={LOJAS[i].id}
+                    key={MODELOS[i].id}
                     className="cmp-cel"
-                    data-destaque={LOJAS[i].id === DESTAQUE ? "1" : undefined}
+                    data-destaque={MODELOS[i].id === DESTAQUE ? "1" : undefined}
                   >
                     <Celula v={v} />
                   </td>
@@ -219,8 +191,31 @@ export function LojasComparativo() {
               </tr>
             ))}
           </tbody>
+        </table>
+      </div>
+
+      {/* O que NÃO muda de modelo para modelo fica fora da tabela: valor igual
+          nas três colunas não é comparação, é repetição que rouba largura de
+          quem compara. */}
+      <dl className="cmp-comuns">
+        {[
+          { rotulo: "Payback estimado", valor: "6 a 12 meses" },
+          { rotulo: "Royalties", valor: "2,5% do faturamento" },
+          { rotulo: "Taxa de marketing", valor: "1% do faturamento" },
+          { rotulo: "Ticket médio no totem", valor: "R$ 60 a R$ 100" },
+        ].map((l) => (
+          <div className="cmp-comum" key={l.rotulo}>
+            <dt className="mono">{l.rotulo}</dt>
+            <dd>{l.valor}</dd>
+          </div>
         ))}
-      </table>
-    </div>
+      </dl>
+
+      <p className="cmp-nota">
+        O investimento é pago uma vez e já inclui a taxa de franquia, o
+        equipamento e o estoque inicial. Royalties e taxa de marketing são iguais
+        nos três modelos.
+      </p>
+    </>
   );
 }

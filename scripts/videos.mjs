@@ -15,8 +15,19 @@
  * `-g 1 -keyint_min 1 -sc_threshold 0` faz de TODO quadro um keyframe. Aí buscar
  * qualquer posição é uma leitura direta.
  *
- * Isso engorda o arquivo por segundo, e é por isso que a redução para 1280px
- * vem junto: os brutos de 1920px somavam 14,4MB e saíram daqui com 3,7MB.
+ * Isso engorda o arquivo, e a conta foi medida nos dois eixos:
+ *
+ *     1280px CRF23   3,7MB   — some detalhe visível em janela de 1900px
+ *     1600px CRF21   7,4MB
+ *     1920px CRF23   8,1MB
+ *     1920px CRF20  11,9MB   <- escolhido
+ *
+ * Ficou na resolução NATIVA porque abaixo dela o navegador amplia, e ampliar é
+ * exatamente o que fazia a cena parecer de qualidade menor que a do arquivo.
+ *
+ * Os 11,9MB são protegidos por carregamento tardio: os elementos nascem com
+ * `preload="none"` e só baixam quando a seção se aproxima, então esse peso
+ * nunca disputa banda com o herói.
  *
  * `-an` remove o áudio de verdade, em vez de só silenciar no elemento. Vídeo
  * movido por rolagem não toca áudio em sentido nenhum; a faixa só ocupava banda.
@@ -35,8 +46,8 @@ const PECAS = [
   { bruto: "pecas-voando.mp4", saida: "pecas.mp4", corte: null },
 ];
 
-const LARGURA = 1280;
-const CRF = 23;
+const LARGURA = 1920;
+const CRF = 20;
 
 let falhou = false;
 for (const p of PECAS) {

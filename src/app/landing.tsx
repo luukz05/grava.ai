@@ -3,33 +3,26 @@
    de caracteres em onda com a marca emergindo dela, e os canais da IA viram
    medidores de glifos. Sem radar, sem sci-fi. */
 
-import Link from "next/link";
 import Image from "next/image";
 import "./v5.css";
 import "./variacoes.css";
 import "./temas.css";
+import "./mapa-unidades.css";
+import "./frentes.css";
+import "./modelos.css";
 /* A arte ASCII segue inteira em `assets.tsx`. Ela saiu da página a pedido, para
    a leitura de layout acontecer sem o ruído dos mocks — voltar é reimportar
    AsciiWaveHeader / AsciiMeter / AsciiTotem / AsciiCircuito e desfazer os
    `<Ph>` abaixo. */
 import { Casca, Heroi, WHATSAPP } from "./casca";
-import { Indice, type Secao } from "./indice";
 import { Ph } from "./ph";
-import { LojasComparativo } from "./lojas-comparativo";
-import { Numeros } from "./numeros";
-import { FrentesLista } from "./orbita";
+import { Modelos } from "./modelos";
+import { MapaUnidades } from "./mapa-unidades";
+import { Frentes } from "./frentes";
 import { Estudio } from "./estudio";
 import { FormFranqueado } from "./form-franqueado";
 import { Rodape } from "./rodape";
 
-/* A ordem aqui é a ordem da página. O índice não infere nada: se uma seção
-   nascer ou mudar de lugar, ela entra nesta lista junto. */
-const SECOES: Secao[] = [
-  { id: "esperar", rotulo: "Sobre" },
-  { id: "ia", rotulo: "A IA" },
-  { id: "pontos", rotulo: "Tipos de loja" },
-  { id: "numeros", rotulo: "Números" },
-];
 
 export type Tema = "dark" | "light";
 
@@ -67,73 +60,30 @@ export function Landing({ tema }: { tema?: Tema }) {
         </header>
       </Heroi>
 
-      {/* A partir daqui o índice acompanha. O wrapper existe só para dar
-            a ele um contêiner que começa nesta seção: sticky precisa de um
-            pai, e o teto do índice é o topo deste bloco. */}
       <div className="corpo">
-        <div className="indice-rail">
-          <Indice secoes={SECOES} />
-        </div>
 
-        {/* Sobre a GRAVA.AI. A estrutura vem do bloco about-3 do shadcnblocks:
-            título e descrição em duas colunas, uma peça grande, um cartão
-            destacado ao lado e o painel de números embaixo.
+        {/* ONDE A REDE ESTÁ.
 
-            O que mudou na adaptação, e por quê:
-            — sem Tailwind e sem shadcn, porque o projeto não usa nenhum dos
-              dois e instalá-los reescreveria o sistema visual inteiro;
-            — sem imagem de banco, porque o guardrail proíbe stock e ainda não
-              existe fotografia da rede;
-            — sem a faixa de logos de cliente e sem "300+ empresas atendidas",
-              porque a franqueadora não forneceu nenhum desses dados. Inventar
-              número de vitrine aqui é exatamente o que esta página se recusa a
-              fazer, e o slot está montado esperando o dado real. */}
-        <section className="hold sec sobre" id="esperar">
-          {/* O apoio tinha quatro linhas e dizia três coisas — o que a marca é,
-              o que o cliente faz e o que o franqueado compra. As duas primeiras
-              a página conta nas seções seguintes, com mais espaço e melhor. O
-              que resta aqui é a única que a manchete não diz sozinha. */}
+            Aqui havia a seção "O que a rede vende não é a máquina": uma grade de
+            três molduras vazias (`<Ph>`) em volta de um cartão de texto. Ela
+            afirmava que a operação vem montada e pedia ao visitante que
+            acreditasse — as fotos que provariam isso não existem.
+
+            O mapa responde a pergunta que o candidato faz de fato, e responde
+            com dado em vez de adjetivo: onde já tem unidade, e o que abre perto
+            dele. "Praça definida, entrega em 30 dias" é a única frase desta
+            página que cria urgência sem inventar nada — a vaga da região dele
+            ou está livre, ou não está.
+
+            Os links para a história e a galeria não se perderam: os dois já
+            estão no rodapé, e o segundo também no menu. */}
+        <section className="hold sec" id="esperar">
           <div className="sec-cab">
-            <h2>O que a rede vende não é a máquina.</h2>
-            <p>É a operação inteira: quiosque, IA e abastecimento, já montados.</p>
+            <h2>Onde a rede já está.</h2>
+            <p>Unidades em operação e as próximas praças, com prazo de entrega.</p>
           </div>
 
-          <div className="sobre-grid">
-            <figure className="sobre-peca">
-              <Ph ratio="16 / 11" label="A unidade em operação" />
-            </figure>
-
-            <div className="sobre-lado">
-              <article className="sobre-card">
-                <Image
-                  src="/brand/grava-mark.png"
-                  alt=""
-                  width={108}
-                  height={128}
-                  className="sobre-marca"
-                />
-                <div>
-                  <h3>Transformando ideias em produtos personalizados</h3>
-                  <p>
-                    A tagline não é slogan: é a descrição do que acontece no
-                    totem. A pessoa descreve, a IA desenha, a máquina grava.
-                  </p>
-                </div>
-                <div className="sobre-acoes">
-                  <Link className="link-saida" href="/institucional">
-                    Conhecer a história
-                  </Link>
-                  <Link className="link-saida" href="/galeria">
-                    Ver a galeria
-                  </Link>
-                </div>
-              </article>
-
-              <figure className="sobre-peca">
-                <Ph ratio="4 / 3" label="Peça saindo do totem" />
-              </figure>
-            </div>
-          </div>
+          <MapaUnidades />
         </section>
 
         {/* A seção "Diferenciais" foi extinta, e não movida.
@@ -162,40 +112,43 @@ export function Landing({ tema }: { tema?: Tema }) {
             texto: eles provam que a IA não para no desenho da arte, e é papel de
             texto provar isso — não de um segundo desenho competindo com o
             primeiro. O hexágono está em `orbita.tsx`, agora sem referência. */}
+        {/* Sem cabeçalho de seção, de propósito. Um título anunciando "o totem
+            atende, entende e entrega" antes de uma cena que MOSTRA exatamente
+            isso é a página contando o final antes de começar — e a cena perde a
+            surpresa que é o argumento dela. A conversa dentro do vídeo já diz o
+            que precisa ser dito, em texto de verdade. */}
         <section className="hold sec" id="ia">
-          <div className="sec-cab">
-            <h2>O totem atende, entende e entrega.</h2>
-            <p>Do que a cliente escreve até a peça na mão dela. Role para ver.</p>
-          </div>
-
           <Estudio />
 
-          <FrentesLista />
+          <Frentes />
         </section>
 
         {/* O sistema fechando o circuito. Reativo à rolagem: a arte fica presa
             enquanto as seis estações passam ao lado dela. */}
 
-        {/* Tipos de loja. Cada ponto tem uma lógica diferente de fluxo, e a
-            unidade se comporta diferente em cada um. Os atributos são
-            qualitativos de propósito: o cliente não forneceu número por tipo de
-            ponto, e o slot de dado fica preparado para receber o real depois. */}
-        <section className="hold sec" id="pontos">
-          {/* A manchete é a frase da própria franqueadora — fica. O que encurtou
-              foi a repetição do "gente", e o apoio ficou só com a informação que
-              a tabela abaixo desenvolve: o que muda de um ponto para o outro. */}
+        {/* DUAS SEÇÕES VIRARAM UMA.
+
+            Aqui havia "Gente em movimento", comparando três LOCAIS sem preço, e
+            logo abaixo "O que custa e o que vem dentro", com um valor único —
+            porque o investimento era o mesmo em qualquer ponto.
+
+            A franqueadora passou a ter preço por MODELO, e isso derruba a
+            premissa das duas: o eixo da escolha deixa de ser onde a unidade fica
+            e passa a ser qual unidade se compra. O valor volta para dentro da
+            tabela, que é o único lugar onde ele compara.
+
+            A âncora `#numeros` fica com esta seção porque é para cá que apontam
+            o botão do herói, o rodapé, a galeria e a página de perguntas — e é
+            aqui que os números passaram a morar. */}
+        <section className="hold sec" id="numeros">
           <div className="sec-cab">
-            <h2>Gente em movimento, em busca de algo especial.</h2>
-            <p>O que muda de um ponto para o outro é o tempo que a pessoa tem.</p>
+            <h2>Três modelos de unidade.</h2>
+            <p>O que muda entre eles é o tamanho do ponto — e o que cada um custa.</p>
           </div>
 
-          <LojasComparativo />
+          <Modelos />
         </section>
 
-        <Numeros />
-
-        {/* Fim do trilho do índice. O CTA fica fora do bloco de propósito:
-            ele é o chão onde o índice chega, não mais uma parada numerada. */}
       </div>
 
       <footer className="hold close" id="falar">
@@ -234,8 +187,7 @@ export function Landing({ tema }: { tema?: Tema }) {
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/institucional", rotulo: "A marca" },
             { href: "#ia", rotulo: "A IA" },
-            { href: "#pontos", rotulo: "Tipos de loja" },
-            { href: "#numeros", rotulo: "Números" },
+            { href: "#numeros", rotulo: "Modelos e valores" },
             { href: "/galeria", rotulo: "Galeria" },
           ]}
         />

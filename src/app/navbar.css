@@ -1,0 +1,206 @@
+/* A barra que se condensa na rolagem.
+
+   No topo: exatamente como a página sempre foi — marca e links à esquerda,
+   ações à direita, tudo alinhado com a coluna de conteúdo. Fora do topo: as
+   três peças recolhidas num oblongo só, centrado e flutuando, com o botão do
+   WhatsApp reduzido a uma esfera do tamanho da chave de tema.
+
+   ───────────────────────────────────────────────────────────────────────────
+   DOIS ELEMENTOS, E ESSE É O PONTO
+
+   `.navbar-faixa` é a coluna: largura máxima e respiro lateral da página, e é
+   ela que gruda no topo. `.navbar` dentro dela é a linha de conteúdo, e é ela
+   que vira o oblongo.
+
+   Eram a mesma coisa antes, e não dava: para o oblongo abraçar o conteúdo o
+   elemento precisa de `min-width` variável, e `min-width` VENCE `max-width` —
+   a barra passava a ser mais larga que a coluna em vez de acompanhá-la, e o
+   estado do topo ficava espaçado demais. Com a coluna por fora, o mínimo passa
+   a ser medido contra ela.
+
+   ───────────────────────────────────────────────────────────────────────────
+   POR QUE SEM JAVASCRIPT
+
+   Quem dirige é `animation-timeline: scroll()`, o mesmo mecanismo que já move a
+   trilha do fundo desta página. Sem ouvinte de rolagem, sem estado em React, e
+   a navbar continua sendo componente de servidor.
+
+   Isso importa mais aqui que em qualquer outro lugar do site: a navbar está na
+   primeira tela de TODAS as rotas. Um ouvinte de rolagem nela seria trabalho no
+   fio principal a cada quadro, no exato momento em que o LCP é medido.
+
+   `@supports` guarda o bloco inteiro. Onde não houver suporte — e com movimento
+   reduzido — a barra fica no estado do topo permanentemente, que é um estado
+   correto e não um defeito.
+
+   ───────────────────────────────────────────────────────────────────────────
+   `--nav-cond` vai de 0 a 1 e tudo lê dela. Precisa de `@property` com tipo
+   declarado: sem isso o navegador trata número dentro de `calc()` como troca
+   discreta, e a barra saltaria entre os dois estados em vez de derreter. */
+
+@property --nav-cond {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* A COLUNA. Herda largura e respiro do `.hold`; o que ela acrescenta é grudar
+   no topo. Nada aqui muda com a rolagem — é o quadro fixo dentro do qual o
+   oblongo se recolhe. */
+.navbar-faixa {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding-top: var(--nav-gap);
+}
+
+/* A LINHA. No topo ela ocupa a coluna inteira, e é isso que mantém marca e
+   links à esquerda com as ações à direita. */
+.navbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 1rem);
+  min-height: 58px;
+}
+
+/* O botão nasce com a mesma altura da chave de tema (42px): eles dividem a
+   linha, e altura diferente entre os dois desalinha a barra inteira. */
+.nav-cta {
+  height: 42px;
+  padding-block: 0;
+}
+
+.nav-cta-ico {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* A faixa: 0 a 160px de rolagem. Curta de propósito — a barra tem que estar
+       recolhida antes de a primeira seção chegar, senão a transição acontece
+       por cima de conteúdo e lê como instabilidade de layout. */
+    .v5 {
+      animation: navCondensar linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 160px;
+    }
+
+    @keyframes navCondensar {
+      to {
+        --nav-cond: 1;
+      }
+    }
+
+    /* O oblongo descola do alto da janela em vez de encostar nela. `top` do
+       sticky, e não margem: margem seria consumida pelo próprio sticky. */
+    .navbar-faixa {
+      top: calc(var(--nav-cond) * 14px);
+      padding-top: calc(var(--nav-gap) * (1 - var(--nav-cond)));
+      margin-top: calc(var(--nav-cond) * var(--nav-gap));
+    }
+
+    /* O OBLONGO. Nasce transparente e sem borda; o que aparece na rolagem é o
+       fundo, o desfoque e o anel.
+
+       `width: fit-content` é o estado condensado. `min-width` a 100% no topo é
+       quem obriga a largura cheia — e agora esses 100% são da COLUNA, não da
+       página. Interpolar `width` entre `100%` e `fit-content` não existe; o
+       mínimo é o que dá a transição.
+
+       É também o que resolve o `margin-right: auto` das pílulas sozinho: com
+       largura cheia sobra espaço e ele empurra as ações para a direita; com
+       largura abraçada não sobra nada e ele vira zero. */
+    .navbar {
+      width: fit-content;
+      min-width: calc((1 - var(--nav-cond)) * 100%);
+      margin-inline: auto;
+      /* Assimetria proposital: a marca é imagem e não tem respiro próprio,
+         enquanto a esfera da direita já traz o dela. Sem os 18px a mais na
+         esquerda, o oblongo fica visivelmente torto. */
+      padding: calc(var(--nav-cond) * 7px) calc(var(--nav-cond) * 8px)
+        calc(var(--nav-cond) * 7px) calc(var(--nav-cond) * 18px);
+      border-radius: 999px;
+      background: rgba(11, 18, 25, calc(var(--nav-cond) * 0.72));
+      box-shadow: 0 10px 40px -18px rgba(0, 0, 0, calc(var(--nav-cond) * 0.95));
+      backdrop-filter: blur(calc(var(--nav-cond) * 14px));
+      -webkit-backdrop-filter: blur(calc(var(--nav-cond) * 14px));
+      border: 1px solid rgba(102, 205, 255, calc(var(--nav-cond) * 0.16));
+      min-height: calc(58px - var(--nav-cond) * 58px);
+    }
+
+    /* A cápsula dos links perde o próprio fundo ao entrar no oblongo: superfície
+       dentro de superfície é caixa dentro de caixa, e a leitura de "você está
+       aqui" passa a vir só da pílula preenchida. */
+    .nav-pilulas {
+      padding: calc(6px * (1 - var(--nav-cond)));
+      background: color-mix(
+        in srgb,
+        var(--fg) calc(4% * (1 - var(--nav-cond))),
+        transparent
+      );
+    }
+
+    .pilula {
+      padding-block: calc(0.7rem - var(--nav-cond) * 0.16rem);
+      padding-inline: calc(1.5rem - var(--nav-cond) * 0.45rem);
+    }
+
+    /* O BOTÃO VIRA ESFERA — 42×42, o tamanho exato da chave de tema ao lado. Os
+       dois são controles da mesma linha; um redondo de 42 ao lado de um
+       arredondado de outra medida lê como acidente, não como par.
+
+       Só `min-width` varia. `width` continua automática: no topo sai do
+       conteúdo, e no fim o mínimo manda porque o rótulo já encolheu a zero.
+       Animar `width` a partir de `calc(0 * 42px)` zeraria o botão no topo — que
+       é justamente onde ele mais precisa existir. */
+    .nav-cta {
+      min-width: calc(var(--nav-cond) * 42px);
+      padding-inline: calc((1 - var(--nav-cond)) * 1.6rem);
+      gap: calc((1 - var(--nav-cond)) * 0.5rem);
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* O rótulo encolhe, e não é escondido: `display: none` deixaria a esfera sem
+       nome acessível — um alvo anônimo para leitor de tela. */
+    .nav-cta-rotulo {
+      display: inline-block;
+      max-width: calc((1 - var(--nav-cond)) * 12rem);
+      opacity: calc(1 - var(--nav-cond) * 1.6);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    /* O ícone só existe quando o rótulo sai. Com os dois visíveis ao mesmo
+       tempo, o botão largo fica com um ícone que não estava no desenho. */
+    .nav-cta-ico {
+      width: calc(var(--nav-cond) * 20px);
+      opacity: calc(var(--nav-cond) * 1.4 - 0.4);
+    }
+
+    /* A marca encolhe junto, senão ela vira a peça mais alta do oblongo e define
+       sozinha a altura dele. */
+    .brand-simbolo {
+      height: calc(32px - var(--nav-cond) * 6px);
+    }
+  }
+}
+
+/* No claro o oblongo é papel, não vidro escuro. */
+[data-tema="light"] .v5 .navbar {
+  background: rgba(255, 255, 255, calc(var(--nav-cond) * 0.78));
+  border-color: rgba(44, 120, 168, calc(var(--nav-cond) * 0.18));
+  box-shadow: 0 10px 34px -20px rgba(20, 40, 60, calc(var(--nav-cond) * 0.5));
+}
+
+/* Sem os links visíveis não existe o que recolher: a barra fica com marca e
+   ações, e condensar isso não muda nada além de encolher o botão. */
+@media (max-width: 820px) {
+  .nav-cta-rotulo {
+    max-width: none;
+    opacity: 1;
+  }
+}

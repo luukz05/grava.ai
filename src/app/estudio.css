@@ -22,9 +22,35 @@
   justify-content: center;
 }
 
+/* SANGRIA TOTAL — e ela vai AQUI, no elemento externo, nunca no palco.
+
+   POR QUE NÃO NO `.est-palco`: é ele que o ScrollTrigger prende. Ao prender, o
+   GSAP copia as margens para o elemento fixo e dimensiona o espaçador a partir
+   delas — e uma margem negativa do tamanho da tela quebra essa conta. O sintoma
+   não é a cena torta: é o DOCUMENTO PARAR DE ROLAR na altura da seção, com a
+   animação congelada no primeiro quadro. Já aconteceu aqui. O elemento preso
+   fica com geometria trivial: 100% de largura, 100vh de altura, margem zero.
+
+   Margem negativa nos dois lados e nenhuma largura declarada: bloco com margem
+   negativa se estica sozinho até onde a margem pede.
+
+   `--est-sangria` é medida em JavaScript, e não escrita como `50vw`, porque
+   `100vw` inclui a barra de rolagem. Com `calc(50% - 50vw)` a cena ficava 7px
+   mais larga que o espaço real e começava 7px à esquerda — some por overflow,
+   mas é largura errada e some de forma diferente em cada sistema. A medida em JS
+   é contra a largura de fato disponível, e é refeita a cada `refresh`.
+
+   O 0px do fallback é de propósito: se o JavaScript não rodar, a seção fica na
+   coluna, que é o lugar certo para ela sem a animação. */
+.est-vivo {
+  margin-inline: calc(var(--est-sangria, 0px) * -1);
+}
+
 .est-vivo .est-palco {
+  width: 100%;
   height: 100vh;
-  padding: 18px 0;
+  padding: 0;
+  gap: 0;
 }
 
 .est-cena {
@@ -35,8 +61,8 @@
 }
 
 .est-vivo .est-cena {
-  flex: 1;
-  min-height: 0;
+  position: absolute;
+  inset: 0;
   border-radius: 0;
 }
 
@@ -65,7 +91,16 @@
   display: none;
 }
 
-/* ============ A CONVERSA ============ */
+/* ============ A CONVERSA ============
+
+   REGRA QUE COMANDA O RESTO: só o cliente tem balão. A IA é texto puro sobre a
+   superfície, com a marca aparecendo uma vez por turno.
+
+   Balão dos dois lados com borda colorida é o que faz qualquer chat parecer
+   template — dois retângulos delineados trocando figurinha. Deixando um lado
+   sem moldura, a conversa passa a ler como alguém RESPONDENDO, e a única forma
+   desenhada na tela vira o que o visitante escreveu. É o que a resposta precisa
+   ser: o assunto, não mais uma caixa. */
 
 .est-ui {
   position: relative;
@@ -77,63 +112,141 @@
   inset: 0;
   display: grid;
   align-content: center;
-  padding: clamp(20px, 4vh, 44px) clamp(18px, 9vw, 170px);
-  /* Véu escuro sob a conversa: o quadro do vídeo por baixo tem brilho de tela e
-     o texto precisa de contraste garantido, não de sorte. */
-  background: linear-gradient(180deg, rgba(4, 8, 12, 0.82), rgba(4, 8, 12, 0.92));
+  padding: clamp(24px, 5vh, 56px) clamp(20px, 6vw, 80px);
+  /* Véu em três paradas, e não um degradê chapado: escurece onde o texto está e
+     deixa as bordas do quadro respirarem. O vídeo por baixo continua existindo,
+     em vez de virar um fundo preto qualquer. */
+  background: radial-gradient(
+      120% 90% at 50% 50%,
+      rgba(4, 8, 12, 0.94) 0%,
+      rgba(4, 8, 12, 0.86) 45%,
+      rgba(4, 8, 12, 0.6) 100%
+    );
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
+/* Coluna de leitura, centrada. A conversa ocupava a largura inteira e as falas
+   da IA saíam com linhas de 140 caracteres — longas demais para ler, e o oposto
+   de premium. */
 .est-conversa {
+  width: min(100%, 46rem);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.5vh, 16px);
+  gap: clamp(18px, 3.2vh, 34px);
+}
+
+/* ---- turno da IA: sem balão ---- */
+
+.est-turno {
+  display: flex;
+  gap: clamp(12px, 1.6vw, 18px);
+}
+
+.est-marca {
+  flex: none;
+  width: clamp(24px, 2.2vw, 30px);
+  margin-top: 0.35em;
+  color: #5cbcf2;
+  opacity: 0.9;
+}
+
+.est-marca svg {
+  width: 100%;
+  display: block;
+}
+
+.est-falas {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 14px);
+  min-width: 0;
 }
 
 .est-fala {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  max-width: 76%;
-}
-
-.est-fala--cliente {
-  margin-left: auto;
-  flex-direction: row-reverse;
-}
-
-.est-avatar {
-  flex: none;
-  width: clamp(22px, 2.4vw, 32px);
-  display: grid;
-  place-items: center;
-  color: #3ba5e8;
-}
-
-.est-avatar svg {
-  width: 100%;
-}
-
-/* Gramática de aplicativo de mensagem, na linguagem da marca — não o verde de
-   ninguém. O formato é o que qualquer pessoa lê sem aprender nada; a cor é o que
-   impede a cena de virar captura de tela de outro produto. */
-.est-balao {
   margin: 0;
-  padding: clamp(9px, 1.4vh, 14px) clamp(13px, 1.6vw, 19px);
-  border-radius: 16px;
-  font-size: clamp(12px, 1.35vw, 17px);
-  line-height: 1.45;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(102, 205, 255, 0.15);
-  color: #dbe6ee;
-  border-bottom-left-radius: 5px;
+  font-size: clamp(15px, 1.45vw, 21px);
+  /* Entrelinha generosa: é o que separa texto que se lê de texto que se decifra,
+     e o que mais distingue interface cara de interface apertada. */
+  line-height: 1.62;
+  letter-spacing: -0.005em;
+  color: #e8eef4;
+  text-wrap: pretty;
 }
 
-.est-fala--cliente .est-balao {
-  background: rgba(59, 165, 232, 0.2);
-  border-color: rgba(102, 205, 255, 0.32);
-  color: #eaf5fd;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 5px;
+/* ---- turno do cliente: o único com forma ---- */
+
+.est-turno--cliente {
+  justify-content: flex-end;
+}
+
+.est-turno--cliente .est-falas {
+  max-width: 82%;
+}
+
+.est-turno--cliente .est-fala {
+  padding: clamp(11px, 1.5vh, 16px) clamp(16px, 1.8vw, 22px);
+  border-radius: 20px 20px 6px 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(59, 165, 232, 0.22),
+    rgba(59, 165, 232, 0.14)
+  );
+  /* Sem borda. O preenchimento já separa a fala do fundo, e o contorno era
+     exatamente o que dava cara de caixa de formulário. */
+  color: #f2f8ff;
+}
+
+/* ---- a última fala está acontecendo ---- */
+
+/* Três pontos pulsando: a IA está gerando ENQUANTO o feixe entra, e é esse
+   detalhe que faz a cena parecer ao vivo em vez de encenada.
+
+   São elementos de verdade, e não `content` animado por keyframes: animar
+   `content` é frágil entre navegadores, e o que se quer aqui — cada ponto
+   subindo com atraso próprio — não cabe numa troca de texto. */
+.est-pontos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22em;
+  margin-left: 0.4em;
+  vertical-align: middle;
+}
+
+.est-pontos i {
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 999px;
+  background: #66cdff;
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .est-pontos i {
+    animation: estPulso 1.25s ease-in-out infinite;
+  }
+
+  .est-pontos i:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+
+  .est-pontos i:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+}
+
+@keyframes estPulso {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-0.18em);
+  }
 }
 
 /* ============ O FEIXE E O ESTOURO ============ */
@@ -183,11 +296,13 @@
   color: #cfdae4;
 }
 
+/* Volta para o rodapé da cena. Ela estava subida em ~30vh para desviar da faixa
+   de legendas, e essa faixa não existe mais. */
 .est-vivo .est-assina {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: clamp(16px, 5vh, 48px);
+  bottom: clamp(24px, 6vh, 56px);
   padding: 0 24px;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
 }
@@ -197,40 +312,8 @@
   color: #3ba5e8;
 }
 
-/* ============ AS LEGENDAS ============ */
-
-/* Sem script todas ficam visíveis e empilhadas: viram a lista do que a máquina
-   faz, que é a informação da seção. Com script, se revezam na mesma linha. */
-.est-legendas {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.est-vivo .est-legendas {
-  display: grid;
-  grid-template: 1fr / 1fr;
-  min-height: 3.2em;
-  align-items: center;
-}
-
-.est-vivo .est-legenda {
-  grid-area: 1 / 1;
-  opacity: 0;
-}
-
-.est-legenda {
-  margin: 0 auto;
-  max-width: 60ch;
-  font-size: clamp(14px, 1.8vw, 19px);
-  text-align: center;
-  opacity: 0.85;
-}
-
 /* ============ TEMA CLARO ============
 
-   A cena continua escura: os vídeos foram feitos sobre vazio preto e a tomada
-   tem o próprio fundo. Só o texto de fora acompanha o tema. */
-[data-tema="light"] .v5 .est-legenda {
-  color: #33414c;
-}
+   A cena continua escura nos dois temas: os vídeos foram feitos sobre vazio
+   preto e a tomada tem o próprio fundo. Não sobrou texto fora dela para
+   acompanhar o tema — as legendas sobrepostas saíram. */

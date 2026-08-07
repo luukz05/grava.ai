@@ -135,12 +135,25 @@
 
 .hold {
   width: 100%;
-  max-width: 82rem;
+  /* DUAS MEDIDAS, E ELAS AGEM EM TELAS DIFERENTES.
+
+     `max-width` é quem manda em tela larga: acima dela, o respiro lateral vira o
+     que sobra dos lados, e mexer no `padding-inline` não muda nada. Subiu de
+     82rem para 90rem — 1312px viraram 1440px de conteúdo.
+
+     `padding-inline` é quem manda abaixo disso, do notebook para baixo. Caiu de
+     2rem para 1.25rem no teto.
+
+     O piso de 0.85rem no celular não desce mais: abaixo disso o texto encosta na
+     borda da tela, e ler grudado na moldura é pior que ler estreito.
+
+     A coluna existe para TEXTO — linha sem limite fica longa demais para ler com
+     conforto. A cena do totem é a única coisa da página que precisa da tela
+     inteira, e ela escapa daqui sozinha, medindo a folga real e anulando por
+     margem negativa (`--est-sangria`, em `estudio.css`). */
+  max-width: 90rem;
   margin-inline: auto;
-  /* Folga lateral menor que antes: o conteúdo ganha horizontal e a página fica
-     menos colunar. O piso de 1rem continua, senão o texto encosta na borda no
-     celular. */
-  padding-inline: clamp(1rem, 2.6vw, 2rem);
+  padding-inline: clamp(0.85rem, 1.8vw, 1.25rem);
 }
 
 .mono {
@@ -154,21 +167,14 @@
   color: var(--fg-2);
 }
 
-/* A linha do topo. Não é barra: é só o contêiner de largura da página com os
-   três blocos em linha. Sticky com folga, e sem superfície própria — a única
-   coisa desenhada aqui é a cápsula das pílulas. */
-.navbar {
-  /* Estática e colada no topo: fica onde começa e sai com a rolagem. Antes era
-     sticky com folga, e acompanhava a página inteira. */
-  position: relative;
-  z-index: 12;
-  margin-top: 0;
-  padding-top: var(--nav-gap);
-  display: flex;
-  align-items: center;
-  gap: clamp(0.5rem, 1.6vw, 1rem);
-  min-height: 58px;
-}
+/* A linha do topo saiu deste arquivo. Ela deixou de ser só um contêiner de
+   largura: agora se recolhe num oblongo ao rolar, e a regra inteira — com a
+   linha do tempo de CSS que faz isso — vive em `navbar.css`, importado pelo
+   próprio `navbar.tsx`.
+
+   O motivo de mudar de arquivo, e não de ficar aqui: `v5.css` é a folha da
+   página, e a barra aparece em todas as rotas. Amarrar o estilo dela ao
+   componente garante que nenhuma rota nova apareça com a barra sem estilo. */
 
 .brand {
   display: flex;
@@ -1432,9 +1438,9 @@
   }
 }
 
-.campo--largo {
-  grid-column: 1 / -1;
-}
+/* `.campo--largo` saiu junto com o campo de pergunta: a grade tem dois campos e
+   nenhum deles atravessa as duas colunas. Voltando a existir campo de largura
+   inteira, a regra é `grid-column: 1 / -1`. */
 
 .campo {
   display: grid;
@@ -1649,6 +1655,9 @@
 .nav-cta {
   padding: 0.78rem 1.6rem;
   font-size: 0.9375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* A primeira seção entra logo abaixo do herói, com metade do respiro que as
@@ -3413,4 +3422,80 @@
   .v5 :focus-visible {
     outline-width: 3px;
   }
+}
+
+/* ---------- comparativo com a foto liderando ----------
+
+   A tabela é a mesma, e o que muda é a hierarquia dentro dela. Antes a imagem
+   era uma tarja de 4/3 espremida acima de sete linhas de texto; quem escolhe
+   entre quiosque aberto e fechado escolhe por como a coisa É, não por adjetivo.
+
+   Estes ajustes vivem numa variante (`.cmp--foto`) em vez de reescreverem o
+   bloco original: a tabela base ainda serve para qualquer comparação sem foto,
+   e sobrescrever ela toda para um caso deixaria as duas leituras misturadas. */
+
+.cmp--foto .cmp-col .ph {
+  /* A imagem sangra até as bordas da coluna e ganha altura. É ela que precisa
+     ser vista antes de qualquer linha de dado. */
+  margin-inline: calc(clamp(0.85rem, 1.6vw, 1.35rem) * -1);
+  margin-bottom: 1.15rem;
+  width: auto;
+  border-radius: 0;
+}
+
+.cmp--foto .cmp-col {
+  padding-top: 0;
+  overflow: hidden;
+}
+
+/* A LINHA DO INVESTIMENTO. É a pergunta que trava a conversa, então é a única
+   que ganha escala — as outras quatro existem para qualificar esta. */
+.cmp--foto tr[data-forte] .cmp-cel .cmp-txt {
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.cmp--foto tr[data-forte] .cmp-rotulo,
+.cmp--foto tr[data-forte] .cmp-cel {
+  padding-block: 1.15rem;
+  border-top-width: 1px;
+  border-top-color: var(--hair-hot);
+}
+
+/* O que é igual nos três modelos. Fora da tabela de propósito: valor repetido
+   nas três colunas não compara nada e ainda rouba largura de quem compara. */
+.cmp-comuns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1px;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  background: var(--hair);
+  border: 1px solid var(--hair);
+}
+
+.cmp-comum {
+  background: var(--bg);
+  padding: 1.1rem 1.25rem;
+}
+
+.cmp-comum dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.cmp-comum dd {
+  margin: 0.35rem 0 0;
+  font-size: 1.0625rem;
+  color: var(--fg);
+}
+
+.cmp-nota {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--fg-2);
+  max-width: 62ch;
 }

@@ -1,0 +1,249 @@
+/* O mapa de unidades. Sem JavaScript: o que abre a etiqueta é `:hover` e
+   `:focus-visible` no próprio marcador. */
+
+.mapa {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
+  gap: clamp(20px, 3vw, 48px);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .mapa {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mapa-palco {
+  position: relative;
+}
+
+.mapa-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* O estado é chão, não assunto: traço fino e preenchimento quase nulo. Se o
+   contorno competir com os pontos, o mapa vira decoração de geografia em vez de
+   resposta à pergunta "tem unidade perto de mim?". */
+.mapa-estado {
+  fill: rgba(59, 165, 232, 0.05);
+  stroke: rgba(102, 205, 255, 0.32);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ============ OS MARCADORES ============ */
+
+.mapa-ponto {
+  cursor: default;
+  outline: none;
+}
+
+/* Alvo de toque: invisível e largo. O pino desenhado tem 5px de raio e ninguém
+   acerta isso com o dedo — o alvo real tem 22. */
+.mapa-alvo {
+  fill: transparent;
+}
+
+.mapa-pino {
+  fill: var(--fg-hot);
+}
+
+.mapa-halo {
+  fill: none;
+  stroke: var(--fg-hot);
+  stroke-width: 1.2;
+  opacity: 0.35;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.65);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms;
+}
+
+/* Prevista: anel vazado em vez de disco cheio. A diferença é de PREENCHIMENTO,
+   e não só de cor — quem não distingue as duas cores continua lendo aberta
+   contra prevista pela forma. */
+.mapa-ponto--prevista .mapa-pino {
+  fill: var(--bg);
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.mapa-ponto--prevista .mapa-halo {
+  stroke: var(--blue);
+  stroke-dasharray: 3 4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mapa-ponto--aberta .mapa-halo {
+    animation: mapaPulso 3.4s ease-out infinite;
+  }
+}
+
+@keyframes mapaPulso {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.4;
+  }
+  70%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ============ A ETIQUETA ============ */
+
+.mapa-etiqueta {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+}
+
+.mapa-ponto:hover .mapa-etiqueta,
+.mapa-ponto:focus-visible .mapa-etiqueta {
+  opacity: 1;
+}
+
+.mapa-ponto:hover .mapa-halo,
+.mapa-ponto:focus-visible .mapa-halo {
+  transform: scale(1.35);
+  opacity: 0.8;
+  animation: none;
+}
+
+/* O contorno no texto é o que garante leitura quando a etiqueta cai sobre o
+   traço do estado ou sobre outro ponto. `paint-order` desenha o contorno ANTES
+   do preenchimento — sem isso, ele comeria metade da espessura da letra. */
+.mapa-cidade,
+.mapa-prazo {
+  paint-order: stroke fill;
+  stroke: var(--bg);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  font-family: inherit;
+}
+
+.mapa-cidade {
+  fill: var(--fg);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.mapa-prazo {
+  fill: var(--fg-hot);
+  font-size: 21px;
+}
+
+.mapa-ponto--prevista .mapa-prazo {
+  fill: var(--blue);
+}
+
+/* Foco de teclado: o anel vai no pino, porque o `<g>` não tem caixa própria e o
+   contorno do navegador sairia do tamanho do grupo inteiro, etiqueta incluída. */
+.mapa-ponto:focus-visible .mapa-pino {
+  stroke: var(--fg);
+  stroke-width: 3;
+}
+
+.mapa-dica {
+  margin: 10px 0 0;
+  font-size: 13px;
+  opacity: 0.5;
+  text-align: center;
+}
+
+@media (hover: none) {
+  .mapa-dica {
+    display: none;
+  }
+}
+
+/* ============ LEGENDA E LISTA ============ */
+
+.mapa-legenda {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+}
+
+.mapa-legenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mapa-chave {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.mapa-chave--aberta {
+  background: var(--fg-hot);
+}
+
+.mapa-chave--prevista {
+  border: 2px solid var(--blue);
+}
+
+.mapa-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mapa-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 14px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.mapa-item:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+
+.mapa-item-cidade {
+  font-weight: 600;
+}
+
+.mapa-item-estado {
+  font-size: 13px;
+  color: var(--fg-hot);
+  white-space: nowrap;
+}
+
+.mapa-item--prevista .mapa-item-estado {
+  color: var(--fg-2);
+}
+
+.mapa-item-ponto {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+/* ============ TEMA CLARO ============ */
+
+[data-tema="light"] .v5 .mapa-estado {
+  fill: rgba(44, 120, 168, 0.06);
+  stroke: rgba(44, 120, 168, 0.38);
+}
+
+[data-tema="light"] .v5 .mapa-ponto--prevista .mapa-pino {
+  fill: #f7f9fb;
+}

@@ -1,0 +1,165 @@
+/* As quatro frentes, em linha, penduradas na IA.
+
+   A régua horizontal é o que carrega a ideia: um traço só atravessando as
+   quatro, saindo do bloco da IA. Ela é desenhada por `::before` no contêiner da
+   lista, e não por um elemento — decoração não deve aparecer para leitor de
+   tela como um quinto item vazio. */
+
+.fre {
+  display: grid;
+  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+}
+
+/* ---- a IA em evidência ---- */
+
+.fre-fonte {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 46rem;
+}
+
+.fre-fonte-rot {
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-hot);
+}
+
+.fre-fonte-txt {
+  margin: 0;
+  font-size: clamp(1.125rem, 2.2vw, 1.6rem);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--fg-2);
+}
+
+.fre-fonte-txt strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* ---- a linha das quatro ---- */
+
+.fre-linha {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2.4vw, 2rem);
+}
+
+/* A régua. Começa e termina dentro do primeiro e do último nó — atravessar a
+   linha inteira até as bordas faria parecer que existe algo além das quatro. */
+.fre-linha::before {
+  content: "";
+  position: absolute;
+  top: 1.35rem;
+  left: 12.5%;
+  right: 12.5%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--hair-hot) 12%,
+    var(--hair-hot) 88%,
+    transparent
+  );
+}
+
+.fre-item {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  /* Cada item começa abaixo da régua, e o nó é quem a toca. */
+  padding-top: 3.4rem;
+}
+
+/* O nó: círculo preenchido sentado em cima da régua. É ele que faz as quatro
+   lerem como pontos de um mesmo sistema, e não como quatro cartões soltos. */
+.fre-no {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--hair-hot);
+  color: var(--fg-hot);
+}
+
+.fre-no svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.fre-num {
+  position: absolute;
+  top: 0.5rem;
+  left: 3.1rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: var(--fg-2);
+}
+
+.fre-rot {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.fre-tit {
+  margin: 0;
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.fre-faz {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+
+/* ---- estreito ----
+
+   Abaixo de 900px as quatro colunas ficariam com ~10 caracteres por linha. Vira
+   duas colunas; a régua sai, porque uma régua que quebra em duas fileiras
+   descreve uma sequência que não existe. */
+@media (max-width: 900px) {
+  .fre-linha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 2.25rem);
+  }
+
+  .fre-linha::before {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .fre-linha {
+    grid-template-columns: 1fr;
+  }
+
+  .fre-item {
+    padding-top: 0;
+    padding-left: 3.6rem;
+    min-height: 2.7rem;
+  }
+
+  .fre-num {
+    top: 0.15rem;
+    left: auto;
+    right: 0;
+  }
+}

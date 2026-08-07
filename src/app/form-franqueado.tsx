@@ -14,16 +14,6 @@ import { useState } from "react";
 
 const WHATSAPP = "5515996610916";
 
-/* A ordem começa no neutro de propósito: "Quero começar agora" na primeira
-   posição lê como pressão para quem ainda está avaliando, que é a maior parte
-   de quem chega de campanha. */
-const PRAZOS = [
-  "Ainda estudando o investimento",
-  "Nos próximos 6 meses",
-  "Nos próximos 3 meses",
-  "Quero começar agora",
-];
-
 export function FormFranqueado() {
   /* A conversa que não abriu. Bloqueador de pop-up, WebView de rede social e
      navegador em modo restrito engolem `window.open` sem erro nenhum: o clique
@@ -47,12 +37,8 @@ export function FormFranqueado() {
       "Olá! Vim pelo site e quero receber o material da franquia GRAVA.AI.",
       "",
       `Nome: ${d.get("nome")}`,
-      `Cidade e estado: ${d.get("cidade")}`,
       `E-mail: ${d.get("email")}`,
-      `Momento: ${d.get("prazo")}`,
     ];
-    const obs = String(d.get("obs") ?? "").trim();
-    if (obs) linhas.push(`Observação: ${obs}`);
 
     const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(linhas.join("\n"))}`;
     let aba: Window | null = null;
@@ -76,20 +62,25 @@ export function FormFranqueado() {
         </p>
       </div>
 
+      {/* DOIS CAMPOS, E SÓ.
+
+          Saíram cidade e estado, o seletor de momento e o campo de pergunta.
+          Cada campo a mais é uma chance a mais de a pessoa desistir no meio — e
+          nenhum dos três era necessário AGORA: onde ela quer a unidade e quando
+          pretende começar são exatamente as perguntas que quem atende faz na
+          primeira mensagem, com a conversa já aberta e a pessoa já engajada.
+
+          Pedir antes é cobrar esforço para qualificar um contato que ainda pode
+          nem existir. */}
       <div className="form-fr-campos">
         <label className="campo">
-          <span>Nome completo</span>
-          <input type="text" name="nome" required autoComplete="name" placeholder="Como devemos te chamar" />
-        </label>
-
-        <label className="campo">
-          <span>Cidade e estado</span>
+          <span>Nome</span>
           <input
             type="text"
-            name="cidade"
+            name="nome"
             required
-            autoComplete="address-level2"
-            placeholder="Onde você quer a unidade"
+            autoComplete="name"
+            placeholder="Como devemos te chamar"
           />
         </label>
 
@@ -102,22 +93,6 @@ export function FormFranqueado() {
             autoComplete="email"
             placeholder="vai junto na conversa"
           />
-        </label>
-
-        <label className="campo">
-          <span>Momento</span>
-          <select name="prazo" defaultValue={PRAZOS[0]}>
-            {PRAZOS.map((p) => (
-              <option key={p}>{p}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="campo campo--largo">
-          <span>
-            Alguma pergunta? <em>opcional</em>
-          </span>
-          <input type="text" name="obs" placeholder="O que você quer saber antes de conversar" />
         </label>
       </div>
 

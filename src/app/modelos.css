@@ -1,0 +1,286 @@
+/* Os três modelos, em painéis que se abrem.
+
+   A MECÂNICA, EM UMA LINHA: os painéis dividem a largura igualmente; o que está
+   sob o cursor cresce e os irmãos encolhem. É `flex` com transição — o mesmo
+   efeito que a referência fazia com framer-motion, sem biblioteca, sem estado em
+   React e funcionando com teclado de graça.
+
+   O SELETOR QUE FAZ ISSO. `.mod:hover .mod-painel` encolhe TODOS enquanto o
+   ponteiro está sobre o conjunto, e a regra seguinte devolve o crescimento ao
+   que está sob ele. Sem a primeira regra, os irmãos ficariam parados e só o de
+   baixo do cursor cresceria — empurrando os outros para fora em vez de trocar
+   espaço com eles. */
+
+.mod {
+  display: flex;
+  gap: clamp(0.5rem, 1vw, 0.85rem);
+  /* Altura fixa: é o que permite a foto encher o painel e o detalhe deslizar
+     dentro dele sem a seção inteira mudar de tamanho a cada hover — que seria
+     a página pulando embaixo do cursor. */
+  height: clamp(26rem, 52vh, 34rem);
+}
+
+.mod-painel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--bg-2);
+  cursor: default;
+  transition: flex 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  outline: none;
+}
+
+.mod:hover .mod-painel {
+  flex: 0.7;
+}
+
+.mod .mod-painel:hover,
+.mod .mod-painel:focus-within {
+  flex: 2.1;
+}
+
+/* Anel de foco no painel inteiro: ele É o alvo do teclado, e o navegador não
+   tem outra caixa para desenhar em volta. */
+.mod-painel:focus-visible {
+  box-shadow: 0 0 0 2px var(--fg-hot);
+}
+
+/* ---- a foto ---- */
+
+.mod-foto {
+  position: absolute;
+  inset: 0;
+}
+
+.mod-foto .ph {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Escurece de baixo para cima, e escurece MAIS quando o painel abre: o detalhe
+   que aparece precisa de contraste garantido, e no estado fechado só o nome e o
+   preço estão sobre a imagem. */
+.mod-painel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 8, 12, 0.15) 0%,
+    rgba(4, 8, 12, 0.55) 52%,
+    rgba(4, 8, 12, 0.93) 100%
+  );
+  transition: opacity 420ms ease;
+}
+
+/* ---- o conteúdo ---- */
+
+.mod-corpo {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  display: grid;
+  gap: 0.35rem;
+  padding: clamp(1rem, 1.8vw, 1.6rem);
+}
+
+.mod-ico {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-bottom: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair-hot);
+  color: var(--fg-hot);
+  background: rgba(4, 8, 12, 0.5);
+}
+
+.mod-ico svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.mod-nome {
+  margin: 0;
+  font-size: clamp(1.0625rem, 1.7vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--fg);
+  /* No painel fechado o nome quebraria em três linhas de duas palavras. */
+  text-wrap: balance;
+}
+
+.mod-preco {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg-hot);
+}
+
+.mod-resumo {
+  margin: 0.2rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--fg-2);
+  /* Sai quando o detalhe entra: os dois dizem a mesma coisa, e o detalhe diz
+     melhor. */
+  max-height: 4rem;
+  opacity: 1;
+  transition: max-height 380ms ease, opacity 240ms ease;
+}
+
+.mod-painel:hover .mod-resumo,
+.mod-painel:focus-within .mod-resumo {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+/* ---- o detalhe, que só existe aberto ---- */
+
+.mod-detalhes {
+  margin: 0;
+  display: grid;
+  gap: 1px;
+  background: rgba(242, 248, 255, 0.14);
+  border: 1px solid rgba(242, 248, 255, 0.14);
+  border-radius: 10px;
+  overflow: hidden;
+  /* `grid-template-rows` de 0fr para 1fr é o que anima altura automática sem
+     precisar medir nada em JavaScript. `max-height` com número mágico erraria em
+     qualquer texto mais longo que o previsto. */
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0;
+  transition: grid-template-rows 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 300ms ease, margin-top 460ms ease;
+}
+
+.mod-painel:hover .mod-detalhes,
+.mod-painel:focus-within .mod-detalhes {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 0.85rem;
+}
+
+/* O filho da grade precisa de `min-height: 0` e `overflow: hidden` para que a
+   linha de 0fr de fato colapse — sem isso o conteúdo segura a altura e a
+   transição não acontece. */
+.mod-det {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.85rem;
+  background: rgba(4, 8, 12, 0.72);
+}
+
+.mod-det dt {
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+.mod-det dd {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--fg);
+  text-align: right;
+}
+
+/* ---- o que é igual nos três ---- */
+
+.mod-comuns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1px;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  background: var(--hair);
+  border: 1px solid var(--hair);
+}
+
+.mod-comum {
+  background: var(--bg);
+  padding: 1.1rem 1.25rem;
+}
+
+.mod-comum dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.mod-comum dd {
+  margin: 0.35rem 0 0;
+  font-size: 1.0625rem;
+  color: var(--fg);
+}
+
+.mod-nota {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--fg-2);
+  max-width: 62ch;
+}
+
+/* ---- toque e telas estreitas ----
+
+   Sem cursor não existe hover, e a expansão por flex deixa de fazer sentido: os
+   painéis empilham e o detalhe fica sempre aberto. Um "toque para expandir" aqui
+   seria um passo a mais para chegar a quatro linhas de texto. */
+@media (hover: none), (max-width: 900px) {
+  .mod {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    height: auto;
+  }
+
+  .mod-painel,
+  .mod:hover .mod-painel,
+  .mod .mod-painel:hover,
+  .mod .mod-painel:focus-within {
+    flex: none;
+    min-height: 24rem;
+  }
+
+  .mod-resumo,
+  .mod-painel:hover .mod-resumo {
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+  }
+
+  .mod-detalhes,
+  .mod-painel:hover .mod-detalhes {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 0.85rem;
+  }
+}
+
+/* ---- tema claro ---- */
+
+[data-tema="light"] .v5 .mod-det {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-tema="light"] .v5 .mod-det dd {
+  color: #16202a;
+}
+
+[data-tema="light"] .v5 .mod-ico {
+  background: rgba(255, 255, 255, 0.75);
+}

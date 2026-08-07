@@ -32,10 +32,11 @@
      em blocos, e está explicada no bloco do `FPS`.
    — buscar só quando o quadro muda. Rolagem dispara dezenas de atualizações por
      segundo; o vídeo tem 24 quadros.
-   — `preload="auto"`. Buscar quadro em vídeo que ainda não baixou não desenha
-     nada. O áudio foi removido dos arquivos, não apenas silenciado no elemento:
-     vídeo movido por rolagem não toca áudio em sentido nenhum, e a faixa só
-     ocupava banda.
+   — baixar antes de precisar. Buscar quadro em vídeo que ainda não chegou não
+     desenha nada, então os elementos nascem com `preload="none"` e o download
+     começa quando a seção está a duas telas de distância. O áudio foi removido
+     dos ARQUIVOS, e não apenas silenciado no elemento: vídeo movido por rolagem
+     não toca áudio em sentido nenhum, e a faixa só ocupava banda.
 
    ───────────────────────────────────────────────────────────────────────────
    ANTES DO JAVASCRIPT
@@ -54,21 +55,23 @@ import "./estudio.css";
    seriam enfeite sem resposta. A pergunta tem que ser do tamanho da resposta. */
 const PEDIDO = "me mostre o que você pode fazer";
 
-const CONVERSA: { de: "cliente" | "ia"; texto: string }[] = [
-  { de: "ia", texto: "Oi! O que você quer gravar hoje?" },
-  { de: "cliente", texto: PEDIDO },
-  { de: "ia", texto: "Metal, cerâmica, lona, plástico — grava em tudo isso." },
-  { de: "ia", texto: "Eu fecho o traço e ajusto no tamanho da área de cada peça. Você não precisa saber nada disso." },
-  { de: "ia", texto: "Gerando…" },
-];
+/* A conversa por TURNOS, e não por mensagem. Falas seguidas da mesma parte ficam
+   juntas sob uma marca só — é assim que uma conversa de verdade se lê, e é a
+   diferença entre parecer alguém falando e parecer log de sistema.
 
-const BATIDAS = [
-  { chave: "chegada", texto: "Um totem, num corredor de alto fluxo." },
-  { chave: "acende", texto: "Ninguém precisa chamar um atendente." },
-  { chave: "conversa", texto: "A cliente escreve o que quer. Em português, do jeito dela." },
-  { chave: "gera", texto: "A IA resolve o que ela nem sabe que precisa ser resolvido." },
-  { chave: "laser", texto: "A gravação acontece ali, na frente dela." },
-  { chave: "pecas", texto: "E a rede vende isso o dia inteiro, em qualquer produto do catálogo." },
+   A última fala da IA ganha o cursor piscando: ela está gerando enquanto o feixe
+   entra, e é esse detalhe que faz a cena parecer ao vivo em vez de encenada. */
+const TURNOS: { de: "cliente" | "ia"; textos: string[] }[] = [
+  { de: "ia", textos: ["Oi! O que você quer gravar hoje?"] },
+  { de: "cliente", textos: [PEDIDO] },
+  {
+    de: "ia",
+    textos: [
+      "Metal, cerâmica, lona, plástico — grava em tudo isso.",
+      "Eu fecho o traço e ajusto na área de cada peça. Você não precisa saber nada disso.",
+      "Gerando",
+    ],
+  },
 ];
 
 /* Os dois arquivos são re-encodados ALL-INTRA (todo quadro é keyframe) e já vêm
@@ -79,8 +82,11 @@ const BATIDAS = [
    obriga o decodificador a voltar ao anterior e decodificar tudo de novo. A
    60Hz de rolagem ele não dá conta e descarta quase toda busca — o sintoma é
    exatamente "travando em blocos". Com todo quadro sendo keyframe a busca é
-   direta. Custa arquivo maior por segundo; a redução para 1280px devolveu isso
-   com folga (4,6MB + 9,8MB viraram 0,9MB + 2,8MB).
+   direta. Custa arquivo maior: são ~12MB nos dois, na resolução nativa de
+   1920px. Reduzir para 1280px derrubava para 3,7MB, mas aí o navegador ampliava
+   em janela larga — e ampliar era exatamente o que fazia a cena parecer de
+   qualidade menor que a do arquivo. O peso é pago por carregamento tardio, não
+   por resolução.
 
    A receita está no `scripts/videos.mjs`, para quando trocarem os arquivos. */
 const FPS = 24;
@@ -121,18 +127,50 @@ export function Estudio() {
         const mm = gsap.matchMedia();
 
         mm.add("(prefers-reduced-motion: no-preference)", () => {
-          no.classList.add("est-vivo");
+          /* A sangria é medida no próprio elemento, sem a classe: a distância da
+             borda esquerda dele até a borda da janela é exatamente o que falta
+             de cada lado. Medir o pai erra — o `<section>` tem respiro interno, e
+             a conta saía 32px curta, deixando faixa preta na lateral.
+
+             E é medida, nunca `50vw`: `100vw` inclui a barra de rolagem. */
+          const sangrar = () => {
+            no.classList.remove("est-vivo");
+            const folga = no.getBoundingClientRect().left;
+            no.classList.add("est-vivo");
+            no.style.setProperty("--est-sangria", `${Math.max(0, folga)}px`);
+          };
+          sangrar();
 
           const vTotem = um<HTMLVideoElement>(".est-vid--totem");
           const vPecas = um<HTMLVideoElement>(".est-vid--pecas");
           const ui = um(".est-ui");
-          const leg = q(".est-legenda");
 
-          /* Buscar quadro num vídeo sem dados não desenha nada. Pedir o download
-             agora — e não no primeiro quadro da animação — é o que evita a cena
-             começar em preto enquanto o arquivo chega. */
-          vTotem.load();
-          vPecas.load();
+          /* CARREGAMENTO TARDIO, e não `preload="auto"` no marcado.
+
+             Os dois arquivos somam ~12MB: estão na resolução nativa de 1920px
+             porque abaixo disso o navegador amplia, e ampliar era o que fazia a
+             cena parecer de qualidade menor que a do arquivo.
+
+             Esse peso não pode competir com o herói. Com `preload="auto"` no
+             HTML, o download começa no carregamento da página e rouba banda de
+             tudo que a primeira tela precisa. Aqui ele só começa quando a seção
+             está a duas telas de distância — o suficiente para chegar antes de
+             alguém rolar até ela, e tarde o bastante para não atrapalhar nada.
+
+             Buscar quadro em vídeo sem dados não desenha nada, então o gatilho é
+             deliberadamente folgado: melhor baixar cedo demais que a cena abrir
+             em preto. */
+          const puxar = ScrollTrigger.create({
+            trigger: no,
+            start: "top bottom+=200%",
+            once: true,
+            onEnter: () => {
+              vTotem.preload = "auto";
+              vPecas.preload = "auto";
+              vTotem.load();
+              vPecas.load();
+            },
+          });
 
           /* Um objeto por vídeo em vez de tween direto no elemento: o GSAP move
              o número e o `onUpdate` escreve o `currentTime`. Escrever direto na
@@ -172,18 +210,22 @@ export function Estudio() {
           gsap.set(q(".est-flash"), { autoAlpha: 0 });
           gsap.set(vPecas, { autoAlpha: 0 });
           gsap.set(q(".est-assina"), { autoAlpha: 0, y: 18 });
-          gsap.set(leg, { autoAlpha: 0 });
 
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: no,
               pin: um(".est-palco"),
               start: "top top",
-              end: "+=5600",
-              /* Suavização baixa de propósito: valor alto faz o vídeo continuar
-                 buscando depois que a pessoa parou de rolar, e buscar sem
-                 rolagem lê como atraso, não como suavidade. */
-              scrub: 0.3,
+              /* SENSIBILIDADE. Era 5600 — quase seis telas de rolagem para seis
+                 batidas, e cada gesto de trackpad mexia pouco na cena. 3400 dá
+                 pouco mais de meia tela por batida: a cena responde ao gesto em
+                 vez de arrastar atrás dele. */
+              end: "+=3400",
+              /* Suavização quase nula: valor alto faz o vídeo continuar buscando
+                 depois que a pessoa parou de rolar, e buscar sem rolagem lê como
+                 atraso, não como suavidade. Com todo quadro sendo keyframe a
+                 busca é barata, então não é preciso amortecer para dar conta. */
+              scrub: 0.18,
               /* `snap` desligado: com seis batidas e a cena presa, o encaixe
                  briga com trackpad. Para ligar:
                  snap: { snapTo: "labels", duration: 0.3, delay: 0.08 } */
@@ -196,19 +238,17 @@ export function Estudio() {
              tempo fica com duração quebrada — o sintoma não é rótulo fora de
              lugar, é o pin travado na página inteira e a cena congelada. Já
              aconteceu neste arquivo. */
-          const batida = (nome: string, i: number, folga = 0.3) => {
+          const batida = (nome: string, i: number, folga = 0.3) =>
             tl.addLabel(nome, i === 0 ? 0 : `>+=${folga}`);
-            if (i > 0) tl.to(leg[i - 1], { autoAlpha: 0, duration: 0.22 }, nome);
-            tl.to(leg[i], { autoAlpha: 1, duration: 0.28 }, `${nome}+=${i > 0 ? 0.14 : 0}`);
-          };
 
           /* 1 — o totem chega. A rolagem é a cabeça de leitura do vídeo. */
           const chTotem = cabeca(vTotem);
           batida("chegada", 0);
           tl.to(chTotem.alvo, { ...chTotem.fim, duration: 3 }, "chegada");
 
-          /* 2 — a tela acesa. O vídeo já entregou o azul; o que entra aqui é só
-             a legenda, para a batida existir na leitura de quem não olha a tela. */
+          /* 2 — a tela acesa. Só um rótulo: quem entrega esta batida é o próprio
+             vídeo, e o que ela faz na linha do tempo é reservar o tempo de
+             rolagem em que o azul inunda a tela. */
           batida("acende", 1);
 
           /* 3 — a conversa, sobre a tela que o vídeo deixou preta. */
@@ -237,7 +277,33 @@ export function Estudio() {
             .to(chPecas.alvo, { ...chPecas.fim, duration: 3 }, "pecas")
             .to(q(".est-assina"), { autoAlpha: 1, y: 0, duration: 0.6 }, "pecas+=1.6");
 
+          /* A classe `est-vivo` sangra a seção para a largura da tela, e isso
+             muda a altura do documento. O ScrollTrigger já mediu antes disso —
+             ele não observa mudanças de layout que ele próprio não causou — e
+             fica com início e fim errados. O sintoma é cruel de diagnosticar:
+             tudo carrega, o espaçador tem a altura certa, a rolagem funciona, e
+             mesmo assim o pin nunca engata e a cena não sai do primeiro quadro.
+
+             Uma remedição depois de tudo montado resolve. Vale também para os
+             vídeos: `loadedmetadata` pode mudar caixa no estado sem palco. */
+          ScrollTrigger.refresh();
+
+          const remedir = () => {
+            sangrar();
+            ScrollTrigger.refresh();
+          };
+          vTotem.addEventListener("loadedmetadata", remedir);
+          vPecas.addEventListener("loadedmetadata", remedir);
+          /* A sangria depende da largura da janela; sem isto ela fica errada
+             depois de redimensionar. O `refresh` do ScrollTrigger já vem junto. */
+          window.addEventListener("resize", remedir);
+
           return () => {
+            vTotem.removeEventListener("loadedmetadata", remedir);
+            vPecas.removeEventListener("loadedmetadata", remedir);
+            window.removeEventListener("resize", remedir);
+            puxar.kill();
+            no.style.removeProperty("--est-sangria");
             no.classList.remove("est-vivo");
           };
         });
@@ -266,7 +332,7 @@ export function Estudio() {
             src="/cena/totem.mp4"
             muted
             playsInline
-            preload="auto"
+            preload="none"
             aria-hidden="true"
           />
           <video
@@ -274,21 +340,46 @@ export function Estudio() {
             src="/cena/pecas.mp4"
             muted
             playsInline
-            preload="auto"
+            preload="none"
             aria-hidden="true"
           />
 
-          {/* A conversa, sobre a tela que o vídeo deixou preta. */}
+          {/* A conversa, sobre a tela que o vídeo deixou preta.
+
+              AGRUPADA POR TURNO, e não uma linha por vez. Falas seguidas da IA
+              ficam sob UMA marca só — repetir o avatar em cada parágrafo é o que
+              faz uma conversa parecer log de sistema em vez de alguém falando. */}
           <div className="est-ui">
             <div className="est-conversa">
-              {CONVERSA.map((f, i) => (
-                <div key={i} className={`est-fala est-fala--${f.de}`}>
-                  {f.de === "ia" && (
-                    <span className="est-avatar" aria-hidden="true">
+              {TURNOS.map((t, i) => (
+                <div key={i} className={`est-turno est-turno--${t.de}`}>
+                  {t.de === "ia" && (
+                    <span className="est-marca" aria-hidden="true">
                       <Marca />
                     </span>
                   )}
-                  <p className="est-balao">{f.texto}</p>
+                  <div className="est-falas">
+                    {t.textos.map((texto, j) => {
+                      /* A última fala do último turno é a que está acontecendo:
+                         ela ganha os pontos pulsando. */
+                      const gerando =
+                        t.de === "ia" &&
+                        i === TURNOS.length - 1 &&
+                        j === t.textos.length - 1;
+                      return (
+                        <p key={j} className="est-fala">
+                          {texto}
+                          {gerando && (
+                            <span className="est-pontos" aria-hidden="true">
+                              <i />
+                              <i />
+                              <i />
+                            </span>
+                          )}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
             </div>
@@ -303,13 +394,6 @@ export function Estudio() {
           </p>
         </div>
 
-        <div className="est-legendas">
-          {BATIDAS.map((b) => (
-            <p className="est-legenda" key={b.chave}>
-              {b.texto}
-            </p>
-          ))}
-        </div>
       </div>
     </div>
   );
