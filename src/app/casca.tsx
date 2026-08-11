@@ -14,7 +14,7 @@ import { Bricolage_Grotesque, Space_Mono, Rajdhani } from "next/font/google";
 import { NavBar, type Pagina } from "./navbar";
 import { AplicarTema } from "./tema-switch";
 import { Flutuante } from "./flutuante";
-import { FundoTopo, TrilhaTopo } from "./fundos";
+import { FundoTopo } from "./fundos";
 
 /* `axes: ["opsz"]` carrega o eixo óptico da Bricolage (12–96) junto com o peso.
    Sem ele o navegador recebe um único desenho de letra, congelado no valor
@@ -68,11 +68,12 @@ export function Casca({
     >
       {tema ? <AplicarTema tema={tema} /> : null}
       <main>
-        {/* Primeiro filho e atrás de tudo: o terreno é chão da página inteira,
-            não de uma seção. Vale nas três rotas pelo mesmo motivo que a carta
-            do herói vale — uma segunda textura de fundo em outra página seria
-            uma segunda marca. */}
-        <TrilhaTopo />
+        {/* Aqui vinha a `TrilhaTopo`: curvas de nível rasas atrás da página
+            inteira, com uma linha acesa que se riscava conforme a rolagem. Saiu
+            a pedido. O que ela fazia — estender o material da marca para além da
+            dobra — o herói passou a fazer sozinho: a carta viva se mexe, e uma
+            textura estática atrás de nove telas de texto ao lado dela lia como
+            segunda tentativa do mesmo assunto. O componente está no histórico. */}
         <NavBar atual={atual} />
         {children}
         <Flutuante />

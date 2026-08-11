@@ -13,10 +13,27 @@
       personalização com inteligência artificial". Busca "quanto custa franquia
       grava ai", "franquia de personalização vale a pena", "qual o payback".
       São perguntas, e uma página de perguntas responde na forma da busca.
-   2. `FAQPage` em JSON-LD é um dos poucos tipos que o Google ainda mostra como
-      resultado rico. A resposta aparece na própria busca, com o site assinando.
+   2. O formato pergunta-resposta curta é o que os buscadores com resposta
+      gerada conseguem citar direto. Vale para o Google, e vale principalmente
+      para ChatGPT, Perplexity e Copilot, que recortam um trecho e assinam a
+      fonte. Uma resposta fechada em três frases é recortável; um parágrafo de
+      página institucional não é.
    3. É útil de verdade. Toda dúvida respondida aqui é uma que não precisa
       ocupar a conversa do WhatsApp — e o WhatsApp é a única métrica do site.
+
+   CORREÇÃO DE 11/08/2026 — O MOTIVO 2 ERA OUTRO E ESTAVA VENCIDO.
+
+   O comentário original dizia que `FAQPage` em JSON-LD renderiza resultado
+   rico no Google. Isso deixou de ser verdade: o Google restringiu o recurso a
+   sites de governo e saúde em agosto de 2023, e o desligou de vez em
+   07/05/2026 — o relatório sai do Search Console em junho e a API em agosto.
+   Nenhuma marcação de FAQ produz caixa expansível na busca hoje.
+
+   A marcação continua no arquivo, e continua valendo — só não pelo que se
+   pensava. O JSON-LD é o mesmo conteúdo em forma legível por máquina, e é o
+   que os sistemas de resposta usam para saber que aquilo ali é uma pergunta
+   com uma resposta fechada e de quem ela é. O que morreu foi o enfeite na
+   página de resultado, não o dado.
 
    REGRA DE CONTEÚDO, QUE VALE MAIS QUE O RESTO.
 
@@ -206,7 +223,9 @@ export default function Perguntas() {
 
       <footer className="hold close" id="falar">
         <div className="sec-cab">
-          <h2>Ficou uma dúvida que não está aqui?</h2>
+          <h2>
+            Ficou uma dúvida <mark>que não está aqui?</mark>
+          </h2>
           <p>Do outro lado responde quem opera a rede, não um atendente.</p>
         </div>
         <div className="row" style={{ marginTop: 0 }}>

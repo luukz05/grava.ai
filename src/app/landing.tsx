@@ -79,7 +79,9 @@ export function Landing({ tema }: { tema?: Tema }) {
             estão no rodapé, e o segundo também no menu. */}
         <section className="hold sec" id="esperar">
           <div className="sec-cab">
-            <h2>Onde a rede já está.</h2>
+            <h2>
+              Onde a rede <mark>já está.</mark>
+            </h2>
             <p>Unidades em operação e as próximas praças, com prazo de entrega.</p>
           </div>
 
@@ -112,12 +114,25 @@ export function Landing({ tema }: { tema?: Tema }) {
             texto: eles provam que a IA não para no desenho da arte, e é papel de
             texto provar isso — não de um segundo desenho competindo com o
             primeiro. O hexágono está em `orbita.tsx`, agora sem referência. */}
-        {/* Sem cabeçalho de seção, de propósito. Um título anunciando "o totem
-            atende, entende e entrega" antes de uma cena que MOSTRA exatamente
-            isso é a página contando o final antes de começar — e a cena perde a
-            surpresa que é o argumento dela. A conversa dentro do vídeo já diz o
-            que precisa ser dito, em texto de verdade. */}
+        {/* Esta seção passou um tempo SEM cabeçalho, de propósito: um título
+            anunciando o que a cena mostra contava o final antes do começo.
+            Voltou a pedido, e por um motivo que o argumento antigo não tinha
+            considerado — a cena entra depois de uma seção de mapa e entra
+            grudando na tela, e chegar nela sem uma linha de aviso é um degrau
+            seco. O cabeçalho aqui não é spoiler se disser o PERCURSO e não o
+            desfecho: "do totem ao produto final" é o enquadramento, e o que
+            acontece dentro dele continua sendo a cena que mostra. */}
         <section className="hold sec" id="ia">
+          <div className="sec-cab">
+            <h2>
+              Do totem <mark>ao produto final.</mark>
+            </h2>
+            <p>
+              O cliente descreve em palavras, a IA desenha, o laser grava e a
+              peça sai pronta no balcão — sem encomenda e sem espera.
+            </p>
+          </div>
+
           <Estudio />
 
           <Frentes />
@@ -142,7 +157,9 @@ export function Landing({ tema }: { tema?: Tema }) {
             aqui que os números passaram a morar. */}
         <section className="hold sec" id="numeros">
           <div className="sec-cab">
-            <h2>Três modelos de unidade.</h2>
+            <h2>
+              Três modelos <mark>de unidade.</mark>
+            </h2>
             <p>O que muda entre eles é o tamanho do ponto — e o que cada um custa.</p>
           </div>
 
@@ -152,20 +169,28 @@ export function Landing({ tema }: { tema?: Tema }) {
       </div>
 
       <footer className="hold close" id="falar">
-        {/* A marca empilhada, que é a versão do documento do cliente para
-              assinatura. No topo ela é símbolo mais wordmark em linha; aqui,
-              onde a página assina, ela aparece inteira. */}
-        <Image
-          src="/brand/grava-stacked.png"
-          alt="GRAVA.AI"
-          width={293}
-          height={183}
-          className="close-logo"
-        />
         <div className="close-duo">
           <div>
+            {/* A marca empilhada, que é a versão do documento do cliente para
+                assinatura. No topo ela é símbolo mais wordmark em linha; aqui,
+                onde a página assina, ela aparece inteira.
+
+                Ela estava FORA do par, ocupando a largura toda acima dele — e
+                por isso o formulário começava abaixo da marca, enquanto a
+                coluna de texto começava embaixo dela também. Os dois topos não
+                se encontravam em lugar nenhum. Dentro da coluna, a primeira
+                linha do formulário nasce na mesma altura do topo da marca. */}
+            <Image
+              src="/brand/grava-stacked.png"
+              alt="GRAVA.AI"
+              width={293}
+              height={183}
+              className="close-logo"
+            />
             <div className="sec-cab">
-              <h2>Leve a unidade para a sua região.</h2>
+              <h2>
+                Leve a unidade <mark>para a sua região.</mark>
+              </h2>
               {/* A frase antiga dizia "não com um formulário". Com o formulário
                     ao lado, ela passou a contradizer a própria página: o que se
                     promete agora é que do outro lado tem gente, não que não

@@ -2,6 +2,25 @@ import type { Metadata, Viewport } from "next";
 import "./reset.css";
 import { SITE_URL, SITE_NOME, WHATSAPP_E164, INSTAGRAM } from "./site";
 
+/* Título e descrição da home, num lugar só porque são usados duas vezes (meta
+   e Open Graph) e divergir entre os dois é como o card do WhatsApp passa a
+   dizer uma coisa e o resultado do Google outra.
+
+   A descrição é reescrita pelo Google na maior parte das vezes — as medições
+   públicas ficam entre 60% e 70% dos casos —, então ela não é um sinal de
+   ranqueamento: é o texto que aparece quando ele decide usar o seu. Duas
+   consequências práticas, ambas aplicadas aqui: cabe em ~155 caracteres, e a
+   carga útil vem na frente, porque no celular sobra pouco mais de 110.
+
+   O que vem na frente é a categoria que a pessoa busca ("franquia de
+   personalização com IA"), não a marca — quem já sabe o nome da marca chega
+   pela busca por nome de qualquer jeito. O investimento fecha a frase de
+   propósito: numa página de captação, a descrição que já filtra quem não tem o
+   valor economiza a conversa no WhatsApp, que é a única métrica do site. */
+const TITULO = "GRAVA.AI — uma franquia que a IA opera junto com você";
+const DESCRICAO =
+  "Franquia de personalização com IA: o totem cria a arte e grava a peça na hora. Investimento de R$ 99.900 e payback estimado de 6 a 12 meses.";
+
 export const metadata: Metadata = {
   /* Faltava, e é a peça que faz todo o resto valer. Sem `metadataBase` o Next
      emite as URLs de Open Graph relativas, e URL relativa em meta tag não
@@ -9,17 +28,21 @@ export const metadata: Metadata = {
      é por WhatsApp que esta página converte. Também é daqui que as canônicas
      de cada rota tiram o domínio. */
   metadataBase: new URL(SITE_URL),
-  title: "GRAVA.AI — uma franquia que a IA opera junto com você",
-  description:
-    "Totens de personalização com IA em shoppings, supermercados e aeroportos. O cliente cria a arte na hora e leva a peça gravada.",
+  title: TITULO,
+  description: DESCRICAO,
   /* A canônica da home. Com `.com` e `.com.br` provavelmente respondendo o
      mesmo conteúdo, é ela que diz qual das duas é a página de verdade — senão
      o site divide a própria autoridade entre dois endereços idênticos. */
   alternates: { canonical: "/" },
+  /* Não existe `keywords` aqui de propósito. A meta tag de palavras-chave é
+     ignorada pelo Google desde 2009 — ele publicou um post só para dizer isso,
+     porque a tag é preenchida pelo dono do site e por isso não vale como sinal.
+     As palavras que importam entram no título, no H1, no texto e nas perguntas
+     do FAQ, onde o buscador as lê no contexto. O mapa de termos por página está
+     em `docs/palavras-chave.md`. */
   openGraph: {
-    title: "GRAVA.AI — uma franquia que a IA opera junto com você",
-    description:
-      "Totens de personalização com IA em shoppings, supermercados e aeroportos. O cliente cria a arte na hora e leva a peça gravada.",
+    title: TITULO,
+    description: DESCRICAO,
     url: "/",
     siteName: SITE_NOME,
     locale: "pt_BR",

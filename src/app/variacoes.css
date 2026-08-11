@@ -76,11 +76,11 @@
   letter-spacing: -0.042em;
 }
 
-/* Manchete de seção, um degrau abaixo — e é um degrau só agora: o fechamento
-   usava -0,035em contra os -0,03em das seções, diferença que só existia porque
-   ele também era maior. Com um corpo só, um tracking só. */
+/* Manchete de seção, um degrau abaixo do herói. Fechou de -0,03em para -0,035em
+   quando o teto do corpo subiu de 2,125rem para 3,5rem: é a mesma regra do topo
+   deste bloco — quanto maior a letra, mais negativo o tracking. */
 .v5[data-forma="oblongo"] .sec-cab > h2 {
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
 /* Título de cartão vive perto do corpo do texto: quase sem aperto, senão as
@@ -141,9 +141,9 @@
   --tp-dy: 0;
 }
 
-/* As duas cartas passam do alto e do fundo da caixa de propósito: elas se
-   deslocam na rolagem, e sem essa folga o parallax abriria faixa vazia na
-   borda. 18% de sobra para deslocamentos de no máximo 5,5%. */
+/* A carta passa do alto e do fundo da caixa de propósito: ela se desloca na
+   rolagem, e sem essa folga o parallax abriria faixa vazia na borda. 18% de
+   sobra para deslocamentos de no máximo 5,5%. */
 .fundo--topo .topo-camada {
   position: absolute;
   left: 0;
@@ -152,14 +152,12 @@
   height: 118%;
 }
 
-/* Perspectiva aérea: o que está longe perde contraste na direção da cor do
-   fundo e perde nitidez. Aqui isso é levado ao extremo de propósito — as duas
-   cartas ocupam a mesma faixa vertical e suas curvas se cruzam, e curva de
-   nível cruzando outra o olho lê como hachura, não como relevo. Com a de trás
-   reduzida a névoa, o cruzamento vira adensamento e some como linha. */
-.fundo--topo .topo-camada--longe {
-  color: color-mix(in oklab, #3ba5e8 40%, #071018);
-  filter: blur(0.9px);
+/* A caixa do canvas de WebGL. A altura já está fixada pela regra acima, então
+   `contain` aqui não muda o tamanho de nada — ele só avisa o navegador de que
+   nada dentro desta caixa pode afetar o layout de fora, e o canvas deixa de
+   entrar nos cálculos de layout da página a cada quadro. */
+.fundo--topo .topo-camada--gl {
+  contain: strict;
 }
 
 /* O deslocamento do ponteiro entra por `translate`, e não por `transform`,
@@ -168,45 +166,47 @@
    se inclina no cursor sem que uma regra apague a outra.
 
    A transição é o amortecedor: ela reinicia a cada quadro e o que sobra é um
-   atraso exponencial atrás do cursor. Sentidos opostos e amplitudes diferentes
-   entre as duas camadas, que é a mesma regra do parallax de rolagem. */
+   atraso exponencial atrás do cursor. Contrário ao cursor, como o parallax de
+   rolagem é contrário ao sentido da página. */
 .fundo--topo .topo-camada--perto {
   translate: calc(var(--tp-dx) * -10px) calc(var(--tp-dy) * -7px);
   transition: translate 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.fundo--topo .topo-camada--longe {
-  translate: calc(var(--tp-dx) * 5px) calc(var(--tp-dy) * 3px);
-  transition: translate 900ms cubic-bezier(0.22, 1, 0.36, 1);
+/* ============ MARCOS COTADOS ============
+
+   Cada marco é um PONTO sem tamanho: `left` fixa a coluna, e o `translate`
+   escrito a cada quadro pelo `carta-viva.tsx` diz a que altura a curva de nível
+   dele está agora. O símbolo se centra sozinho em cima desse ponto, então quem
+   move o marco não precisa saber o tamanho do desenho.
+
+   Duas propriedades separadas de propósito: o ponto usa `translate` (é o
+   percurso, escrito em JavaScript) e o símbolo usa `transform` (é a entrada,
+   escrita em CSS). Se as duas coisas estivessem no mesmo elemento e na mesma
+   propriedade, uma apagaria a outra. */
+.fundo--topo .topo-marcos {
+  position: absolute;
+  inset: 0;
 }
 
-/* Marcos hexagonais: o único ponto do fundo em que a marca aparece. Entram
-   depois da carta plotada — marco antes da curva seria marco pousado no nada. */
 .topo-marco {
-  transform-box: fill-box;
-  transform-origin: center;
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+.topo-marco > svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  overflow: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .topo-marco {
+  .topo-marco > svg {
     animation: tpMarco 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  /* O percurso pelas curvas. Os quadros são gerados no servidor — cada destino
-     é o valor exato de `cota()` naquela curva — e chegam num `<style>` junto do
-     SVG; aqui só se liga a animação.
-
-     É esta media query que justifica a variável em vez de `animation` no estilo
-     em linha: com movimento reduzido a regra inteira desaparece e cada marco
-     fica parado na cota em que foi desenhado, que é um estado correto e não um
-     defeito.
-
-     A curva quase reta no meio com freio nas pontas dá o salto: o marco arranca
-     de uma cota, atravessa e assenta na outra. Sai da parede e chega na parede,
-     que é como coisa colocada se move — o resto do tempo ele está parado, e a
-     parada é o que faz o salto ler como troca de cota em vez de deriva. */
-  .topo-marco-rota {
-    animation: var(--tp-rota) var(--tp-volta) cubic-bezier(0.7, 0, 0.25, 1) infinite both;
   }
 }
 
@@ -273,16 +273,15 @@
   opacity: 0.13;
 }
 
-/* ============ TRAÇADO E APAGAMENTO ============
+/* ============ ENTRADA E APAGAMENTO ============
 
-     entrada    cada curva se risca do começo ao fim pelo `stroke-dashoffset`,
-                com atraso escalonado — as mestras primeiro, as intermediárias
-                depois. É a carta sendo plotada.
+     entrada    a carta clareia inteira. Antes cada curva se riscava pelo
+                `stroke-dashoffset`, como um plotter; com o terreno em WebGL não
+                existem mais traços individuais a riscar, e o campo já está
+                morfando quando aparece — a entrada é o terreno emergindo, não
+                sendo desenhado.
      rolagem    máscara horizontal apaga da esquerda para a direita conforme o
-                herói sai, no mesmo sentido do traçado.
-
-   Os dois gestos vão para o mesmo lado de propósito: apagar no sentido
-   contrário leria como cortina fechando, e não como o desenho sendo desfeito.
+                herói sai. Este gesto não mudou.
 
    `--tp-apaga` precisa de `@property`: sem tipo declarado o navegador
    interpola porcentagem dentro de máscara como troca discreta, e a varredura
@@ -294,9 +293,8 @@
   initial-value: 0%;
 }
 
-/* A máscara vai nas duas camadas, não no `.fundo`: assim a varredura é uma só
-   para as duas cartas, e o grão fica de fora dela. Que a camada de trás esteja
-   deslocada no eixo Y não desalinha nada, porque este gradiente só varia em X. */
+/* A máscara vai na camada e não no `.fundo`, para o grão ficar de fora dela: o
+   grão é da lente, e lente não é apagada junto com o que ela está vendo. */
 .fundo--topo .topo-camada {
   --tp-apaga: 0%;
   -webkit-mask-image: linear-gradient(
@@ -311,15 +309,6 @@
   );
 }
 
-@keyframes tpRiscar {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @keyframes tpApagar {
   from {
     --tp-apaga: 0%;
@@ -329,8 +318,8 @@
   }
 }
 
-/* Era `tpLuz`, mas agora a luz e a carta de trás usam o mesmo par de quadros.
-   Nome pelo que ele faz, não por quem o usava primeiro. */
+/* Era `tpLuz`, mas a luz e a carta usam o mesmo par de quadros. Nome pelo que
+   ele faz, não por quem o usava primeiro. */
 @keyframes tpAparecer {
   from {
     opacity: 0;
@@ -340,18 +329,8 @@
   }
 }
 
-/* Longe desce, perto sobe. O que dá profundidade é a diferença de velocidade
-   entre as duas, não o deslocamento em si — daí os percentuais pequenos:
+/* A carta sobe enquanto a página desce. Percentual pequeno de propósito:
    parallax que se percebe como parallax já passou do ponto. */
-@keyframes tpLonge {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(0, 5.5%, 0);
-  }
-}
-
 @keyframes tpPerto {
   from {
     transform: translate3d(0, 0, 0);
@@ -362,15 +341,15 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .topo-curva {
-    stroke-dasharray: 1;
-    animation: tpRiscar 2.1s cubic-bezier(0.32, 0.9, 0.26, 1) both;
-  }
+  /* A entrada vai na caixa DE DENTRO, e não na `.topo-camada`: a de fora já
+     carrega a varredura de saída e o parallax, e uma segunda lista de
+     `animation` no mesmo elemento substituiria a primeira por inteiro.
 
-  /* A carta de trás clareia inteira, e mais rápido que o plotter da frente: é
-     o terreno que já estava lá antes de alguém desenhar por cima. */
-  .fundo--topo .topo-camada--longe {
-    animation: tpAparecer 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+     O atraso cobre o intervalo entre o HTML chegar e o WebGL ter o primeiro
+     quadro na tela. Sem ele o canvas clareia enquanto ainda está vazio, e o que
+     se vê é a carta aparecendo depois da própria entrada ter terminado. */
+  .fundo--topo .topo-camada--gl .topography-container {
+    animation: tpAparecer 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
   }
 
   .fundo--topo .topo-luz {
@@ -390,216 +369,12 @@
       animation-range: exit 0% exit 100%, exit 0% exit 100%;
     }
 
-    /* A de trás repete aqui o `tpAparecer` do bloco acima porque a lista de
-       `animation` substitui a anterior por inteiro — omitir apagaria a entrada
-       dela. Três animações, duas linhas do tempo: a primeira no relógio, as
-       outras na rolagem. */
-    .fundo--topo .topo-camada--longe {
-      animation: tpAparecer 1.5s cubic-bezier(0.22, 1, 0.36, 1) both,
-        tpApagar linear both, tpLonge linear both;
-      animation-timeline: auto, view(), view();
-      animation-range: normal, exit 0% exit 100%, exit 0% exit 100%;
-    }
-
     .fundo--topo .topo-luz {
       animation: tpAparecer 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
         tpAparecer linear reverse both;
       animation-timeline: auto, view();
       animation-range: normal, exit 0% exit 90%;
     }
-  }
-}
-
-/* ============ A TRILHA, ATRÁS DA PÁGINA INTEIRA ============
-
-   Camada de chão: ocupa toda a altura do `main` e fica atrás de tudo. O `main`
-   vira contexto de posicionamento para isso, e os blocos de conteúdo sobem um
-   degrau — está logo abaixo, e o porquê está escrito lá.
-
-   `z-index: 0` e não `-1`: com valor negativo a camada cairia atrás do fundo
-   do `.v5`, que é quem pinta a cor da página, e sumiria por completo. */
-.v5 main {
-  position: relative;
-}
-
-/* Só os blocos que realmente existem nas três rotas. Uma regra em `main > *`
-   pegaria também a barra fixa e o par flutuante — os dois são `position:
-   fixed` com z-index próprio, e reescrever isso arrancaria eles da tela. */
-.v5 main > .herowrap,
-.v5 main > .corpo,
-.v5 main > header,
-.v5 main > section,
-.v5 main > footer {
-  position: relative;
-  z-index: 1;
-}
-
-.trilha {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  color: var(--blue);
-  /* O terreno nasce depois do herói e morre antes do rodapé: em cima ele
-     encostaria na carta do herói e as duas texturas somariam densidade
-     justamente onde está a manchete; embaixo, o fechamento é onde a página
-     assina, e assinatura não quer chão desenhado. */
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 9%,
-    #000 88%,
-    transparent 99%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 9%,
-    #000 88%,
-    transparent 99%
-  );
-}
-
-.trilha svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* Atrás de nove telas de texto, e não atrás de uma manchete: o terreno do
-   corpo vive num degrau de presença abaixo do herói. Este 0,45 sobre as
-   opacidades já baixas de cada traço é o que separa textura de ruído. */
-.trilha-nivel {
-  opacity: 0.45;
-}
-
-/* A trilha é a única linha acesa da camada — é ela que carrega significado, e
-   por isso é a única que ganha a tinta de realce. */
-.trilha-linha--fio {
-  color: var(--fg-hot);
-  opacity: 0.5;
-}
-
-.trilha-linha--halo {
-  color: var(--cyan);
-  opacity: 0.1;
-}
-
-/* O halo é a segunda repintura da camada a cada quadro de rolagem. No celular
-   ele sai: a tela é menor, o traço fino já lê, e o aparelho é o que menos tem
-   sobra para gastar em brilho de fundo. */
-@media (max-width: 900px) {
-  .trilha-linha--halo {
-    display: none;
-  }
-}
-
-/* No claro o azul da marca sobre papel precisa recuar mais: o mesmo traço que
-   é discreto sobre quase-preto vira sujeira sobre quase-branco. */
-[data-tema="light"] .v5 .trilha {
-  color: #2c78a8;
-}
-
-[data-tema="light"] .v5 .trilha-nivel {
-  opacity: 0.32;
-}
-
-[data-tema="light"] .v5 .trilha-linha--fio {
-  opacity: 0.42;
-}
-
-[data-tema="light"] .v5 .trilha-linha--halo {
-  opacity: 0.07;
-}
-
-/* O traçado. `pathLength="1"` no elemento normaliza o comprimento do caminho,
-   então `stroke-dashoffset` vai de 1 a 0 sem ninguém precisar saber quantos
-   pixels a trilha tem — e ela muda de tamanho com a altura da página.
-
-   A linha do tempo é `scroll()`, a rolagem do documento inteiro, de 0 a 100%:
-   é literalmente o percurso da pessoa desenhado. Sem `@supports`, ou com
-   movimento reduzido, o `stroke-dasharray` nunca é aplicado e a trilha aparece
-   inteira — o caminho marcado no mapa, parado. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .trilha-linha {
-      stroke-dasharray: 1;
-      animation: trilhaRiscar linear both;
-      animation-timeline: scroll();
-      animation-range: 0% 100%;
-    }
-  }
-}
-
-@keyframes trilhaRiscar {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Transparência reduzida some com o CAMPO de curvas, não com a camada inteira.
-
-   A regra antes era `display: none` no `.trilha` e isso apagava tudo. O
-   problema não é a media query estar errada — o desenho passa mesmo por trás de
-   nove telas de texto corrido, e é para esse caso que o ajuste existe. O
-   problema é ela não significar no Windows o que significa no macOS.
-
-   No macOS, "Reduzir transparência" é um ajuste de acessibilidade que a pessoa
-   liga de propósito. No Windows, o Chrome reporta `reduce` quando "Efeitos de
-   transparência" está desligado — e ele desliga sozinho na economia de bateria,
-   em sessão de Área de Trabalho Remota e em fallback de GPU, além de ser a
-   primeira coisa que muita gente desmarca por desempenho. O mesmo sinal, de um
-   lado é intenção e do outro é estado da máquina.
-
-   Como o sinal não é confiável, ele passa a mexer só no halo — que é a única
-   coisa nesta camada que de fato é véu translúcido: sete pixels de traço a 0,1
-   de opacidade por baixo da linha, para dar brilho. O campo de curvas não é
-   véu, é traço fino, e não é o que "transparência reduzida" quer resolver.
-
-   Nada aqui pode mexer na tinta do `.trilha-nivel`. Esta regra já foi
-   `display: none` no `.trilha` inteiro; a primeira tentativa de conserto só
-   mudou o alvo para o `.trilha-nivel`, que é exatamente o campo que sumiu no
-   Windows. E baixar a opacidade dele aqui seria o mesmo erro por outro caminho:
-   `.v5 .trilha-nivel` tem especificidade maior que o `.trilha-nivel` do bloco
-   de 1x logo abaixo, então venceria justamente na máquina onde o traço já está
-   no limite de ser visto. */
-@media (prefers-reduced-transparency: reduce) {
-  .v5 .trilha-linha--halo {
-    display: none;
-  }
-}
-
-/* Traço fino em tela de 1x.
-
-   A trilha é o único SVG da página com `preserveAspectRatio="none"` e
-   `vector-effect="non-scaling-stroke"` ao mesmo tempo: o traço fica travado em
-   0,9px de CSS enquanto a caixa estica cinco vezes na vertical. Com 0,16 de
-   opacidade no traço e 0,45 na camada, a tinta efetiva é 0,072 — em tela 2x
-   isso ainda cobre quase dois pixels de aparelho e aparece; em 1x cai abaixo de
-   um pixel, o antisserrilhado dilui o que sobrou e a linha some sobre um fundo
-   quase preto.
-
-   Por isso ela aparece no macOS (Retina) e não no Windows (monitor comum), e
-   por isso a carta do herói aparece nos dois — ela escala junto e não tem essa
-   combinação. A correção é devolver tinta onde não há subpixel para gastar. */
-@media (max-resolution: 1.5dppx) {
-  .trilha-nivel {
-    opacity: 0.78;
-  }
-
-  .trilha-linha--fio {
-    opacity: 0.72;
-  }
-
-  [data-tema="light"] .v5 .trilha-nivel {
-    opacity: 0.5;
-  }
-
-  [data-tema="light"] .v5 .trilha-linha--fio {
-    opacity: 0.6;
   }
 }
 

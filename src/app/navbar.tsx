@@ -22,8 +22,8 @@ import "./navbar.css";
    agora.
 
    Quem faz isso é `animation-timeline: scroll()` no CSS — o mesmo mecanismo que
-   já move a trilha do fundo. Não há ouvinte de rolagem, não há estado em React,
-   e o componente continua sendo de servidor.
+   apaga a carta do herói quando ela sai. Não há ouvinte de rolagem, não há
+   estado em React, e o componente continua sendo de servidor.
 
    O rótulo do botão não é apagado quando ele encolhe: vira `.nav-cta-rotulo`
    com largura zero e `visibility` preservada para o leitor de tela, e o ícone

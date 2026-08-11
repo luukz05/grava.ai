@@ -7,6 +7,7 @@
    Forma, tipografia, barra do topo e fixos vêm do `Casca`, o mesmo das outras
    duas rotas. */
 
+import type { Metadata } from "next";
 import "../v5.css";
 import "../variacoes.css";
 import "../temas.css";
@@ -14,10 +15,24 @@ import { Casca, Heroi, WHATSAPP } from "../casca";
 import { Ph } from "../ph";
 import { Rodape } from "../rodape";
 
-export const metadata = {
-  title: "GRAVA.AI — galeria de peças",
-  description: "O que sai do totem: peças gravadas com arte criada na hora.",
+/* A descrição anterior tinha 58 caracteres e desperdiçava o espaço: cabe cerca
+   de 155, e o que não é dito ali o Google preenche sozinho com um trecho
+   qualquer da página — que aqui ainda é casca. */
+const TITULO = "GRAVA.AI — galeria de peças gravadas";
+const DESCRICAO =
+  "O que sai do totem GRAVA.AI: peças gravadas a laser com arte criada por IA na hora, de lembrança de shopping a presente de viagem, com ticket de R$ 60 a R$ 100.";
+
+export const metadata: Metadata = {
+  title: TITULO,
+  description: DESCRICAO,
   alternates: { canonical: "/galeria" },
+  openGraph: {
+    title: TITULO,
+    description: DESCRICAO,
+    url: "/galeria",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 /* Os materiais que a apresentação do cliente cita. Nada além deles: inventar
@@ -71,7 +86,9 @@ export default function Galeria() {
 
       <footer className="hold close" id="falar">
         <div className="sec-cab">
-          <h2>Quer ver de perto?</h2>
+          <h2>
+            Quer ver <mark>de perto?</mark>
+          </h2>
           <p>A apresentação completa da franquia sai pelo WhatsApp.</p>
         </div>
         <div className="row" style={{ marginTop: 0 }}>

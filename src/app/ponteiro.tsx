@@ -7,13 +7,13 @@ import { useEffect, useRef } from "react";
    Publica quatro variáveis de CSS no `.fundo--topo` e não desenha nada: a
    posição do cursor dentro da caixa (`--tp-x/--tp-y`, em pixels) e o desvio dele
    em relação ao centro (`--tp-dx/--tp-dy`, de -0,5 a 0,5). Quem usa isso é o
-   CSS — a caixa de luz se desloca e as duas cartas se inclinam em sentidos
-   opostos, o que dá ao terreno a sensação de responder sem que nada nele seja
-   recalculado.
+   CSS — a caixa de luz se desloca e a carta se inclina no sentido contrário, o
+   que dá ao terreno a sensação de responder sem que nada nele seja recalculado.
 
-   O que NÃO se faz aqui: deformar a geometria. Recalcular quinze caminhos por
-   quadro repinta o SVG inteiro a 60Hz dentro do herói, que é exatamente onde o
-   LCP é medido. O custo desta versão é uma variável de CSS por quadro, e o
+   O que NÃO se faz aqui: mexer no terreno. O shader da carta tem um modo de
+   cursor próprio (`mouseInteraction`), que levanta o relevo em volta do ponteiro
+   e está desligado de propósito — duas respostas ao mesmo movimento, uma por
+   cima da outra. O custo desta versão é uma variável de CSS por quadro, e o
    resto é composição.
 
    Só com ponteiro fino e sem movimento reduzido: em toque não existe posição de

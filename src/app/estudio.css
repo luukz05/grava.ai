@@ -1,4 +1,4 @@
-/* A cena do totem — dois vídeos e a conversa viva no meio.
+/* A cena do totem — dois vídeos e o console da IA no meio.
 
    DOIS LAYOUTS NO MESMO MARCADO. O padrão é fluxo normal — é o que o servidor
    manda e o que fica de pé sem JavaScript, com movimento reduzido ou se o GSAP
@@ -91,16 +91,22 @@
   display: none;
 }
 
-/* ============ A CONVERSA ============
+/* ============ O CONSOLE ============
 
-   REGRA QUE COMANDA O RESTO: só o cliente tem balão. A IA é texto puro sobre a
-   superfície, com a marca aparecendo uma vez por turno.
+   A forma é a que virou padrão em console de IA — saudação centrada com o
+   símbolo, campo arredondado com dica em cinza, barra de ações dentro dele,
+   atalhos em pílula embaixo. É forma, não marca: o símbolo é o hexágono da
+   GRAVA.AI e a etiqueta de modelo diz o nome desta rede.
 
-   Balão dos dois lados com borda colorida é o que faz qualquer chat parecer
-   template — dois retângulos delineados trocando figurinha. Deixando um lado
-   sem moldura, a conversa passa a ler como alguém RESPONDENDO, e a única forma
-   desenhada na tela vira o que o visitante escreveu. É o que a resposta precisa
-   ser: o assunto, não mais uma caixa. */
+   O QUE FAZ ISSO PARECER INTERFACE DE VERDADE, e não um mock:
+
+   — o campo tem duas alturas de superfície (fundo mais claro que a cena, borda
+     de um pixel mais clara ainda). Superfície sem borda lê como retângulo
+     pintado; borda sem superfície lê como contorno vazio.
+   — o raio é grande (22px) e o interior é folgado. Aperto é o que denuncia
+     interface improvisada.
+   — os ícones são cinza e só o texto digitado é branco. Console de verdade
+     hierarquiza assim: as ações estão disponíveis, não estão pedindo atenção. */
 
 .est-ui {
   position: relative;
@@ -126,18 +132,251 @@
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* Coluna de leitura, centrada. A conversa ocupava a largura inteira e as falas
-   da IA saíam com linhas de 140 caracteres — longas demais para ler, e o oposto
-   de premium. */
-.est-conversa {
+.est-console {
   width: min(100%, 46rem);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(18px, 3.2vh, 34px);
+  gap: clamp(14px, 2.2vh, 22px);
+  /* O zoom da digitação escala esta caixa. `will-change` porque ela contém o
+     texto que está sendo escrito: sem a promessa, o navegador rerasteriza a
+     tipografia a cada quadro do zoom e o texto ferve. */
+  will-change: transform;
 }
 
-/* ---- turno da IA: sem balão ---- */
+/* ---- a saudação ---- */
+
+.est-saudacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.2vw, 16px);
+  margin: 0;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(20px, 2.6vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #f2f8ff;
+}
+
+.est-saudacao-marca {
+  flex: none;
+  width: clamp(22px, 2.2vw, 32px);
+  color: #66cdff;
+}
+
+/* ---- o topo de altura fixa ----
+
+   Saudação e conversa ocupam a MESMA célula: uma sai enquanto a outra entra, e
+   nenhuma das duas empurra o campo. O campo é o que o zoom enquadra; se ele se
+   mexesse no meio da cena, o enquadramento sairia junto.
+
+   `align-items: end` porque conversa cresce de baixo para cima em relação ao
+   campo — a última fala é a que fica colada nele, como em qualquer thread. */
+.est-topo {
+  display: grid;
+}
+
+/* ALTURA FIXA, não mínima, e com recorte.
+
+   Com `min-height` a conversa mais alta que a caixa faria a linha crescer — e
+   como o console é centrado verticalmente, o campo desceria metade do excesso
+   no meio da cena, justamente depois de o zoom o ter enquadrado.
+
+   Com altura travada e `overflow: hidden`, o excesso é recortado. E, como os
+   filhos estão alinhados pelo fim, ele é recortado EM CIMA: é exatamente o que
+   se vê num thread de verdade rolado até o fim — as falas antigas saem por
+   cima, a última fica colada no campo. O defeito virou o comportamento certo. */
+.est-vivo .est-topo {
+  height: clamp(200px, 40vh, 380px);
+  align-items: end;
+  overflow: hidden;
+}
+
+.est-thread {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(14px, 2.4vh, 26px);
+}
+
+/* ---- o campo ---- */
+
+.est-composer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+  padding: clamp(14px, 1.8vh, 20px) clamp(14px, 1.4vw, 20px);
+  border: 1px solid rgba(160, 205, 235, 0.16);
+  border-radius: 22px;
+  background: rgba(19, 27, 35, 0.82);
+  /* A sombra é interna e de cima: é o que faz a caixa afundar na cena em vez de
+     flutuar sobre ela. Sombra externa aqui daria cara de cartão colado. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.est-composer-txt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  min-height: 1.6em;
+  font-size: clamp(14px, 1.25vw, 18px);
+  line-height: 1.5;
+  color: #eef5fb;
+}
+
+/* A dica ocupa o mesmo lugar do texto e sai quando ele começa. Fora do fluxo
+   para as duas não somarem largura enquanto se cruzam. */
+.est-dica {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  translate: 0 -50%;
+  color: #7d8b98;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.est-digitado {
+  white-space: pre;
+}
+
+/* O cursor de texto. Pisca em CSS, e não pela linha do tempo: piscar é do
+   relógio, não da rolagem — um cursor que pisca conforme a pessoa rola lê como
+   defeito de renderização. */
+.est-caret {
+  width: 1.5px;
+  height: 1.15em;
+  background: #66cdff;
+  border-radius: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .est-caret {
+    animation: estPisca 1.1s steps(1, end) infinite;
+  }
+}
+
+@keyframes estPisca {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- a barra de ações dentro do campo ---- */
+
+.est-composer-barra {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.9vw, 12px);
+  color: #8b98a5;
+}
+
+.est-acao {
+  display: grid;
+  place-items: center;
+  width: clamp(26px, 2.2vw, 32px);
+  height: clamp(26px, 2.2vw, 32px);
+  border-radius: 999px;
+}
+
+.est-acao svg {
+  width: 62%;
+  display: block;
+}
+
+/* O `+` é o único com superfície própria: é a ação primária da barra em
+   qualquer console — anexar — e é assim que ela se distingue das outras sem
+   precisar de rótulo. */
+.est-acao--mais {
+  border: 1px solid rgba(160, 205, 235, 0.16);
+}
+
+/* A etiqueta de modelo empurra os ícones de voz para a direita. */
+.est-modelo {
+  margin-left: auto;
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: 0.01em;
+  color: #8b98a5;
+}
+
+.est-modelo b {
+  font-weight: 600;
+  color: #dce7f0;
+}
+
+/* ---- os atalhos ---- */
+
+.est-atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(6px, 0.7vw, 10px);
+}
+
+.est-atalho {
+  padding: 0.45em 0.85em;
+  border: 1px solid rgba(160, 205, 235, 0.14);
+  border-radius: 999px;
+  background: rgba(19, 27, 35, 0.7);
+  font-size: clamp(11px, 1vw, 13px);
+  color: #b6c4d0;
+}
+
+/* ---- o ponteiro e o clique ---- */
+
+/* Os dois moram dentro do campo, deslocados para o ponto em que a escrita
+   começa. O ponteiro chega até aqui vindo de fora da tela; o anel é o clique.
+
+   `left`/`top` em percentual do campo e não em pixel: o campo muda de largura
+   com a tela, e o ponto de clique tem que acompanhar. */
+.est-cursor,
+.est-clique {
+  position: absolute;
+  left: clamp(18px, 1.6vw, 26px);
+  top: clamp(20px, 2.4vh, 30px);
+  pointer-events: none;
+}
+
+.est-cursor {
+  width: clamp(18px, 1.6vw, 24px);
+  z-index: 2;
+  /* A sombra é o que separa o ponteiro do fundo escuro sem precisar de contorno
+     grosso — a mesma razão pela qual o cursor do sistema tem uma. */
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55));
+}
+
+.est-cursor svg {
+  width: 100%;
+  display: block;
+}
+
+.est-clique {
+  width: clamp(30px, 3vw, 44px);
+  aspect-ratio: 1;
+  margin: calc(clamp(30px, 3vw, 44px) / -2) 0 0 calc(clamp(30px, 3vw, 44px) / -2);
+  border: 1.5px solid rgba(102, 205, 255, 0.85);
+  border-radius: 999px;
+  opacity: 0;
+}
+
+/* ============ A CONVERSA ============
+
+   REGRA QUE COMANDA O RESTO: só o cliente tem balão. A IA é texto puro sobre a
+   superfície, com a marca aparecendo uma vez por turno.
+
+   Balão dos dois lados com borda colorida é o que faz qualquer chat parecer
+   template — dois retângulos delineados trocando figurinha. Deixando um lado
+   sem moldura, a conversa passa a ler como alguém RESPONDENDO, e a única forma
+   desenhada na tela vira o que o visitante escreveu. É o que a resposta precisa
+   ser: o assunto, não mais uma caixa. */
 
 .est-turno {
   display: flex;
@@ -185,7 +424,7 @@
   max-width: 82%;
 }
 
-.est-turno--cliente .est-fala {
+.est-fala--dita {
   padding: clamp(11px, 1.5vh, 16px) clamp(16px, 1.8vw, 22px);
   border-radius: 20px 20px 6px 20px;
   background: linear-gradient(
@@ -196,6 +435,113 @@
   /* Sem borda. O preenchimento já separa a fala do fundo, e o contorno era
      exatamente o que dava cara de caixa de formulário. */
   color: #f2f8ff;
+}
+
+/* ============ O RACIOCÍNIO ============
+
+   O bloco que prova que existe trabalho acontecendo. Ele fica um degrau abaixo
+   da resposta em tudo — corpo menor, cor mais fria, sem peso — porque é o
+   bastidor: se competir com a resposta, a cena passa a ser sobre o processo em
+   vez de sobre o que sai dele. */
+
+.est-pensando {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(7px, 1.1vh, 11px);
+  padding-bottom: clamp(4px, 0.8vh, 8px);
+}
+
+/* "Pensando" com um brilho passando por cima. O degradê é mais largo que o
+   texto e anda da esquerda para a direita: é a convenção que virou padrão para
+   "trabalhando", e ela funciona porque não é um spinner a mais numa tela que já
+   tem quatro. */
+.est-pensando-rot {
+  font-size: clamp(12px, 1.05vw, 14px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #7d8b98;
+  background: linear-gradient(90deg, #7d8b98 30%, #d9ecfa 50%, #7d8b98 70%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .est-pensando-rot {
+    animation: estVarre 2.4s linear infinite;
+  }
+}
+
+@keyframes estVarre {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+.est-passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1vh, 10px);
+}
+
+.est-passo {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.9vw, 12px);
+  font-size: clamp(12px, 1.1vw, 15px);
+  line-height: 1.4;
+  color: #9fb0be;
+}
+
+/* O anel e o visto ocupam a mesma caixa: um apaga enquanto o outro acende, e
+   nenhum dos dois muda a largura da linha ao trocar. */
+.est-passo-ico {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(14px, 1.2vw, 17px);
+  aspect-ratio: 1;
+}
+
+.est-anel {
+  position: absolute;
+  inset: 0;
+  border: 1.6px solid rgba(160, 205, 235, 0.22);
+  border-top-color: #66cdff;
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .est-anel {
+    animation: estGira 0.85s linear infinite;
+  }
+}
+
+@keyframes estGira {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.est-ok {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #66cdff;
+}
+
+.est-ok svg {
+  width: 100%;
+  display: block;
 }
 
 /* ---- a última fala está acontecendo ---- */
@@ -249,6 +595,21 @@
   }
 }
 
+/* ---- o estado sem script ----
+
+   Sem a animação nada é escondido: a cena vira uma composição legível com o
+   console montado, o pedido já escrito no campo e a resposta inteira embaixo.
+   O que sai são as duas coisas que só existem em movimento — o ponteiro, que
+   sem trajeto seria uma seta parada no meio do campo, e o anel do clique. */
+.estudio:not(.est-vivo) .est-cursor,
+.estudio:not(.est-vivo) .est-clique {
+  display: none;
+}
+
+.estudio:not(.est-vivo) .est-dica {
+  display: none;
+}
+
 /* ============ O FEIXE E O ESTOURO ============ */
 
 .est-feixe {
@@ -281,35 +642,6 @@
   pointer-events: none;
   opacity: 0;
   background: radial-gradient(120% 90% at 50% 50%, #fff 0%, #eaf6ff 55%, #cfe9ff 100%);
-}
-
-/* ============ A ASSINATURA ============ */
-
-.est-assina {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 0;
-  padding: 18px 24px;
-  font-size: clamp(13px, 1.5vw, 18px);
-  color: #cfdae4;
-}
-
-/* Volta para o rodapé da cena. Ela estava subida em ~30vh para desviar da faixa
-   de legendas, e essa faixa não existe mais. */
-.est-vivo .est-assina {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(24px, 6vh, 56px);
-  padding: 0 24px;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
-}
-
-.est-assina-marca {
-  width: clamp(20px, 2vw, 28px);
-  color: #3ba5e8;
 }
 
 /* ============ TEMA CLARO ============

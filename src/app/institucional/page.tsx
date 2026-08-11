@@ -30,15 +30,22 @@ import {
   IcoAeroporto,
 } from "../icons";
 
+/* Uma frase só, usada na meta e no Open Graph. Antes eram duas frases
+   diferentes para a mesma página: o card do WhatsApp dizia uma coisa e o
+   resultado do Google outra, o que é ruído gratuito num site que ainda está
+   construindo o próprio nome. */
+const TITULO = "GRAVA.AI — transformando ideias em produtos personalizados";
+const DESCRICAO =
+  "Personalização de produtos com inteligência artificial: o cliente descreve a arte, a IA cria e o totem grava a peça na hora, onde tem gente em movimento.";
+
 export const metadata: Metadata = {
-  title: "GRAVA.AI — transformando ideias em produtos personalizados",
-  description:
-    "A GRAVA.AI une Inteligência Artificial e personalização para criar produtos exclusivos na hora — onde tem gente em movimento em busca de algo especial.",
+  title: TITULO,
+  description: DESCRICAO,
   alternates: { canonical: "/institucional" },
   openGraph: {
-    title: "GRAVA.AI — transformando ideias em produtos personalizados",
-    description:
-      "Uma marca que coloca o cliente no centro da criação e usa tecnologia para transformar cada momento em um produto que carrega uma história.",
+    title: TITULO,
+    description: DESCRICAO,
+    url: "/institucional",
     locale: "pt_BR",
     type: "website",
   },
@@ -80,7 +87,9 @@ export default function Institucional() {
             190 caracteres para dizer o que a frase abaixo diz em 67. O credo,
             logo em seguida, é quem carrega o peso desta seção. */}
         <div className="sec-cab">
-          <h2>O mercado mudou. A marca acompanhou.</h2>
+          <h2>
+            O mercado mudou. <mark>A marca acompanhou.</mark>
+          </h2>
           <p>Exclusivo, personalizado e na hora: é o que a IA passou a permitir.</p>
         </div>
         {/* O credo fica fora do cabeçalho: é a frase de propósito da marca, não
@@ -95,7 +104,9 @@ export default function Institucional() {
 
       <section className="hold sec" id="pilares">
         <div className="sec-cab">
-          <h2>Três pilares sustentam a empresa.</h2>
+          <h2>
+            Três pilares <mark>sustentam a empresa.</mark>
+          </h2>
           <p>Não são valores de parede: são o que precisa funcionar junto.</p>
         </div>
         <div className="cells cells--3">
@@ -134,7 +145,9 @@ export default function Institucional() {
 
       <section className="hold sec" id="produto">
         <div className="sec-cab">
-          <h2>Da ideia ao produto, em 3 passos.</h2>
+          <h2>
+            Da ideia ao produto, <mark>em 3 passos.</mark>
+          </h2>
           <p>Tudo acontece no ponto, na frente do cliente, sem encomenda.</p>
         </div>
         <div className="steps">
@@ -181,7 +194,9 @@ export default function Institucional() {
 
       <section className="hold sec" id="ia">
         <div className="sec-cab">
-          <h2>Movidos por Inteligência Artificial.</h2>
+          <h2>
+            Movidos por <mark>Inteligência Artificial.</mark>
+          </h2>
           <p>Da criação da arte ao atendimento, tudo passa por ela.</p>
         </div>
         <div className="cells cells--3">
@@ -214,7 +229,9 @@ export default function Institucional() {
 
       <section className="hold sec" id="onde">
         <div className="sec-cab">
-          <h2>Onde a GRAVA.AI pode estar?</h2>
+          <h2>
+            Onde a GRAVA.AI <mark>pode estar?</mark>
+          </h2>
           <p>Ocupa pouca área e vive do fluxo que o ponto já tem.</p>
         </div>
         <div className="cells cells--3">
@@ -244,7 +261,9 @@ export default function Institucional() {
 
       <footer className="hold close" id="falar">
         <div className="sec-cab">
-          <h2>Leve a GRAVA.AI para a sua região.</h2>
+          <h2>
+            Leve a GRAVA.AI <mark>para a sua região.</mark>
+          </h2>
           <p>A conversa começa no WhatsApp, com quem opera a rede.</p>
         </div>
         <div className="row" style={{ marginTop: 0 }}>

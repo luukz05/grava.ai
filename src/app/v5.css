@@ -962,27 +962,47 @@
    lugar a cada seção. Agora é `.sec-cab` nas treze, e mudar o degrau muda em
    todas de uma vez.
 
+   ───────────────────────────────────────────────────────────────────────────
+   O APOIO SAIU DE BAIXO E FOI PARA O LADO
+
+   A manchete estava presa em 2,125rem por um motivo escrito: com o apoio
+   EMBAIXO, um corpo maior fazia os dois blocos brigarem, e o de baixo — três
+   ou quatro linhas de texto corrido — pesava mais na tela que a própria
+   manchete. Duas coisas competindo no mesmo eixo, e o tamanho não resolvia.
+
+   Com o apoio ao LADO, em coluna estreita e corpo pequeno, essa restrição
+   caiu: não existe mais nada disputando o eixo vertical com a manchete, e ela
+   passa a poder ocupar o espaço que uma manchete ocupa. Daí o teto em 3,5rem.
+
+   A leitura fica em duas alturas: à esquerda a afirmação, grande, com a segunda
+   linha na cor da marca; à direita a frase de contexto, pequena e sem pressa.
+   Quem varre a página lê só a esquerda e entende a seção.
+
+   OS DOIS ENCOSTAM NAS BORDAS. A manchete começa no limite esquerdo do `.hold`
+   e o apoio termina no direito — `justify-self: end` mais `text-align: right`,
+   porque bloco encostado à direita com texto alinhado à esquerda deixa uma
+   borda serrilhada onde deveria haver uma reta. O vão do meio é o que sobrar,
+   e é ele que faz os dois lerem como extremos da mesma linha em vez de duas
+   colunas de um layout.
+
+   `mark` marca a parte colorida, e ela vira uma linha própria. É a mesma
+   convenção da manchete do herói — lá o realce é dentro da linha porque a
+   frase é longa; aqui é a linha inteira, porque são duas frases curtas.
+
+   Quebra em 1000px: abaixo disso não sobra largura para duas colunas com
+   manchete grande, e o cabeçalho volta a ser manchete em cima, apoio embaixo.
+
    As medidas, e por que estas:
 
-   `2.125rem` de teto    A manchete estava em 2,75rem e o apoio embaixo dela
-                         ocupava três ou quatro linhas: o bloco de apoio pesava
-                         mais na tela que a própria manchete, invertendo a
-                         hierarquia que o tamanho tentava criar. Baixar o teto
-                         resolve metade; a outra metade é o texto, e está no
-                         conteúdo — apoio de uma linha só.
-
-                         Impacto não vem de corpo grande. Vem de frase curta,
-                         peso 700, entrelinha fechada e espaço em volta. Uma
-                         manchete de 34px sobre uma linha de apoio é mais forte
-                         que uma de 44px sobre um parágrafo, porque ali existe
-                         uma coisa dominando e aqui existem duas competindo.
-
-   `24ch` na manchete    Com o corpo menor e a frase mais curta, é o que segura
-                         quase todas em uma ou duas linhas.
-   `72ch` no apoio       Largo o bastante para as frases novas caberem em uma
-                         linha no desktop, que é o formato pedido.
-   `0.85rem` de respiro  Entre os dois. Com a manchete menor, 1rem começava a
-                         soltar o apoio dela. */
+   `3.5rem` de teto      Grande o bastante para dominar a tela sozinha, e ainda
+                         abaixo da manchete do herói — a hierarquia entre as
+                         duas continua de pé.
+   `20ch` na manchete    Com `mark` já forçando a quebra, isto é só a trava
+                         para frase longa não virar quatro linhas.
+   `28ch` no apoio       A coluna da direita. Estreita de propósito: ela é
+                         contexto, e contexto largo vira parágrafo.
+   `72ch` no apoio       Fora da grade — quando ele volta para baixo da
+                         manchete, volta também à medida de leitura corrida. */
 
 .sec-cab {
   margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
@@ -990,18 +1010,74 @@
 
 .sec-cab > h2 {
   font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
-  font-size: clamp(1.375rem, 2.9vw, 2.125rem);
+  font-size: clamp(1.5rem, 5.2vw, 3.5rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.08;
+  line-height: 1.04;
   margin: 0;
-  max-width: 24ch;
+  max-width: 20ch;
+}
+
+/* A segunda linha da manchete, na cor da marca. `display: block` porque a
+   quebra é editorial: ela está escrita no conteúdo, e não deixada para o
+   navegador decidir conforme a largura sobrar. */
+.sec-cab > h2 mark {
+  display: block;
+  background: none;
+  color: var(--fg-hot);
 }
 
 .sec-cab > p {
   margin: 0.85rem 0 0;
   color: var(--fg-2);
   max-width: 72ch;
+}
+
+@media (min-width: 1000px) {
+  /* `auto` na primeira coluna e não `1fr`: com `1fr` a manchete ganharia metade
+     da sobra e o apoio seria empurrado para dentro da página. Assim a manchete
+     ocupa o que a frase dela pede, o apoio ocupa o que a dele pede, e todo o
+     resto vira vão no meio — que é o que põe os dois nas bordas. */
+  .sec-cab {
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, auto);
+    justify-content: space-between;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  .sec-cab > h2 {
+    grid-area: 1 / 1;
+  }
+
+  .sec-cab > p {
+    grid-area: 1 / 2;
+    justify-self: end;
+    text-align: right;
+    margin: 0;
+    max-width: 28ch;
+    font-size: 0.9375rem;
+    /* Empurra o apoio para a altura da primeira linha da manchete. Alinhados
+       pelo topo da caixa eles ficam desencontrados: a manchete tem entrelinha
+       fechada e corpo três vezes maior, então o topo dela é bem acima da
+       primeira linha do texto pequeno. */
+    padding-top: clamp(0.35rem, 1.1vw, 0.85rem);
+  }
+
+  /* O fechamento fica numa coluna de metade da página, com o formulário ao
+     lado. Duas colunas dentro de meia página espremeriam as duas — ali o
+     cabeçalho continua empilhado. */
+  .close-duo .sec-cab {
+    display: block;
+  }
+
+  .close-duo .sec-cab > p {
+    margin: 0.85rem 0 0;
+    max-width: 72ch;
+    font-size: inherit;
+    text-align: left;
+    padding-top: 0;
+  }
 }
 
 
@@ -1142,8 +1218,15 @@
 
 /* A marca empilhada assinando o fechamento. O arquivo é 640×640 com folga
    grande em volta do desenho, então o que controla o tamanho ótico é a altura,
-   não a largura da caixa. */
+   não a largura da caixa.
+
+   Ela vive DENTRO da coluna de texto do `.close-duo`, e não acima do par: é o
+   que faz o topo da marca e o topo do formulário caírem na mesma linha, já que
+   o par alinha os dois filhos por `align-items: start`. Fora do par, a marca
+   empurrava só a coluna da esquerda para baixo e os dois blocos nasciam em
+   alturas diferentes. */
 .close-logo {
+  display: block;
   height: clamp(3.5rem, 8vw, 5.25rem);
   width: auto;
   margin-bottom: clamp(1rem, 2.5vw, 1.5rem);

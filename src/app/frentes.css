@@ -1,165 +1,275 @@
-/* As quatro frentes, em linha, penduradas na IA.
+/* As quatro frentes, uma de cada vez, com a linha do tempo no topo.
 
-   A régua horizontal é o que carrega a ideia: um traço só atravessando as
-   quatro, saindo do bloco da IA. Ela é desenhada por `::before` no contêiner da
-   lista, e não por um elemento — decoração não deve aparecer para leitor de
-   tela como um quinto item vazio. */
+   A régua contínua da versão em colunas virou quatro segmentos que enchem. Ela
+   ainda atravessa o topo inteiro — é o mesmo "um sistema só" — mas agora também
+   diz onde a pessoa está e quanto falta para trocar.
+
+   O preenchimento é `scaleX(var(--p))`, e o `--p` é escrito pelo laço de
+   `requestAnimationFrame` do componente. Não existe `animation` aqui de
+   propósito: dois relógios medindo o mesmo intervalo dessincronizam sempre, e o
+   React precisa de um deles para saber a hora de trocar de frente. */
 
 .fre {
   display: grid;
   gap: clamp(1.5rem, 3.5vw, 2.75rem);
 }
 
-/* ---- a IA em evidência ---- */
+/* ---- a IA em evidência ----
+
+   Geometria, corpo e cor vêm do `.sec-cab` do `v5.css`. O que sobra aqui é só
+   o que é desta seção: o respiro, que quem dá é o `gap` do `.fre` — deixar
+   também a margem do cabeçalho somaria dois donos para o mesmo espaço e esta
+   seção abriria mais que as outras. */
 
 .fre-fonte {
-  display: grid;
-  gap: 0.6rem;
-  max-width: 46rem;
+  margin-bottom: 0;
 }
 
-.fre-fonte-rot {
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--fg-hot);
-}
-
-.fre-fonte-txt {
-  margin: 0;
-  font-size: clamp(1.125rem, 2.2vw, 1.6rem);
-  line-height: 1.4;
-  letter-spacing: -0.015em;
-  color: var(--fg-2);
-}
-
-.fre-fonte-txt strong {
+/* O destaque dentro do apoio. "quatro frentes" é o que a linha abaixo desenha,
+   e a ligação entre a frase e o desenho é a única coisa que este realce faz. */
+.fre-fonte > p strong {
   color: var(--fg);
   font-weight: 600;
 }
 
-/* ---- a linha das quatro ---- */
+/* ---- o quadro ---- */
 
-.fre-linha {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
+.fre-quadro {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* ---- a linha do topo ---- */
+
+.fre-passos {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(1rem, 2.4vw, 2rem);
+  gap: clamp(0.6rem, 1.8vw, 1.5rem);
 }
 
-/* A régua. Começa e termina dentro do primeiro e do último nó — atravessar a
-   linha inteira até as bordas faria parecer que existe algo além das quatro. */
-.fre-linha::before {
-  content: "";
-  position: absolute;
-  top: 1.35rem;
-  left: 12.5%;
-  right: 12.5%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--hair-hot) 12%,
-    var(--hair-hot) 88%,
-    transparent
-  );
-}
+.fre-passo {
+  /* Botão sem cara de botão: o alvo de clique é a coluna inteira, e o que
+     responde ao estado é a cor do texto e o preenchimento da trilha. */
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 
-.fre-item {
-  position: relative;
   display: grid;
-  gap: 0.35rem;
-  /* Cada item começa abaixo da régua, e o nó é quem a toca. */
-  padding-top: 3.4rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "trilha trilha"
+    "num    rot";
+  gap: 0.55rem 0.5rem;
+  align-items: baseline;
 }
 
-/* O nó: círculo preenchido sentado em cima da régua. É ele que faz as quatro
-   lerem como pontos de um mesmo sistema, e não como quatro cartões soltos. */
-.fre-no {
+.fre-passo:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.fre-trilha {
+  grid-area: trilha;
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.fre-enche {
+  --p: 0;
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  /* Origem à esquerda: a barra enche no sentido da leitura. */
+  transform: scaleX(var(--p));
+  transform-origin: left center;
+  background: var(--hair-hot);
+}
+
+/* O segmento em curso é o único aceso. Os anteriores ficam cheios num tom mais
+   surdo — passado presente, mas sem competir com o agora. */
+.fre-passo[data-ativo] .fre-enche {
+  background: var(--fg-hot);
+}
+
+.fre-num {
+  grid-area: num;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+}
+
+.fre-rot {
+  grid-area: rot;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: var(--fg-2);
+  transition: color var(--t-ui) var(--e-ui);
+}
+
+.fre-passo[data-ativo] .fre-num,
+.fre-passo[data-ativo] .fre-rot {
+  color: var(--fg);
+}
+
+/* Passar o mouse já pausa o ciclo; o clarear é o aviso visual de que aquilo
+   ali responde. */
+.fre-passo:hover .fre-rot {
+  color: var(--fg);
+}
+
+/* ---- vídeo à esquerda, texto à direita ---- */
+
+.fre-corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3.5vw, 2.75rem);
+  align-items: center;
+}
+
+.fre-midia {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--hair);
+  background: var(--bg-2);
+}
+
+/* Os quatro clipes ocupam a mesma caixa e se revezam por opacidade. Corte seco
+   entre dois `<video>` remontados piscaria o fundo do quadro. */
+.fre-slot {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--t-mov) var(--e-ui);
+  /* O inativo não recebe clique nem foco — inclusive o placeholder, que tem
+     `role="img"`. */
+  pointer-events: none;
+}
+
+.fre-slot[data-ativo] {
+  opacity: 1;
+}
+
+/* O placeholder guarda a própria proporção quando está solto na página; aqui a
+   caixa já tem a dela, e mandar na altura é o que faz ele preencher o slot. */
+.fre-slot > .ph {
+  height: 100%;
+}
+
+.fre-texto {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: start;
+}
+
+.fre-ico {
   display: grid;
   place-items: center;
   width: 2.7rem;
   height: 2.7rem;
+  margin-bottom: 0.35rem;
   border-radius: 999px;
   background: var(--bg);
   border: 1px solid var(--hair-hot);
   color: var(--fg-hot);
 }
 
-.fre-no svg {
+.fre-ico svg {
   width: 1.15rem;
   height: 1.15rem;
 }
 
-.fre-num {
-  position: absolute;
-  top: 0.5rem;
-  left: 3.1rem;
+.fre-onde {
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
-  color: var(--fg-2);
-}
-
-.fre-rot {
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fg-2);
 }
 
 .fre-tit {
   margin: 0;
-  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
   font-weight: 700;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   color: var(--fg);
 }
 
 .fre-faz {
   margin: 0.15rem 0 0;
-  font-size: 0.875rem;
+  max-width: 34ch;
+  font-size: clamp(0.9375rem, 1.3vw, 1.0625rem);
   line-height: 1.55;
   color: var(--fg-2);
   text-wrap: pretty;
 }
 
-/* ---- estreito ----
-
-   Abaixo de 900px as quatro colunas ficariam com ~10 caracteres por linha. Vira
-   duas colunas; a régua sai, porque uma régua que quebra em duas fileiras
-   descreve uma sequência que não existe. */
-@media (max-width: 900px) {
-  .fre-linha {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1.5rem, 4vw, 2.25rem);
+/* A entrada do texto. O painel é remontado a cada troca (`key`), então a
+   animação roda de novo sem precisar de classe nenhuma. Um deslocamento curto
+   para cima, atrás do vídeo que já está trocando: dois gestos grandes ao mesmo
+   tempo brigariam pelo olho. */
+@media (prefers-reduced-motion: no-preference) {
+  .fre-texto > * {
+    animation: fre-entra 420ms var(--e-ui) both;
   }
 
-  .fre-linha::before {
-    display: none;
+  .fre-texto > .fre-onde {
+    animation-delay: 40ms;
+  }
+  .fre-texto > .fre-tit {
+    animation-delay: 70ms;
+  }
+  .fre-texto > .fre-faz {
+    animation-delay: 100ms;
   }
 }
 
-@media (max-width: 560px) {
-  .fre-linha {
+@keyframes fre-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---- estreito ---- */
+
+@media (max-width: 900px) {
+  .fre-corpo {
     grid-template-columns: 1fr;
+    gap: clamp(1.25rem, 4vw, 1.75rem);
   }
 
-  .fre-item {
-    padding-top: 0;
-    padding-left: 3.6rem;
-    min-height: 2.7rem;
+  .fre-faz {
+    max-width: 52ch;
+  }
+}
+
+/* Abaixo de 640px o rótulo em quatro colunas cabe em ~9 caracteres e quebra em
+   três linhas. Some: o número sozinho basta para localizar, e o nome da frente
+   em curso já está no painel, em corpo maior. */
+@media (max-width: 640px) {
+  .fre-passo {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "trilha"
+      "num";
   }
 
-  .fre-num {
-    top: 0.15rem;
-    left: auto;
-    right: 0;
+  .fre-rot {
+    display: none;
+  }
+
+  .fre-midia {
+    aspect-ratio: 4 / 3;
   }
 }

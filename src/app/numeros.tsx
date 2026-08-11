@@ -39,7 +39,9 @@ export function Numeros() {
             pergunta que trava a conversa não é quanto custa — é o que vem
             dentro. O título passou a fazer a pergunta que o bloco responde, e o
             payback continua logo abaixo, na grade. */}
-        <h2>O que custa e o que vem dentro.</h2>
+        <h2>
+          O que custa <mark>e o que vem dentro.</mark>
+        </h2>
         {/* O apoio descrevia a estrutura do bloco — "abaixo está a composição
             e o que vem junto". O bloco já tem dois títulos dizendo isso, cada
             um em cima do grupo que ele nomeia. Legenda de layout não é apoio de

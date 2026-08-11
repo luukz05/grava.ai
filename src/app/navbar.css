@@ -21,8 +21,8 @@
    ───────────────────────────────────────────────────────────────────────────
    POR QUE SEM JAVASCRIPT
 
-   Quem dirige é `animation-timeline: scroll()`, o mesmo mecanismo que já move a
-   trilha do fundo desta página. Sem ouvinte de rolagem, sem estado em React, e
+   Quem dirige é `animation-timeline: scroll()`, o mesmo mecanismo que apaga a
+   carta do herói quando ela sai. Sem ouvinte de rolagem, sem estado em React, e
    a navbar continua sendo componente de servidor.
 
    Isso importa mais aqui que em qualquer outro lugar do site: a navbar está na
