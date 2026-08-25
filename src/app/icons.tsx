@@ -14,6 +14,31 @@ const base = {
   "aria-hidden": true as const,
 };
 
+/* A marca. Não segue o `base` acima e não deveria: os ícones são traço de 1,5
+   numa caixa de 24, a marca é sólido de contorno medido numa caixa de 522×628.
+   O que ela tem em comum com eles é o `currentColor` — o tom vem do CSS, porque
+   a mesma marca precisa sair clara sobre aço e escura sobre cerâmica.
+
+   Mora aqui porque já era o segundo lugar a desenhar o mesmo caminho: a cena do
+   totem tinha uma cópia privada, e o balão de leitura do herói ia ser a
+   terceira. Caminho de marca duplicado é marca que muda em um lugar só no dia
+   em que o vetor original aparecer.
+
+   A geometria e o porquê de cada número estão em `public/brand/grava-mark.svg`,
+   que é a mesma reconstrução — e segue sendo o arquivo a substituir quando o
+   original vier. */
+export function Marca({ className }: P) {
+  return (
+    <svg className={className} viewBox="0 0 522 628" aria-hidden="true">
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M261 0 522 156.4 522 471.2 261 627.6 0 471.2 0 156.4Z M261 170.8 147 238.8 147 388.8 261 456.8 375 388.8 375 315.3 257 315.3 522 159.8 522 156.4 486 134.8 341 217.8Z"
+      />
+    </svg>
+  );
+}
+
 export function IcoTotem({ className }: P) {
   return (
     <svg {...base} className={className}>

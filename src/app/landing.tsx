@@ -10,12 +10,13 @@ import "./temas.css";
 import "./mapa-unidades.css";
 import "./frentes.css";
 import "./modelos.css";
+import "./gravidade.css";
 /* A arte ASCII segue inteira em `assets.tsx`. Ela saiu da página a pedido, para
    a leitura de layout acontecer sem o ruído dos mocks — voltar é reimportar
-   AsciiWaveHeader / AsciiMeter / AsciiTotem / AsciiCircuito e desfazer os
-   `<Ph>` abaixo. */
+   AsciiWaveHeader / AsciiMeter / AsciiTotem / AsciiCircuito no lugar de quem
+   herdou o espaço deles. */
 import { Casca, Heroi, WHATSAPP } from "./casca";
-import { Ph } from "./ph";
+import { Gravidade } from "./gravidade";
 import { Modelos } from "./modelos";
 import { MapaUnidades } from "./mapa-unidades";
 import { Frentes } from "./frentes";
@@ -54,8 +55,12 @@ export function Landing({ tema }: { tema?: Tema }) {
               </a>
             </div>
           </div>
-          <figure className="scope" style={{ margin: 0 }}>
-            <Ph ratio="860 / 536" label="Header — malha ASCII com a marca" />
+          {/* Sem `.scope`: o painel de fio e fundo emoldurava um placeholder,
+              e o que está aqui agora não quer moldura. As massas líquidas
+              dissolvem nas bordas — encostá-las num retângulo de 1px seria
+              desmentir o material na única linha da caixa. */}
+          <figure className="hero-arte">
+            <Gravidade />
           </figure>
         </header>
       </Heroi>

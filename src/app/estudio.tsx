@@ -77,6 +77,7 @@
 
 import { useEffect, useRef } from "react";
 import "./estudio.css";
+import { Marca } from "./icons";
 
 /* A fala do cliente. Aberta de propósito: "me mostre o que você pode fazer" é o
    que justifica o catálogo INTEIRO chegando no fim. Um pedido específico ("arte
@@ -126,18 +127,6 @@ const RESPOSTA = [
 
    A receita está no `scripts/videos.mjs`, para quando trocarem os arquivos. */
 const FPS = 24;
-
-function Marca({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 522 628" aria-hidden="true">
-      <path
-        fill="currentColor"
-        fillRule="evenodd"
-        d="M261 0 522 156.4 522 471.2 261 627.6 0 471.2 0 156.4Z M261 170.8 147 238.8 147 388.8 261 456.8 375 388.8 375 315.3 257 315.3 522 159.8 522 156.4 486 134.8 341 217.8Z"
-      />
-    </svg>
-  );
-}
 
 /* Os ícones da barra do campo. Traço de 1,6 como o resto dos ícones do site, e
    desenhados aqui em vez de virem de um pacote: são quatro caminhos. */

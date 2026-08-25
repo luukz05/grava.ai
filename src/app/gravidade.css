@@ -1,0 +1,624 @@
+/* Gravidade zero — massas líquidas atrás, peça gravada na frente.
+   O componente está em `gravidade.tsx`, e o porquê de cada camada também. */
+
+/* A `<figure>` que segura a cena no herói. Não é `.scope` e não herda nada
+   dele: aqui não há painel, só a arte. O `margin: 0` é o do agente do usuário,
+   que ainda dá 40px laterais em `figure`. */
+.hero-arte {
+  margin: 0;
+  min-width: 0;
+}
+
+.grav {
+  position: relative;
+  width: 100%;
+  /* Altura em svh e não proporção: o painel divide o primeiro viewport com a
+     manchete, e uma caixa por proporção cresce com a LARGURA da coluna — em
+     tela larga e baixa ela empurrava o herói para fora da dobra, que é
+     exatamente o que o `min-height: 80svh` do herói tenta evitar. */
+  height: clamp(320px, 54svh, 560px);
+  /* `isolation` cria contexto de empilhamento próprio: as massas borradas
+     ficam presas aqui e não sobem por cima da carta topográfica do herói. */
+  isolation: isolate;
+}
+
+/* ---------- as massas líquidas ---------- */
+
+.grav-liquido {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Dissolve nas quatro bordas. Sem isso o `overflow: hidden` corta a massa em
+     linha reta, e uma reta é a única coisa que líquido não faz.
+
+     `closest-side` e não uma porcentagem: em `radial-gradient` a medida é o
+     RAIO, não o diâmetro. Escrito como `115% 105%` o raio horizontal virava
+     115% da LARGURA da caixa — mais que o dobro do necessário para chegar na
+     borda —, então a parada transparente caía fora do quadro e a máscara não
+     apagava nada. O resultado era exatamente o retângulo que ela existe para
+     não deixar acontecer. `closest-side` põe o raio na metade de cada lado, que
+     é a medida certa por definição. */
+  -webkit-mask-image: radial-gradient(
+    closest-side at 50% 50%,
+    #000 48%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    closest-side at 50% 50%,
+    #000 48%,
+    transparent 100%
+  );
+}
+
+/* A caixa que posiciona, deriva e borra. A proporção é a da marca — 522×628 do
+   `grava-mark.svg`, hexágono de topo-ponta —, então basta dar altura: a largura
+   sai do hexágono e não de um palpite. */
+.grav-massa {
+  position: absolute;
+  display: block;
+  aspect-ratio: 522 / 628;
+  /* Borrão contido. Antes eram 22px sobre tinta densa e o resultado era massa,
+     não eco: as arestas do hexágono derretiam e sobrava mancha. O ponto de
+     equilíbrio é borrar o bastante para a forma não ter contorno próprio e de
+     menos para ainda se reconhecer o que ela é. */
+  filter: blur(17px);
+  will-change: transform;
+}
+
+/* O recorte e a tinta. Hexágono de topo-ponta, os mesmos seis vértices da
+   marca.
+
+   O ciano é token de SUPERFÍCIE, e isto é superfície: lavagem e halo, nunca
+   texto. Os três ecos usam a mesma tinta em três diluições — cor diferente por
+   eco daria um segundo assunto de cor no herói. E as diluições são baixas de
+   propósito: isto é eco de silhueta, não forma. Se der para apontar onde o
+   hexágono começa e acaba, está forte demais. */
+.grav-hex {
+  display: block;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: color-mix(in srgb, var(--cyan) 20%, transparent);
+  will-change: transform;
+}
+
+.grav-massa--a {
+  height: 66%;
+  left: 2%;
+  top: 4%;
+}
+
+.grav-massa--b {
+  height: 58%;
+  right: 4%;
+  top: 24%;
+}
+
+.grav-massa--b .grav-hex {
+  background: color-mix(in srgb, var(--blue) 20%, transparent);
+}
+
+.grav-massa--c {
+  height: 40%;
+  left: 30%;
+  bottom: 2%;
+}
+
+.grav-massa--c .grav-hex {
+  background: color-mix(in srgb, var(--cyan) 13%, transparent);
+}
+
+/* ---------- a peça ---------- */
+
+.grav-palco {
+  position: absolute;
+  inset: 0;
+}
+
+/* `position: absolute; inset: 0` e NÃO uma grade de uma célula só com as peças
+   empilhadas em `grid-area: 1 / 1`.
+
+   A grade parecia o caminho — é como se empilha camada sem tirar do fluxo —,
+   mas `place-items: center` faz a peça se encolher ao conteúdo em vez de
+   esticar, e aí o `height: 100%` dela não tinha contra o que resolver: a altura
+   da linha vinha do conteúdo, e a altura do conteúdo dependia do 100%. O
+   navegador desiste do círculo e trata como `auto`, então a foto entrava no
+   tamanho natural — 900px de altura numa caixa de 492 — e transbordava o herói
+   pela metade de baixo. Com `inset: 0` a altura é definida por fora, e a
+   porcentagem tem contra o que medir. */
+.grav-peca {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  /* Um estado de repouso só, e ele é ao mesmo tempo o de entrada e o de saída:
+     a peça vem de baixo, menor e desfocada, e volta para lá quando sai. É
+     profundidade, não queda — a peça se afasta da lente e desaparece no fundo
+     da cena, que é o que faz sentido num quadro sem chão.
+
+     Ter DOIS estados (entrar por baixo, sair por cima) exigiria saber a direção
+     da troca, e num ciclo de duas peças o estado inativo é o mesmo lugar de
+     onde a próxima entra: a peça que subiu ao sair teria que descer de volta,
+     atravessando a cena à vista de todos, para poder entrar de novo. */
+  transform: translate3d(0, 9%, 0) scale(0.88);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.grav-peca[data-ativo] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.grav-deriva {
+  display: block;
+  height: var(--escala, 84%);
+}
+
+.grav-peca img {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  /* O giro de base de cada peça, vindo do componente. Fica AQUI e não junto da
+     deriva porque a deriva é animação: escrever o giro dentro dos quadros dela
+     obrigaria a repetir o valor em cada um, e trocar a inclinação de uma peça
+     viraria editar a animação de todas. */
+  transform: rotate(var(--giro, 0deg));
+  /* A sombra é o único lastro da cena: sem ela o inox recortado flutua como
+     adesivo. Vai deslocada e muito difusa — luz de estúdio distante, não sol a
+     pino, que é o que a foto original mostra. */
+  filter: drop-shadow(0 26px 42px rgba(0, 0, 0, 0.55));
+}
+
+/* ---------- a fala da IA ----------
+
+   Avatar, bico e pílula numa linha, na ordem de quem fala para o que é dito.
+   As medidas aqui não são decorativas: o `--vao` e o `--nucleo` entram nas
+   contas da divisão mais abaixo, e mexer neles sem mexer lá desalinha a fusão
+   inicial.
+
+   `--nucleo` é o diâmetro do avatar E a largura do toco a que a pílula se reduz
+   no primeiro quadro. Os dois precisam ser o mesmo número: é o que faz a célula
+   começar redonda em vez de começar como uma pílula curta. */
+.grav-hud {
+  --vao: 0.55rem;
+  --nucleo: 2.75rem;
+  /* Distância da borda esquerda do avatar até a borda esquerda da pílula: o vão
+     mais o pedaço do bico que sobra de fora dela. É o deslocamento da fusão, e
+     mora aqui para acompanhar sozinho qualquer mudança nas duas medidas acima. */
+  --desloc: calc(var(--nucleo) + var(--vao) + 0.28rem);
+  position: absolute;
+  left: 1%;
+  bottom: 5%;
+  display: flex;
+  align-items: center;
+  max-width: 98%;
+}
+
+/* Preenchimento OPACO, e essa é a condição de todo o efeito: enquanto as duas
+   formas se sobrepõem elas têm que ler como uma massa contínua, e superfície
+   translúcida denuncia a sobreposição dobrando o alfa na área comum.
+
+   A SUPERFÍCIE É CLARA, não escura. Painel desta página é chapa quase preta com
+   fio de 1px — material que funciona parado sobre fundo liso. Aqui embaixo tem
+   carta topográfica se mexendo, eco de hexágono e metal escovado, e chapa
+   escura sobre isso vira mancha: some o que é forma e some o que é texto. Um
+   passo acima do fundo resolve os dois de uma vez, e é o que uma fala pede — a
+   bolha de conversa é sempre mais clara que a cena, nunca mais escura.
+
+   E não há fio em volta pela mesma razão do preenchimento opaco: dois fios se
+   cruzando no meio da fusão contariam que ali são duas coisas. Quem separa a
+   pílula do fundo é o próprio salto de valor, mais a sombra. */
+.grav-hud-ia,
+.grav-hud-bico,
+.grav-hud-fala {
+  background: color-mix(in srgb, var(--bg-2) 78%, var(--cyan) 22%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* O avatar: a marca dentro do círculo. É o único lugar da cena onde ela
+   aparece, e é o suficiente — quem está falando fica dito uma vez. */
+.grav-hud-ia {
+  flex: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--nucleo);
+  height: var(--nucleo);
+  border-radius: 50%;
+  color: var(--fg-hot);
+}
+
+.grav-hud-ia svg {
+  width: 42%;
+  height: auto;
+  display: block;
+}
+
+/* O anel de escuta em volta do avatar. Vai no pseudoelemento e não na sombra do
+   círculo porque durante a fusão ele estaria por cima da pílula, desenhando uma
+   circunferência dentro da massa e entregando que ali são duas peças. Separado,
+   ele tem opacidade própria e só acende depois que as duas se soltam. */
+.grav-hud-ia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--cyan) 15%, transparent);
+}
+
+/* O bico. Quadrado girado 45°: metade entra por baixo da pílula pela margem
+   negativa, e o que sobra de fora é o triângulo. O `border-radius` de 2px é o
+   que impede a ponta de sair afiada — bico de fala tem ponta amaciada, e a
+   diferença entre os dois é a diferença entre balão e seta. */
+.grav-hud-bico {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-left: var(--vao);
+  margin-right: -0.42rem;
+  border-radius: 0.125rem;
+  transform: rotate(45deg);
+}
+
+.grav-hud-fala {
+  display: grid;
+  align-items: center;
+  min-height: var(--nucleo);
+  padding: 0.45rem 1.05rem;
+  border-radius: 999px;
+}
+
+.grav-hud-rotulo {
+  font-family: var(--f-mono), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-hot);
+  white-space: nowrap;
+}
+
+.grav-hud-leitura {
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  /* `--fg-2` é o cinza de texto secundário sobre o fundo da página. Sobre esta
+     superfície, que é mais clara, ele encosta no piso de leitura: a linha vem
+     de `--fg` diluído, que acompanha a superfície em vez de brigar com ela. */
+  color: color-mix(in srgb, var(--fg) 74%, transparent);
+  white-space: nowrap;
+}
+
+/* ---------- o movimento ----------
+   Fora deste bloco a cena é estática: as massas ficam onde nasceram e a peça
+   ativa aparece sem deriva e sem entrada. A troca por opacidade continua, e é
+   o que `prefers-reduced-motion` pede — mudança de estado sem deslocamento. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Dois movimentos por eco, em caixas diferentes: a de fora deriva e respira,
+     a de dentro gira. Separados porque um hexágono que só deriva lê como
+     adesivo arrastado, e um que só gira lê como engrenagem — é a soma dos dois,
+     em períodos que não fecham juntos, que dá o vagar de coisa boiando. */
+  .grav-massa--a {
+    animation: grav-flutua 26s ease-in-out infinite alternate;
+  }
+
+  .grav-massa--b {
+    animation: grav-flutua 31s ease-in-out infinite alternate;
+    animation-delay: -9s;
+  }
+
+  .grav-massa--c {
+    animation: grav-flutua 37s ease-in-out infinite alternate;
+    animation-delay: -18s;
+  }
+
+  /* Sentidos alternados e voltas longas. Um hexágono é simétrico a cada 60°, e
+     é por isso que os arcos aqui são curtos: passar de 60° não acrescenta forma
+     nova, só devolve a mesma silhueta e denuncia o ciclo. */
+  .grav-massa--a .grav-hex {
+    animation: grav-gira 44s ease-in-out infinite alternate;
+    --giro-de: -6deg;
+    --giro-ate: 26deg;
+  }
+
+  .grav-massa--b .grav-hex {
+    animation: grav-gira 52s ease-in-out infinite alternate;
+    --giro-de: 18deg;
+    --giro-ate: -14deg;
+  }
+
+  .grav-massa--c .grav-hex {
+    animation: grav-gira 38s ease-in-out infinite alternate;
+    --giro-de: 8deg;
+    --giro-ate: 40deg;
+  }
+
+  .grav-deriva {
+    animation: grav-deriva 17s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .grav-peca {
+    transition:
+      opacity 900ms var(--e-ui),
+      transform 1100ms var(--e-ui),
+      filter 900ms var(--e-ui);
+  }
+
+  /* A saída é mais curta que a entrada de propósito: as duas correm ao mesmo
+     tempo, e com tempos iguais há um instante em que as duas peças estão a meio
+     caminho e igualmente translúcidas — o quadro fica com peça e meia. Saindo
+     antes, a cena esvazia e só então enche. */
+  .grav-peca:not([data-ativo]) {
+    transition:
+      opacity 620ms var(--e-ui),
+      transform 780ms var(--e-ui),
+      filter 620ms var(--e-ui);
+  }
+
+  /* ---------- a divisão do balão ----------
+
+     As três animações abaixo só existem porque `data-ativo` entra e sai: uma
+     animação declarada sobre um seletor que passa a casar COMEÇA do zero
+     naquele instante. É o que faz a divisão se repetir a cada troca de peça sem
+     estado nenhum em JavaScript, sem `key` trocando e sem remontar o nó.
+
+     E é por isso que o estado-base do balão (fora deste bloco) é o de DEPOIS da
+     divisão: quando `data-ativo` sai, a animação sai junto e o balão fica na
+     forma final enquanto a peça se apaga, em vez de saltar de volta para a
+     célula fundida. O `both` segura o primeiro quadro durante o atraso. */
+  /* A pílula alonga primeiro: a célula estica antes de estrangular. */
+  .grav-peca[data-ativo] .grav-hud-fala {
+    animation: grav-alonga 620ms var(--e-ui) 340ms both;
+  }
+
+  /* O avatar sai de baixo da ponta da pílula e volta ao lugar dele. Começa
+     enquanto o alongamento ainda corre — divisão não tem etapa parada. */
+  .grav-peca[data-ativo] .grav-hud-ia {
+    animation: grav-brota 780ms var(--e-mola) 620ms both;
+  }
+
+  /* O bico só existe depois que os dois se soltam. Antes disso ele apontaria
+     para dentro da própria massa, e ainda apareceria como um dente fora dela —
+     ele nasce do vão, e o vão ainda não existe. */
+  .grav-peca[data-ativo] .grav-hud-bico {
+    animation: grav-le 260ms var(--e-ui) 1000ms both;
+  }
+
+  /* O texto entra depois da forma, e não com ela: durante o alongamento a
+     pílula ainda está recortada, e o texto apareceria cortado no meio da
+     palavra junto com a borda que o revela. */
+  .grav-peca[data-ativo] .grav-hud-rotulo {
+    animation: grav-le 420ms var(--e-ui) 820ms both;
+  }
+
+  .grav-peca[data-ativo] .grav-hud-leitura {
+    animation: grav-le 420ms var(--e-ui) 940ms both;
+  }
+
+  /* A marca acende com o avatar já solto: antes disso o círculo está por baixo
+     da pílula, e marca acesa ali dentro seria desenho boiando na massa. */
+  .grav-peca[data-ativo] .grav-hud-ia svg {
+    animation: grav-le 380ms var(--e-ui) 1080ms both;
+  }
+
+  /* E o anel de escuta por último, já pulsando. É o que diz que a leitura
+     acontece agora e não é etiqueta impressa. */
+  .grav-peca[data-ativo] .grav-hud-ia::after {
+    animation:
+      grav-le 300ms var(--e-ui) 1180ms both,
+      grav-pulsa 2.6s ease-in-out 1.5s infinite;
+  }
+}
+
+/* Deriva: meio por cento de translação e dois graus de giro, num circuito que
+   não fecha em nenhum ponto óbvio. É pouco de propósito — o que se quer é a
+   sensação de que a peça não está apoiada em nada, e qualquer coisa acima
+   disso vira animação de banner. */
+@keyframes grav-deriva {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  22% {
+    transform: translate3d(1.6%, -2.8%, 0) rotate(3.1deg);
+  }
+  45% {
+    transform: translate3d(-1%, 2%, 0) rotate(-2.4deg);
+  }
+  70% {
+    transform: translate3d(-2%, -1.6%, 0) rotate(1.4deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+/* O eco vagando: sai do lugar e muda de tamanho, sem nunca voltar exatamente
+   ao ponto de partida dentro da ida. Quem fecha o circuito é o `alternate`, que
+   percorre o mesmo caminho de volta — e como os três têm períodos diferentes, o
+   conjunto não repete composição num prazo que alguém vá notar. */
+@keyframes grav-flutua {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  38% {
+    transform: translate3d(7%, -6%, 0) scale(1.08);
+  }
+  71% {
+    transform: translate3d(-5%, 4%, 0) scale(0.93);
+  }
+  100% {
+    transform: translate3d(3%, 8%, 0) scale(1.05);
+  }
+}
+
+/* ---------- a meiose ----------
+
+   Alongamento: a pílula começa recortada a um toco do tamanho do núcleo, na
+   ponta ESQUERDA, que é exatamente onde o avatar está pousado. Os dois juntos,
+   opacos e do mesmo tom, são uma bolha redonda só. Daí o recorte abre para a
+   direita e a célula estica.
+
+   `inset()` com canto `round 999px` e não uma animação de largura: largura
+   reflui o texto quadro a quadro e ainda esmaga a pílula contra o resto da
+   linha. O recorte não move nada de lugar — ele revela o que já está no lugar
+   certo, com as pontas arredondadas de graça. */
+@keyframes grav-alonga {
+  from {
+    clip-path: inset(0 calc(100% - var(--nucleo)) 0 0 round 999px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 999px);
+  }
+}
+
+/* Brotamento: o avatar sai de baixo da ponta da pílula e volta ao lugar dele.
+
+   O deslocamento é `--desloc`, e ele não é um número escolhido: é a distância
+   exata entre a borda esquerda do avatar e a borda esquerda da pílula, contando
+   o vão e o quanto o bico entra por baixo dela. Com esse valor os dois começam
+   concêntricos — uma célula, não duas encostadas. Se o bico ou o vão mudarem de
+   medida, `--desloc` acompanha sozinho.
+
+   Enquanto o avatar desliza para fora, a área comum entre dois topos redondos
+   vai afinando: aquele estrangulamento é o pescoço da divisão, e ele é
+   geometria, não desenho.
+
+   A escala passa de 1 no meio do caminho e volta. É a lembrança de tensão
+   superficial: o que se desprende de uma massa incha antes de arredondar. */
+@keyframes grav-brota {
+  from {
+    transform: translateX(var(--desloc)) scale(0.94);
+  }
+  62% {
+    transform: translateX(-3%) scale(1.06);
+  }
+  to {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes grav-le {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* O ponto vivo. Só o halo respira; o miolo fica firme, senão o ponto pisca
+   inteiro e vira alerta em vez de sinal de leitura em curso. */
+@keyframes grav-pulsa {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--cyan) 16%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 0.52rem color-mix(in srgb, var(--cyan) 4%, transparent);
+  }
+}
+
+/* O giro do hexágono. Os dois ângulos vêm de variável para o arco ser escolhido
+   por eco e a animação ser uma só. */
+@keyframes grav-gira {
+  from {
+    transform: rotate(var(--giro-de, 0deg));
+  }
+  to {
+    transform: rotate(var(--giro-ate, 30deg));
+  }
+}
+
+/* ---------- tema claro ----------
+   Sobre papel o eco perde o pouco de presença que tem: azul translúcido sobre
+   escuro clareia e aparece, sobre branco escurece de menos. Um passo a mais de
+   tinta, e a sombra da peça com menos preto para não virar borrão sujo. */
+[data-tema="light"] .v5 .grav-hex {
+  background: color-mix(in srgb, var(--cyan) 30%, transparent);
+}
+
+[data-tema="light"] .v5 .grav-massa--b .grav-hex {
+  background: color-mix(in srgb, var(--blue) 26%, transparent);
+}
+
+[data-tema="light"] .v5 .grav-massa--c .grav-hex {
+  background: color-mix(in srgb, var(--cyan) 20%, transparent);
+}
+
+[data-tema="light"] .v5 .grav-peca img {
+  filter: drop-shadow(0 22px 36px rgba(11, 17, 22, 0.24));
+}
+
+/* No escuro a fala se destaca subindo um passo acima do fundo; no claro isso se
+   inverte — sobre papel, uma pastilha mais clara que a página desaparece. O
+   contraste passa a vir de baixo: superfície escura, texto claro. É a mesma
+   ideia de "a fala se separa da cena", com o sinal trocado.
+
+   E a sombra afina junto: 50% de preto embaixo de qualquer coisa sobre papel
+   não é relevo, é sujeira. */
+[data-tema="light"] .v5 .grav-hud-ia,
+[data-tema="light"] .v5 .grav-hud-bico,
+[data-tema="light"] .v5 .grav-hud-fala {
+  background: color-mix(in srgb, #0b1116 92%, var(--cyan));
+  box-shadow: 0 10px 26px rgba(11, 17, 22, 0.18);
+}
+
+[data-tema="light"] .v5 .grav-hud-ia {
+  color: var(--cyan);
+}
+
+[data-tema="light"] .v5 .grav-hud-rotulo {
+  color: var(--cyan);
+}
+
+[data-tema="light"] .v5 .grav-hud-leitura {
+  color: rgba(242, 248, 255, 0.76);
+}
+
+/* ---------- coluna estreita ----------
+   Abaixo de 900px o herói vira uma coluna só e o painel passa a ficar SOB o
+   texto, não ao lado dele. Ali ele disputa a dobra com a manchete e com os dois
+   botões, então encolhe: o papel dele no celular é confirmar do que a página
+   fala, não ser a página. */
+@media (max-width: 900px) {
+  .grav {
+    height: clamp(240px, 34svh, 380px);
+  }
+
+  /* O borrão acompanha a escala da caixa: 17px sobre um hexágono de 320px é
+     aresta amaciada, sobre um de 130px é o hexágono inteiro virando bolha. */
+  .grav-massa {
+    filter: blur(11px);
+  }
+
+  .grav-hud {
+    --nucleo: 2.25rem;
+  }
+
+  .grav-hud-fala {
+    padding: 0.35rem 0.85rem;
+  }
+
+  .grav-hud-rotulo {
+    font-size: 0.5625rem;
+  }
+
+  .grav-hud-leitura {
+    font-size: 0.625rem;
+  }
+}
+
+/* As duas linhas do balão não quebram — pílula com texto em duas linhas de
+   largura desigual deixa de ser pílula. Como não podem quebrar, na tela
+   estreita a segunda linha sai: o rótulo diz o que é a peça, que é o mínimo, e
+   a leitura é o detalhe que sobrevive sem. */
+@media (max-width: 620px) {
+  .grav-hud-leitura {
+    display: none;
+  }
+}
