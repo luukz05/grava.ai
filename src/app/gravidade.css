@@ -139,8 +139,8 @@
      da cena, que é o que faz sentido num quadro sem chão.
 
      Ter DOIS estados (entrar por baixo, sair por cima) exigiria saber a direção
-     da troca, e num ciclo de duas peças o estado inativo é o mesmo lugar de
-     onde a próxima entra: a peça que subiu ao sair teria que descer de volta,
+     da troca, e num ciclo fechado o estado inativo é o mesmo lugar de onde a
+     próxima entra: a peça que subiu ao sair teria que descer de volta,
      atravessando a cena à vista de todos, para poder entrar de novo. */
   transform: translate3d(0, 9%, 0) scale(0.88);
   filter: blur(7px);

@@ -28,8 +28,8 @@
    menu. Aqui a peça só precisa dizer "isto é o que sai da máquina".
 
    ACESSIBILIDADE. O conjunto é uma imagem só para quem lê por leitor de tela:
-   o rótulo está no contêiner, as peças vão com `alt` vazio. Descrever duas
-   fotos que se alternam sozinhas viraria duas leituras para a mesma ideia.
+   o rótulo está no contêiner, as peças vão com `alt` vazio. Descrever uma a uma
+   fotos que se alternam sozinhas viraria cinco leituras para a mesma ideia.
 
    O `role="img"` no contêiner também torna o conteúdo dele presentacional, e
    isso vale para o texto do balão de leitura: ele não é anunciado, e é assim
@@ -52,16 +52,16 @@ type Peca = {
      Os valores contam com o giro: peça girada ocupa uma caixa maior que ela
      mesma (`h·cos + l·sen`), então quem gira mais entra menor. */
   escala: number;
-  /* Giro de base, somado à deriva. As duas fotos vieram do mesmo ensaio e com a
-     mesma diagonal — as duas caindo para a esquerda —, e alternar duas peças
-     inclinadas do mesmo jeito lê como uma peça só que troca de forma. Aqui o
-     copo vai para a direita e a faca fica quase de pé: a troca passa a ser uma
+  /* Giro de base, somado à deriva. As fotos vieram todas do mesmo ensaio e com a
+     mesma diagonal — todas caindo para o mesmo lado —, e peças inclinadas do
+     mesmo jeito em sequência leem como uma peça só que troca de forma. Aqui o
+     giro alterna de sinal entre vizinhas da fila: a troca passa a ser uma
      mudança de eixo, e não só de silhueta.
 
-     ESPELHAR seria o caminho curto, e não serve: as duas peças têm a marca
-     gravada — o hexágono com o G no copo, "GRAVA.AI" na lâmina —, e horizontal
-     invertida a marca vira marca errada. Chegamos no mesmo lugar pelo giro, que
-     não mexe na leitura de nada. */
+     ESPELHAR seria o caminho curto, e não serve: todas as peças têm a marca
+     gravada — o hexágono com o G no copo, na garrafa e na sacola, "GRAVA.AI" na
+     lâmina e na caneta —, e horizontal invertida a marca vira marca errada.
+     Chegamos no mesmo lugar pelo giro, que não mexe na leitura de nada. */
   giro: number;
   /* O que a IA diz sobre a peça. Duas linhas, dois papéis: `rotulo` identifica
      — é a peça que a máquina reconheceu —, `leitura` é o que ela extraiu daí.
@@ -76,6 +76,10 @@ type Peca = {
   leitura: string;
 };
 
+/* A ordem NÃO é a de chegada das fotos: ela alterna silhueta — bojuda, fina,
+   larga, fina, bojuda. Duas peças finas seguidas trocam uma linha inclinada por
+   outra linha inclinada, e a troca some; o que se lê como troca é a mudança de
+   massa no quadro. */
 const PECAS: Peca[] = [
   {
     src: "/produtos/copo.png",
@@ -94,6 +98,39 @@ const PECAS: Peca[] = [
     giro: -30,
     rotulo: "Faca de chef · 20 cm",
     leitura: "Aço inox · texto gravado em 26 s",
+  },
+  {
+    src: "/produtos/sacola.png",
+    largura: 622,
+    altura: 900,
+    /* A mais baixa da fila, e por ser larga: na altura das outras a sacola
+       ocupa quase o dobro de área, e o quadro passa a ser sobre ela. */
+    escala: 66,
+    giro: -12,
+    rotulo: "Ecobag · lona de algodão",
+    leitura: "Tecido natural · marca gravada em 30 s",
+  },
+  {
+    src: "/produtos/caneta.png",
+    largura: 446,
+    altura: 900,
+    escala: 76,
+    /* Contrário à diagonal da foto, e quase todo: a caneta chega inclinada como
+       a faca chega, e duas linhas finas no mesmo ângulo em cena viram a mesma
+       peça. Aqui ela levanta e fica com só um resto de inclinação — é a peça
+       mais vertical da fila, que é o contraste que faltava. */
+    giro: 20,
+    rotulo: "Caneta · corpo em inox",
+    leitura: "Inox escovado · texto gravado em 12 s",
+  },
+  {
+    src: "/produtos/garrafa.png",
+    largura: 528,
+    altura: 900,
+    escala: 72,
+    giro: -18,
+    rotulo: "Garrafa térmica · 750 ml",
+    leitura: "Inox escovado · hexágono gravado em 42 s",
   },
 ];
 
@@ -144,7 +181,7 @@ export function Gravidade() {
     <div
       className="grav"
       role="img"
-      aria-label="Peças gravadas pela rede: copo térmico em inox e faca de chef, ambas com a marca gravada a laser."
+      aria-label="Peças gravadas pela rede: copo térmico, faca de chef, ecobag de lona, caneta e garrafa térmica, todas com a marca gravada a laser."
     >
       {/* Os ecos de silhueta. Três e não dois: com dois o olho lê um par que se
           cruza, e o cruzamento tem período visível.
