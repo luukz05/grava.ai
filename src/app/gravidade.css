@@ -178,26 +178,40 @@
 /* ---------- a fala da IA ----------
 
    Avatar, bico e pílula numa linha, na ordem de quem fala para o que é dito.
-   As medidas aqui não são decorativas: o `--vao` e o `--nucleo` entram nas
-   contas da divisão mais abaixo, e mexer neles sem mexer lá desalinha a fusão
-   inicial.
 
-   `--nucleo` é o diâmetro do avatar E a largura do toco a que a pílula se reduz
-   no primeiro quadro. Os dois precisam ser o mesmo número: é o que faz a célula
-   começar redonda em vez de começar como uma pílula curta. */
+   ONDE ELA APARECE VEM DA PEÇA, não daqui. Antes era sempre o mesmo canto
+   inferior esquerdo, e cinco peças diferentes com o balão parado no mesmo pixel
+   entregam o truque: o olho para de ler "a máquina reconheceu ESTA peça" e passa
+   a ler "tem uma legenda fixa no canto". Cada peça manda o seu ponto em
+   `--hud-x`/`--hud-y` e o lado em `data-lado`, e a escolha não é sorteio — é
+   onde aquela silhueta deixa espaço livre.
+
+   `--hud-x` é distância da borda do lado ANCORADO, não sempre da esquerda: é o
+   avatar que se prende à borda, e a pílula cresce dali para dentro do quadro.
+   Ancorar sempre à esquerda e empurrar com `left: 70%` jogaria o texto para
+   fora em tela estreita. */
 .grav-hud {
   --vao: 0.55rem;
   --nucleo: 2.75rem;
-  /* Distância da borda esquerda do avatar até a borda esquerda da pílula: o vão
-     mais o pedaço do bico que sobra de fora dela. É o deslocamento da fusão, e
-     mora aqui para acompanhar sozinho qualquer mudança nas duas medidas acima. */
-  --desloc: calc(var(--nucleo) + var(--vao) + 0.28rem);
   position: absolute;
-  left: 1%;
-  bottom: 5%;
+  left: var(--hud-x, 1%);
+  bottom: var(--hud-y, 5%);
   display: flex;
   align-items: center;
-  max-width: 98%;
+  max-width: 96%;
+}
+
+/* Ancorada à direita, a fila inteira inverte: a pílula passa a crescer para a
+   ESQUERDA, para dentro do quadro. Sem isso, um balão preso à direita empurraria
+   o texto para fora da cena. */
+.grav-hud[data-lado="dir"] {
+  left: auto;
+  right: var(--hud-x, 1%);
+  flex-direction: row-reverse;
+  /* E a abertura da pílula inverte junto: a borda presa passa a ser a direita,
+     que é a que encosta no avatar deste lado. */
+  --corte-esq: 100%;
+  --corte-dir: 0;
 }
 
 /* Preenchimento OPACO, e essa é a condição de todo o efeito: enquanto as duas
@@ -264,6 +278,14 @@
   margin-right: -0.42rem;
   border-radius: 0.125rem;
   transform: rotate(45deg);
+}
+
+/* `row-reverse` troca a ordem visual mas não troca o significado de "left" e
+   "right" — as margens continuam físicas. Espelhadas na mão: o vão fica do lado
+   do avatar, a metade que some fica do lado da pílula. */
+.grav-hud[data-lado="dir"] .grav-hud-bico {
+  margin-left: -0.42rem;
+  margin-right: var(--vao);
 }
 
 .grav-hud-fala {
@@ -360,58 +382,65 @@
       filter 620ms var(--e-ui);
   }
 
-  /* ---------- a divisão do balão ----------
+  /* ---------- a fala se montando ----------
 
-     As três animações abaixo só existem porque `data-ativo` entra e sai: uma
-     animação declarada sobre um seletor que passa a casar COMEÇA do zero
-     naquele instante. É o que faz a divisão se repetir a cada troca de peça sem
-     estado nenhum em JavaScript, sem `key` trocando e sem remontar o nó.
+     As animações abaixo só existem porque `data-ativo` entra e sai: uma animação
+     declarada sobre um seletor que passa a casar COMEÇA do zero naquele
+     instante. É o que faz a sequência se repetir a cada troca de peça sem estado
+     nenhum em JavaScript, sem `key` trocando e sem remontar o nó.
 
      E é por isso que o estado-base do balão (fora deste bloco) é o de DEPOIS da
-     divisão: quando `data-ativo` sai, a animação sai junto e o balão fica na
-     forma final enquanto a peça se apaga, em vez de saltar de volta para a
-     célula fundida. O `both` segura o primeiro quadro durante o atraso. */
-  /* A pílula alonga primeiro: a célula estica antes de estrangular. */
-  .grav-peca[data-ativo] .grav-hud-fala {
-    animation: grav-alonga 620ms var(--e-ui) 340ms both;
-  }
+     montagem: quando `data-ativo` sai, a animação sai junto e o balão fica
+     inteiro enquanto a peça se apaga, em vez de saltar de volta para o primeiro
+     quadro. O `both` segura esse primeiro quadro durante o atraso.
 
-  /* O avatar sai de baixo da ponta da pílula e volta ao lugar dele. Começa
-     enquanto o alongamento ainda corre — divisão não tem etapa parada. */
+     A ORDEM É QUEM FALA, DEPOIS O QUE FOI DITO. O avatar surge sozinho e só
+     então a pílula se abre a partir dele — a mesma ordem de uma conversa, e a
+     mesma de um assistente que acorda antes de responder. É também o que o balão
+     precisa dizer: alguém está olhando para esta peça AGORA. Ver a legenda
+     pronta e a marca chegar depois contaria o contrário — que o texto já estava
+     lá e a máquina veio carimbar. */
+  /* Primeiro o avatar, e sozinho no quadro. */
   .grav-peca[data-ativo] .grav-hud-ia {
-    animation: grav-brota 780ms var(--e-mola) 620ms both;
+    animation: grav-surge 520ms var(--e-mola) 120ms both;
   }
 
-  /* O bico só existe depois que os dois se soltam. Antes disso ele apontaria
-     para dentro da própria massa, e ainda apareceria como um dente fora dela —
-     ele nasce do vão, e o vão ainda não existe. */
+  /* A marca acende com o círculo ainda assentando: o avatar chega vazio e ganha
+     dono no quadro seguinte. */
+  .grav-peca[data-ativo] .grav-hud-ia svg {
+    animation: grav-le 300ms var(--e-ui) 420ms both;
+  }
+
+  /* E então a pílula se abre A PARTIR do avatar. Ela começa fechada rente à
+     borda que encosta nele: o que se vê é a fala saindo de quem fala, não uma
+     caixa aparecendo do lado. */
+  .grav-peca[data-ativo] .grav-hud-fala {
+    animation: grav-abre 560ms var(--e-ui) 480ms both;
+  }
+
+  /* O bico entra com a pílula já aberta o bastante para recebê-lo. Antes disso
+     ele seria um dente solto no vão. */
   .grav-peca[data-ativo] .grav-hud-bico {
-    animation: grav-le 260ms var(--e-ui) 1000ms both;
+    animation: grav-le 240ms var(--e-ui) 760ms both;
   }
 
-  /* O texto entra depois da forma, e não com ela: durante o alongamento a
-     pílula ainda está recortada, e o texto apareceria cortado no meio da
-     palavra junto com a borda que o revela. */
+  /* O texto entra depois da forma, e não com ela: durante a abertura a pílula
+     ainda está recortada, e o texto apareceria cortado no meio da palavra junto
+     com a borda que o revela. */
   .grav-peca[data-ativo] .grav-hud-rotulo {
-    animation: grav-le 420ms var(--e-ui) 820ms both;
+    animation: grav-le 380ms var(--e-ui) 700ms both;
   }
 
   .grav-peca[data-ativo] .grav-hud-leitura {
-    animation: grav-le 420ms var(--e-ui) 940ms both;
-  }
-
-  /* A marca acende com o avatar já solto: antes disso o círculo está por baixo
-     da pílula, e marca acesa ali dentro seria desenho boiando na massa. */
-  .grav-peca[data-ativo] .grav-hud-ia svg {
-    animation: grav-le 380ms var(--e-ui) 1080ms both;
+    animation: grav-le 380ms var(--e-ui) 820ms both;
   }
 
   /* E o anel de escuta por último, já pulsando. É o que diz que a leitura
      acontece agora e não é etiqueta impressa. */
   .grav-peca[data-ativo] .grav-hud-ia::after {
     animation:
-      grav-le 300ms var(--e-ui) 1180ms both,
-      grav-pulsa 2.6s ease-in-out 1.5s infinite;
+      grav-le 300ms var(--e-ui) 900ms both,
+      grav-pulsa 2.6s ease-in-out 1.2s infinite;
   }
 }
 
@@ -456,49 +485,49 @@
   }
 }
 
-/* ---------- a meiose ----------
+/* ---------- a fala se montando ----------
 
-   Alongamento: a pílula começa recortada a um toco do tamanho do núcleo, na
-   ponta ESQUERDA, que é exatamente onde o avatar está pousado. Os dois juntos,
-   opacos e do mesmo tom, são uma bolha redonda só. Daí o recorte abre para a
-   direita e a célula estica.
+   O avatar chegando: de um ponto ao círculo cheio, passando um pouco do tamanho
+   antes de assentar. O excesso é o que separa "apareceu" de "acendeu" — com a
+   mola do sistema (`--e-mola`) ele chega com peso, como coisa que entra em cena,
+   e não como opacidade subindo.
+
+   Ele NÃO desliza de lugar nenhum. Balão que entra deslizando pede uma origem, e
+   a origem aqui seria a peça, que está bem atrás dele: o gesto acabaria dizendo
+   que a leitura veio de fora do quadro. */
+@keyframes grav-surge {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(1.09);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* A pílula se abrindo A PARTIR do avatar: o recorte começa fechado rente à borda
+   que encosta nele e corre até liberar a pílula inteira. Qual das duas bordas
+   fica presa vem de `--corte-esq`/`--corte-dir`, que o lado do balão define —
+   ancorada à direita, a fala tem que se abrir para a esquerda, senão ela nasce
+   longe de quem está falando.
 
    `inset()` com canto `round 999px` e não uma animação de largura: largura
    reflui o texto quadro a quadro e ainda esmaga a pílula contra o resto da
    linha. O recorte não move nada de lugar — ele revela o que já está no lugar
    certo, com as pontas arredondadas de graça. */
-@keyframes grav-alonga {
+@keyframes grav-abre {
   from {
-    clip-path: inset(0 calc(100% - var(--nucleo)) 0 0 round 999px);
+    clip-path: inset(
+      0 var(--corte-dir, 100%) 0 var(--corte-esq, 0) round 999px
+    );
   }
   to {
     clip-path: inset(0 0 0 0 round 999px);
-  }
-}
-
-/* Brotamento: o avatar sai de baixo da ponta da pílula e volta ao lugar dele.
-
-   O deslocamento é `--desloc`, e ele não é um número escolhido: é a distância
-   exata entre a borda esquerda do avatar e a borda esquerda da pílula, contando
-   o vão e o quanto o bico entra por baixo dela. Com esse valor os dois começam
-   concêntricos — uma célula, não duas encostadas. Se o bico ou o vão mudarem de
-   medida, `--desloc` acompanha sozinho.
-
-   Enquanto o avatar desliza para fora, a área comum entre dois topos redondos
-   vai afinando: aquele estrangulamento é o pescoço da divisão, e ele é
-   geometria, não desenho.
-
-   A escala passa de 1 no meio do caminho e volta. É a lembrança de tensão
-   superficial: o que se desprende de uma massa incha antes de arredondar. */
-@keyframes grav-brota {
-  from {
-    transform: translateX(var(--desloc)) scale(0.94);
-  }
-  62% {
-    transform: translateX(-3%) scale(1.06);
-  }
-  to {
-    transform: translateX(0) scale(1);
   }
 }
 
@@ -598,6 +627,11 @@
 
   .grav-hud {
     --nucleo: 2.25rem;
+    /* A altura variável some na coluna estreita, e o lado fica. O palco aqui tem
+       menos da metade da altura do de mesa: os mesmos 60% que na tela larga
+       põem o balão num vão livre, aqui o põem em cima da peça. O que sobra de
+       variedade — esquerda e direita — é o que ainda cabe. */
+    bottom: 4%;
   }
 
   .grav-hud-fala {

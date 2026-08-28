@@ -38,13 +38,35 @@
    térmico 500 ml, inox escovado, 38 s" a cada 4,6s seria ruído, não conteúdo. */
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { Marca } from "./icons";
 
+/* As fotos são IMPORTADAS, e não caminhos para `public/`. A diferença é a URL
+   que sai no HTML: importada, o arquivo vai para `_next/static/media` com o
+   HASH DO CONTEÚDO no nome, e trocar a foto troca a URL.
+
+   Isso não é preferência de organização — é o conserto de um bug. Servido de
+   `public/`, o endereço é `/produtos/sacola.png` para sempre, e o otimizador
+   guarda o resultado sob `url + largura + qualidade`. Trocamos a foto da sacola
+   e o desktop continuou mostrando a antiga por horas enquanto o celular já via a
+   nova: são larguras diferentes pedidas pelo `sizes`, então uma tinha entrada no
+   cache e a outra não. Com o hash, a entrada velha simplesmente não é mais
+   pedida por ninguém.
+
+   O preço é sair de `public/`: o mesmo arquivo lá seria servido nos DOIS
+   endereços e iria no pacote duas vezes. */
+import copo from "./produtos/copo.png";
+import faca from "./produtos/faca.png";
+import sacola from "./produtos/sacola.png";
+import caneta from "./produtos/caneta.png";
+import garrafa from "./produtos/garrafa.png";
+
 type Peca = {
-  src: string;
-  largura: number;
-  altura: number;
+  /* A imagem importada, não o caminho: ela carrega as medidas junto, e o
+     `<Image>` tira `width` e `height` dela. Antes esses dois números eram
+     copiados na mão aqui embaixo, e recortar a foto de novo com outra largura
+     deixava a proporção mentindo até alguém reparar. */
+  src: StaticImageData;
   /* Altura da peça dentro do palco, em porcentagem. A faca é mais comprida que
      o copo e, na mesma altura, dominaria o quadro — o que iguala as duas aos
      olhos é a área ocupada, não a medida.
@@ -74,6 +96,25 @@ type Peca = {
      conservadores; confirmar com o cliente antes de publicar. */
   rotulo: string;
   leitura: string;
+  /* Onde a fala da IA pousa em cima do palco, e para que lado ela se abre.
+
+     Existe porque o balão parado no mesmo canto nas cinco peças lê como legenda
+     fixa do quadro — o olho aprende o lugar dela em duas trocas e para de
+     associar o texto à peça. Movendo, cada aparição volta a ser um evento sobre
+     AQUELA peça.
+
+     Não é aleatório e não pode ser: o lugar é escolhido peça a peça, no vão que
+     aquela silhueta deixa. Sorteio a cada troca acabaria pondo a fala em cima da
+     lâmina ou fora do quadro, e ainda tiraria a única coisa que o movimento
+     precisa ter — ser sempre igual para a mesma peça. */
+  hud: {
+    /* De que borda o avatar se prende. Ancorado à direita, a pílula cresce para
+       a esquerda; é o que mantém o texto dentro da cena dos dois lados. */
+    lado: "esq" | "dir";
+    /* Distância da borda ancorada e do rodapé do palco, em porcentagem. */
+    x: number;
+    y: number;
+  };
 };
 
 /* A ordem NÃO é a de chegada das fotos: ela alterna silhueta — bojuda, fina,
@@ -82,38 +123,40 @@ type Peca = {
    massa no quadro. */
 const PECAS: Peca[] = [
   {
-    src: "/produtos/copo.png",
-    largura: 523,
-    altura: 900,
+    src: copo,
     escala: 72,
     giro: 24,
     rotulo: "Copo térmico · 500 ml",
     leitura: "Inox escovado · hexágono gravado em 38 s",
+    /* Alto e à direita: o copo é largo no meio e estreito no topo, então em cima
+       sobra quadro do lado para onde ele NÃO cai. */
+    hud: { lado: "esq", x: 0, y: 5 },
   },
   {
-    src: "/produtos/faca.png",
-    largura: 425,
-    altura: 900,
+    src: faca,
     escala: 78,
     giro: -30,
     rotulo: "Faca de chef · 20 cm",
     leitura: "Aço inox · texto gravado em 26 s",
+    /* A faca atravessa o quadro na diagonal e encosta a ponta embaixo à direita.
+       O canto que sobra é o de baixo à esquerda, e bem embaixo. */
+    hud: { lado: "dir", x: 1, y: 7 },
   },
   {
-    src: "/produtos/sacola.png",
-    largura: 622,
-    altura: 900,
+    src: sacola,
     /* A mais baixa da fila, e por ser larga: na altura das outras a sacola
        ocupa quase o dobro de área, e o quadro passa a ser sobre ela. */
     escala: 66,
     giro: -12,
     rotulo: "Ecobag · lona de algodão",
     leitura: "Tecido natural · marca gravada em 30 s",
+    /* A sacola é a peça mais larga e ocupa o meio do quadro inteiro. Nenhuma
+       altura à esquerda fica limpa; o que sobra é o rodapé à direita, passada a
+       barra da lona. */
+    hud: { lado: "esq", x: 1, y: 4 },
   },
   {
-    src: "/produtos/caneta.png",
-    largura: 446,
-    altura: 900,
+    src: caneta,
     escala: 76,
     /* Contrário à diagonal da foto, e quase todo: a caneta chega inclinada como
        a faca chega, e duas linhas finas no mesmo ângulo em cena viram a mesma
@@ -122,15 +165,20 @@ const PECAS: Peca[] = [
     giro: 20,
     rotulo: "Caneta · corpo em inox",
     leitura: "Inox escovado · texto gravado em 12 s",
+    /* A caneta é a peça mais estreita e fica quase em pé no meio: sobra quadro
+       dos dois lados, e é a única em que o alto à esquerda fica limpo. */
+    hud: { lado: "dir", x: 1, y: 66 },
   },
   {
-    src: "/produtos/garrafa.png",
-    largura: 528,
-    altura: 900,
+    src: garrafa,
     escala: 72,
     giro: -18,
     rotulo: "Garrafa térmica · 750 ml",
     leitura: "Inox escovado · hexágono gravado em 42 s",
+    /* A garrafa termina alto — o fundo dela não chega ao rodapé —, e é isso que
+       libera a faixa de baixo inteira. À esquerda, que é para onde ela se
+       inclina e portanto onde a base está mais recuada. */
+    hud: { lado: "esq", x: 0, y: 86 },
   },
 ];
 
@@ -207,7 +255,7 @@ export function Gravidade() {
       <div className="grav-palco" ref={palco}>
         {PECAS.map((peca, i) => (
           <div
-            key={peca.src}
+            key={peca.src.src}
             className="grav-peca"
             data-ativo={i === atual ? "" : undefined}
             style={
@@ -224,42 +272,68 @@ export function Gravidade() {
               <Image
                 src={peca.src}
                 alt=""
-                width={peca.largura}
-                height={peca.altura}
-                /* A primeira peça é o que se vê no primeiro quadro acima da
-                   dobra; a segunda pode esperar a rede. */
-                priority={i === 0}
+                /* TODAS carregam de saída, e nenhuma é `lazy`. Duas razões:
+
+                   1. o adiamento nem chega a acontecer aqui. As peças inativas
+                      estão em `opacity: 0` desde o primeiro quadro, e o Chrome
+                      não dispara o carregamento adiado de imagem dentro de
+                      subárvore transparente — nem estando em pleno viewport.
+                      Resultado: a peça só ia buscar a foto no instante em que
+                      entrava em cena, e entrava BRANCA;
+                   2. mesmo que disparasse, adiar não pagaria. As cinco aparecem
+                      dentro de 23 s sem que ninguém precise rolar nada — é um
+                      ciclo, não um catálogo. Adiar aqui é trocar tráfego que
+                      viria de qualquer jeito por buraco no meio da vitrine.
+
+                   O que separa a primeira das outras é a PRIORIDADE, não o
+                   momento: ela é a candidata a LCP e vai na frente, as outras
+                   entram na fila atrás de todo o resto da página.
+
+                   Sem `priority`: no Next 16 ele saiu em favor de `preload`, e
+                   a própria doc diz para preferir `loading`/`fetchPriority` a
+                   `preload` — que é o que está aqui. */
+                loading="eager"
+                fetchPriority={i === 0 ? "high" : "low"}
                 sizes="(max-width: 900px) 60vw, 30vw"
               />
             </span>
 
-            {/* A fala da IA sobre a peça, e a divisão que a traz.
+            {/* A fala da IA sobre a peça, e a ordem em que ela se monta.
 
                 É a forma de conversa e não de etiqueta: o avatar redondo com a
-                marca à esquerda, o bico, e a pílula com o que ela reconheceu.
-                Quem monta a leitura como legenda flutuante está dizendo "eis os
-                dados"; montada como fala, ela diz quem está falando — e o
-                assunto desta página é justamente que existe alguém operando.
+                marca, o bico, e a pílula com o que ela reconheceu. Quem monta a
+                leitura como legenda flutuante está dizendo "eis os dados";
+                montada como fala, ela diz quem está falando — e o assunto desta
+                página é justamente que existe alguém operando.
 
-                A MEIOSE SEM METABALL. O caminho conhecido para duas formas se
-                fundirem e se destacarem é o filtro `goo` — borrar o grupo e
-                puxar o alfa no contraste. Ele foi descartado por dois motivos, e
-                o segundo é o que decide: o filtro pega o texto junto e o entrega
-                borrado, o que obrigaria a duplicar a geometria em duas camadas
-                (formas filtradas embaixo, texto nítido em cima) e a mantê-las
-                alinhadas na mão para sempre.
+                A ORDEM DOS TRÊS é o que carrega esse sentido, e ela está no CSS
+                junto das animações: primeiro o avatar, depois a pílula abrindo a
+                partir dele, e só então o bico e o texto. Chegar tudo junto seria
+                uma placa aparecendo; chegar ao contrário — texto primeiro, marca
+                depois — diria que a legenda já estava pronta e a máquina veio
+                assinar embaixo.
 
-                O que está aqui não precisa de filtro nenhum: as duas formas têm
-                as pontas totalmente arredondadas e o preenchimento OPACO, então
-                enquanto se sobrepõem elas são uma massa só — e o pescoço que
-                estrangula no meio da separação é a própria interseção de duas
-                formas redondas se afastando. A geometria já faz o gesto; o
-                filtro só cobraria por ele.
+                O PREENCHIMENTO É OPACO nos três, e isso não é escolha de estilo.
+                O bico entra meia diagonal por baixo da pílula: com superfície
+                translúcida, a área comum dobra o alfa e desenha a costura entre
+                as duas peças exatamente onde elas deviam ler como uma só. Opaco,
+                a junção some sem precisar de filtro nenhum — nada de `goo`, que
+                ainda borraria o texto junto e obrigaria a duplicar a geometria em
+                duas camadas para manter a leitura nítida.
 
                 O balão fica fora do wrapper da deriva de propósito: ele é
                 leitura da máquina sobre a peça, não parte da peça. Objeto
                 flutua; medição não. */}
-            <div className="grav-hud">
+            <div
+              className="grav-hud"
+              data-lado={peca.hud.lado}
+              style={
+                {
+                  "--hud-x": `${peca.hud.x}%`,
+                  "--hud-y": `${peca.hud.y}%`,
+                } as React.CSSProperties
+              }
+            >
               <div className="grav-hud-ia">
                 <Marca />
               </div>

@@ -1,11 +1,14 @@
-/* O mapa de unidades. Sem JavaScript: o que abre a etiqueta é `:hover` e
-   `:focus-visible` no próprio marcador. */
+/* O mapa de unidades: o estado à esquerda, a unidade em foco à direita. O que
+   troca o foco está em `mapa-unidades.tsx`, e o porquê também. */
 
 .mapa {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
-  gap: clamp(20px, 3vw, 48px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.95fr);
+  gap: clamp(20px, 3vw, 44px);
+  /* Centralizado, e não `start`: os dois lados agora têm alturas parecidas — o
+     mapa de um lado, o cartão do outro — e alinhar pelo topo deixaria o mais
+     curto pendurado. */
+  align-items: center;
 }
 
 @media (max-width: 900px) {
@@ -39,7 +42,7 @@
 /* ============ OS MARCADORES ============ */
 
 .mapa-ponto {
-  cursor: default;
+  cursor: pointer;
   outline: none;
 }
 
@@ -104,39 +107,68 @@
   transition: opacity 180ms ease-out;
 }
 
-.mapa-ponto:hover .mapa-etiqueta,
-.mapa-ponto:focus-visible .mapa-etiqueta {
+/* A etiqueta abre no ponto em foco e em quem o cursor tocar. As duas coisas
+   valem: o ciclo mostra uma cidade por vez, e quem quiser conferir outra sem
+   esperar a vez dela só precisa passar por cima. */
+.mapa-ponto[data-ativo] .mapa-etiqueta,
+.mapa-ponto:focus-visible .mapa-etiqueta,
+.mapa-ponto:hover .mapa-etiqueta {
   opacity: 1;
 }
 
-.mapa-ponto:hover .mapa-halo,
-.mapa-ponto:focus-visible .mapa-halo {
+.mapa-ponto[data-ativo] .mapa-halo,
+.mapa-ponto:focus-visible .mapa-halo,
+.mapa-ponto:hover .mapa-halo {
   transform: scale(1.35);
   opacity: 0.8;
   animation: none;
 }
 
+/* O ponto em foco cresce e ganha um anel próprio. É o que amarra o mapa ao
+   painel do lado: sem essa marca, o painel trocaria de cidade sozinho e nada no
+   mapa diria de onde aquilo veio. */
+.mapa-ponto[data-ativo] .mapa-pino {
+  r: 7;
+}
+
+.mapa-ponto[data-fixada] .mapa-pino {
+  stroke: var(--fg);
+  stroke-width: 2.5;
+}
+
 /* O contorno no texto é o que garante leitura quando a etiqueta cai sobre o
    traço do estado ou sobre outro ponto. `paint-order` desenha o contorno ANTES
    do preenchimento — sem isso, ele comeria metade da espessura da letra. */
+/* Os tamanhos aqui são unidades do `viewBox`, e não pixels: o SVG tem 1000 de
+   largura e é desenhado em torno de 800 numa tela de mesa, então o número
+   encolhe uns 20% no caminho — e encolhe mais em coluna estreita, porque o mapa
+   acompanha a largura disponível. É por isso que o valor certo aqui não sai de
+   cabeça: 26 pareciam 26 e chegavam na tela com 21, maiores que a legenda logo
+   abaixo do mapa.
+
+   Referência medida: 19 daqui dão ~15px em tela larga. É o que se quer de uma
+   etiqueta de mapa — legível de relance e visivelmente menor que o painel, que é
+   onde o assunto está. */
 .mapa-cidade,
 .mapa-prazo {
   paint-order: stroke fill;
   stroke: var(--bg);
-  stroke-width: 5;
+  /* O contorno acompanha o corpo: 5 sob uma letra de 19 engrossaria o traço a
+     ponto de fechar os contra-formas do "a" e do "e". */
+  stroke-width: 3.6;
   stroke-linejoin: round;
   font-family: inherit;
 }
 
 .mapa-cidade {
   fill: var(--fg);
-  font-size: 26px;
+  font-size: 19px;
   font-weight: 600;
 }
 
 .mapa-prazo {
   fill: var(--fg-hot);
-  font-size: 21px;
+  font-size: 15px;
 }
 
 .mapa-ponto--prevista .mapa-prazo {
@@ -150,24 +182,190 @@
   stroke-width: 3;
 }
 
-.mapa-dica {
-  margin: 10px 0 0;
-  font-size: 13px;
-  opacity: 0.5;
-  text-align: center;
+.mapa-rodape {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
 }
 
-@media (hover: none) {
-  .mapa-dica {
-    display: none;
+.mapa-dica {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.55;
+}
+
+/* A dica FICA no toque, ao contrário da versão anterior. Antes ela dizia "passe
+   o cursor", que não existe no celular; agora ela diz o que fazer para escolher
+   uma unidade, e é ali que a instrução mais falta — um ponto de mapa não parece
+   um botão em tela nenhuma, e no toque nem hover existe para sugerir. */
+
+/* ============ O PAINEL DA UNIDADE ============ */
+
+.uni {
+  margin: 0;
+  border: 1px solid var(--hair);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--bg-2);
+}
+
+/* A foto tem proporção fixa, e é isso que sustenta o ciclo: unidade com foto
+   alta e unidade com foto larga fariam o painel crescer e encolher a cada 5s, e
+   a página inteira abaixo dele pularia junto. */
+.uni-foto {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: color-mix(in srgb, var(--bg) 82%, var(--cyan) 18%);
+}
+
+.uni-img {
+  object-fit: cover;
+}
+
+/* O modelo do quiosque é peça recortada, não cena: entra inteiro e com folga.
+   Cortado em `cover` viraria um pedaço de vitrine sem pé nem cabeça. */
+.uni-img--inteira {
+  object-fit: contain;
+  /* Folga desigual: mais embaixo, porque ali passa a faixa da contagem. Sem
+     isso o quiosque encosta no relógio. */
+  padding: 5% 5% 13%;
+}
+
+/* O quadro da unidade prevista não tem foto de lugar nenhum — tem o modelo do
+   quiosque no vazio. Um halo atrás dele é o que separa "render do modelo" de
+   "a foto não carregou": a peça passa a estar POSTA em algum lugar, mesmo que o
+   lugar seja abstrato. */
+.uni[data-estado="prevista"] .uni-foto {
+  background:
+    radial-gradient(
+      58% 62% at 50% 46%,
+      color-mix(in srgb, var(--cyan) 20%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
+/* O selo mora sobre a foto nas duas situações — na unidade aberta sobre a foto
+   de verdade, na prevista sobre o halo. Véu escuro e tinta clara nos dois temas,
+   pela mesma razão da faixa: o que está atrás dele não obedece ao tema. */
+.uni-selo {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(5, 9, 13, 0.66);
+  backdrop-filter: blur(6px);
+  font-family: var(--f-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9fe0ff;
+}
+
+.uni[data-estado="prevista"] .uni-selo {
+  color: rgba(242, 248, 255, 0.78);
+}
+
+/* A faixa da contagem, rente ao pé da foto. Ela é o único lugar da página onde a
+   pressa é literal, e por isso fica sobre a imagem e não abaixo dela: contagem
+   embaixo, junto do resto do texto, lê como mais uma linha de ficha. */
+.uni-faixa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 9px 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  /* Superfície do cartão, e não véu sobre foto: a faixa só existe na unidade
+     PREVISTA, e ali embaixo dela está o halo, que já é do tema. Véu escuro num
+     cartão de tema claro seria uma tarja preta atravessada num cartão branco. */
+  background: color-mix(in srgb, var(--bg-2) 82%, transparent);
+  border-top: 1px solid var(--hair);
+  backdrop-filter: blur(4px);
+}
+
+.uni-faixa-rotulo {
+  font-family: var(--f-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+/* Números em tabular, e é obrigatório: os segundos trocam a cada segundo, e com
+   largura variável a faixa inteira se mexeria para os lados sessenta vezes por
+   minuto. */
+.uni-relogio {
+  font-family: var(--f-mono), monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-2);
+}
+
+.uni-relogio b {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.uni-info {
+  padding: 16px 18px 18px;
+}
+
+.uni-cidade {
+  margin: 0;
+  font-size: clamp(1.15rem, 1.9vw, 1.4rem);
+  line-height: 1.15;
+}
+
+.uni-situacao {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--fg-hot);
+}
+
+.uni[data-estado="prevista"] .uni-situacao {
+  color: var(--fg-2);
+}
+
+.uni-ponto,
+.uni-nota {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+/* A entrada do painel a cada troca. Curta e sem deslocamento lateral: é a mesma
+   caixa mudando de conteúdo, não um cartão chegando de algum lugar. */
+@media (prefers-reduced-motion: no-preference) {
+  .uni {
+    animation: uniEntra 420ms var(--e-ui) both;
   }
 }
 
-/* ============ LEGENDA E LISTA ============ */
+@keyframes uniEntra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============ LEGENDA E DICA ============ */
 
 .mapa-legenda {
   list-style: none;
-  margin: 0 0 20px;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
@@ -196,47 +394,6 @@
   border: 2px solid var(--blue);
 }
 
-.mapa-lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.mapa-item {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 4px 14px;
-  align-items: baseline;
-  padding: 12px 0;
-  border-top: 1px solid var(--hair);
-}
-
-.mapa-item:last-child {
-  border-bottom: 1px solid var(--hair);
-}
-
-.mapa-item-cidade {
-  font-weight: 600;
-}
-
-.mapa-item-estado {
-  font-size: 13px;
-  color: var(--fg-hot);
-  white-space: nowrap;
-}
-
-.mapa-item--prevista .mapa-item-estado {
-  color: var(--fg-2);
-}
-
-.mapa-item-ponto {
-  grid-column: 1 / -1;
-  font-size: 13px;
-  color: var(--fg-2);
-}
-
 /* ============ TEMA CLARO ============ */
 
 [data-tema="light"] .v5 .mapa-estado {
@@ -246,4 +403,17 @@
 
 [data-tema="light"] .v5 .mapa-ponto--prevista .mapa-pino {
   fill: #f7f9fb;
+}
+
+/* O halo da prevista é lavagem sobre papel branco: no escuro ele acende, no
+   claro ele precisa de mais tinta para existir — mesma conta do eco de hexágono
+   do herói. */
+[data-tema="light"] .v5 .uni[data-estado="prevista"] .uni-foto {
+  background:
+    radial-gradient(
+      58% 62% at 50% 46%,
+      color-mix(in srgb, var(--cyan) 30%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
 }
