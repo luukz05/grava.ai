@@ -6,7 +6,6 @@
 import Image from "next/image";
 import "./v5.css";
 import "./variacoes.css";
-import "./temas.css";
 import "./mapa-unidades.css";
 import "./modelos.css";
 import "./gravidade.css";
@@ -27,11 +26,9 @@ import { FormFranqueado } from "./form-franqueado";
 import { Rodape } from "./rodape";
 
 
-export type Tema = "dark" | "light";
-
-export function Landing({ tema }: { tema?: Tema }) {
+export function Landing() {
   return (
-    <Casca atual="franqueado" tema={tema}>
+    <Casca atual="franqueado">
       {/* Herói: carta topográfica atrás do conteúdo. As curvas se riscam na
           entrada e a máscara apaga da esquerda para a direita conforme o bloco
           sai — os dois gestos no mesmo sentido. */}

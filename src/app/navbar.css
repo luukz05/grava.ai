@@ -3,7 +3,7 @@
    No topo: exatamente como a página sempre foi — marca e links à esquerda,
    ações à direita, tudo alinhado com a coluna de conteúdo. Fora do topo: as
    três peças recolhidas num oblongo só, centrado e flutuando, com o botão do
-   WhatsApp reduzido a uma esfera do tamanho da chave de tema.
+   WhatsApp reduzido a uma esfera de 42px.
 
    ───────────────────────────────────────────────────────────────────────────
    DOIS ELEMENTOS, E ESSE É O PONTO
@@ -64,7 +64,7 @@
   min-height: 58px;
 }
 
-/* O botão nasce com a mesma altura da chave de tema (42px): eles dividem a
+/* O botão nasce com 42px de altura: ele divide a
    linha, e altura diferente entre os dois desalinha a barra inteira. */
 .nav-cta {
   height: 42px;
@@ -148,7 +148,7 @@
       padding-inline: calc(1.5rem - var(--nav-cond) * 0.45rem);
     }
 
-    /* O BOTÃO VIRA ESFERA — 42×42, o tamanho exato da chave de tema ao lado. Os
+    /* O BOTÃO VIRA ESFERA — 42×42, o mesmo alvo de dedo do resto da barra. Os
        dois são controles da mesma linha; um redondo de 42 ao lado de um
        arredondado de outra medida lê como acidente, não como par.
 

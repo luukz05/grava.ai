@@ -50,7 +50,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "../v5.css";
 import "../variacoes.css";
-import "../temas.css";
 import "./perguntas.css";
 import { Casca, Heroi, WHATSAPP } from "../casca";
 import { Rodape } from "../rodape";

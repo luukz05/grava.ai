@@ -12,7 +12,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "../v5.css";
 import "../variacoes.css";
-import "../temas.css";
 import "./institucional.css";
 import { Casca, Heroi } from "../casca";
 import { FundoFecho } from "../fundos";

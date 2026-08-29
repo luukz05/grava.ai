@@ -234,11 +234,11 @@
    manchetes (`.sec-cab > h2 mark` no `v5.css`), e o mesmo azul do console e do
    feixe. O realce e a cena passam a falar a mesma língua.
 
-   O azul aqui é #66cdff, e não o `--fg-hot` do tema: o palco tem fundo preto
-   próprio nos dois temas (os vídeos foram gerados sobre vazio preto), então a
-   cor do texto sobre ele não pode acompanhar o tema claro — ela clarearia até
-   sumir. É a mesma razão pela qual o resto desta legenda também está em valor
-   fixo, e não em variável de tema.
+   O azul aqui é #66cdff em valor cru, e não o `--fg-hot`: o palco tem fundo
+   preto PRÓPRIO (os vídeos foram gerados sobre vazio preto), mais escuro que o
+   `--bg` da página. A cor sobre ele é medida contra esse preto, não contra a
+   superfície da página — por isso ela não sai de token. É a mesma razão pela
+   qual o resto desta legenda também está em valor fixo.
 
    Sem peso extra: o azul já é o contraste. Negrito somado à cor é dois destaques
    para o mesmo pedaço de frase, e o segundo não acrescenta nada além de ruído. */
@@ -414,9 +414,9 @@
   color: var(--fg-2);
 }
 
-/* Sem palco, o realce volta à cor do tema: aqui o texto está sobre o fundo da
-   PÁGINA, que acompanha claro e escuro, e o azul fixo da cena ficaria berrante
-   no tema claro. É a mesma cor que o `mark` das manchetes usa. */
+/* Sem palco, o realce volta ao token: aqui o texto está sobre o fundo da
+   PÁGINA, e não sobre o preto da cena, então quem manda é `--fg-hot`. É a
+   mesma cor que o `mark` das manchetes usa. */
 .pcs:not(.est-vivo) .pcs-txt mark,
 .pcs:not(.est-vivo) .pcs-tit mark {
   color: var(--fg-hot);

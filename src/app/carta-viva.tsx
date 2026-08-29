@@ -4,56 +4,27 @@
 
    O shader mora em `topography.tsx` (componente do React Bits, vendorizado sem
    opinião nenhuma sobre esta página). Aqui ficam as duas coisas que são da
-   GRAVA e não do shader: a paleta nos dois temas e a regulagem dos parâmetros.
+   GRAVA e não do shader: a paleta da marca e a regulagem dos parâmetros.
 
    Componente separado do `fundos.tsx` de propósito: WebGL exige `"use client"`,
    e o fundo é o resto da cena — degradê, luz, grão — que continua sendo HTML
    servido pronto. Assim só o canvas paga hidratação. */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Topography, { type Amostrador } from "./topography";
 
 /* As três cores são faixas de elevação: `baixa` é o vale, `media` é o traço
-   dominante (o azul da marca), `alta` é a crista.
+   dominante (o azul da marca), `alta` é a crista, que clareia até quase
+   branco-azulado — sobre breu o que salta é luz.
 
-   No escuro a crista CLAREIA até quase branco-azulado. No claro ela ESCURECE,
-   porque em papel o que salta é tinta, não luz — manter a crista clara ali
-   apagaria justamente o alto do relevo contra o fundo. */
-const PALETA = {
-  dark: { baixa: "#0e2f4a", media: "#3ba5e8", alta: "#a9e2ff" },
-  light: { baixa: "#bcd4e4", media: "#2c78a8", alta: "#0f3b5c" },
-} as const;
+   Aqui existia um segundo conjunto de cores para um tema claro, escolhido em
+   tempo de execução. O site é dark-only: a paleta é constante e o canvas não
+   observa mais nada. */
+const PALETA = { baixa: "#0e2f4a", media: "#3ba5e8", alta: "#a9e2ff" } as const;
 
-/* O botão de volume do fundo, e o único parâmetro que muda entre os temas.
-   Traço azul sobre papel tem contraste muito maior que traço azul sobre breu: o
-   mesmo alfa que é névoa no escuro vira desenho competindo com a manchete no
-   claro. É o mesmo ajuste que os `color-mix` faziam na carta em SVG. */
-const OPACIDADE = { dark: 0.62, light: 0.4 } as const;
-
-/* Lê o tema do `<html>` e reage à troca pela chave da navbar.
-
-   `MutationObserver` no atributo, e não estado compartilhado de React: quem
-   escreve o `data-tema` é o script bloqueante do layout e o `tema-switch`, os
-   dois fora desta árvore. Observar o DOM é olhar para a fonte da verdade em vez
-   de manter uma segunda cópia dela.
-
-   Começa em `dark` para o primeiro quadro bater com o do servidor; o valor real
-   chega no efeito, como no `tema-switch`. Aqui isso não pisca: o canvas só
-   existe depois da hidratação. */
-function useTema(): "dark" | "light" {
-  const [tema, setTema] = useState<"dark" | "light">("dark");
-
-  useEffect(() => {
-    const ler = () =>
-      setTema(document.documentElement.dataset.tema === "light" ? "light" : "dark");
-    ler();
-    const mo = new MutationObserver(ler);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-tema"] });
-    return () => mo.disconnect();
-  }, []);
-
-  return tema;
-}
+/* O botão de volume do fundo: névoa atrás da manchete, não desenho competindo
+   com ela. */
+const OPACIDADE = 0.62;
 
 /* ---------- os marcos cotados ----------
 
@@ -306,9 +277,6 @@ function MarcosCotados({ registrar }: { registrar: (fn: (a: Amostrador) => void)
    Padrão `true` para o herói, que é quem tinha o comportamento antes de este
    parâmetro existir: acrescentar opção não deve mudar quem já estava lá. */
 export function CartaViva({ marcos = true }: { marcos?: boolean } = {}) {
-  const tema = useTema();
-  const cor = PALETA[tema];
-
   /* O canvas entrega o campo, os marcos consomem. A ponte é uma ref porque
      `aoQuadro` é chamado de dentro do laço de render: passar a função por
      estado faria o React re-renderizar a árvore inteira a cada quadro. */
@@ -324,9 +292,9 @@ export function CartaViva({ marcos = true }: { marcos?: boolean } = {}) {
     <>
       <Topography
         aoQuadro={aoQuadro}
-        lowColor={cor.baixa}
-        midColor={cor.media}
-        highColor={cor.alta}
+        lowColor={PALETA.baixa}
+        midColor={PALETA.media}
+        highColor={PALETA.alta}
         /* Devagar. Este terreno fica atrás da manchete e do CTA principal da
            página: ele tem que se mexer o bastante para não parecer um PNG, e
            pouco o bastante para ninguém olhar para ele. */
@@ -343,7 +311,7 @@ export function CartaViva({ marcos = true }: { marcos?: boolean } = {}) {
         colorMode="elevation"
         contrast={2.6}
         brightness={1}
-        opacity={OPACIDADE[tema]}
+        opacity={OPACIDADE}
         /* O grão da cena é o `feTurbulence` do `fundos.tsx`, e ele fica parado
            enquanto o terreno se move — filme está na lente, não no terreno. O
            grão do shader anda junto com o campo e desfaria essa leitura. */

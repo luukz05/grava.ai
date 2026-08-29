@@ -9,7 +9,7 @@
      `@radix-ui/react-slot`: nenhum dos quatro existe neste projeto, e trazer o
      conjunto para um rodapé reescreveria o sistema visual da página;
    — sem `<Button variant="secondary" asChild>` nos canais: o círculo deles é o
-     mesmo material da chave de tema da barra do topo, que já é o "botão de
+     mesmo material dos botões da barra do topo, que já é o "botão de
      ícone" desta página. Dois desenhos diferentes para o mesmo papel seria
      inconsistência, não variedade;
    — a marca entra como lockup do manual, sem o nome repetido ao lado em texto:

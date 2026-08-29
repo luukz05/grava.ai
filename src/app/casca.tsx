@@ -2,8 +2,8 @@
 
    Antes cada rota montava a sua: instanciava as fontes por conta própria,
    escrevia o wrapper com — ou sem — `data-forma`, e decidia se tinha barra do
-   topo nova, chave de tema, botão flutuante e barra fixa. O resultado é o que
-   se espera disso: a landing arredondada e a institucional reta, uma com a
+   topo nova, botão flutuante e barra fixa. O resultado é o que se espera
+   disso: a landing arredondada e a institucional reta, uma com a
    display da marca carregada e a outra não, duas assinaturas de fundo
    diferentes na mesma marca.
 
@@ -12,7 +12,6 @@
 
 import { Bricolage_Grotesque, Space_Mono, Rajdhani } from "next/font/google";
 import { NavBar, type Pagina } from "./navbar";
-import { AplicarTema } from "./tema-switch";
 import { Flutuante } from "./flutuante";
 import { FundoTopo } from "./fundos";
 
@@ -51,13 +50,9 @@ export const WHATSAPP = "https://wa.me/5515996610916";
 
 export function Casca({
   atual,
-  tema,
   children,
 }: {
   atual: Pagina;
-  /* Passar `tema` fixa a página naquele tema — é o que as rotas de estudo
-     fazem. Sem ele, quem manda é o `<html>`. */
-  tema?: "dark" | "light";
   children: React.ReactNode;
 }) {
   return (
@@ -66,7 +61,6 @@ export function Casca({
       data-forma="oblongo"
       data-fundo="topo"
     >
-      {tema ? <AplicarTema tema={tema} /> : null}
       <main>
         {/* Aqui vinha a `TrilhaTopo`: curvas de nível rasas atrás da página
             inteira, com uma linha acesa que se riscava conforme a rolagem. Saiu

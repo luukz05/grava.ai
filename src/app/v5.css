@@ -11,8 +11,7 @@
   --hair: rgba(242, 248, 255, 0.1);
   --hair-hot: rgba(102, 205, 255, 0.34);
   --blue: #3ba5e8;
-  /* Superfície: preenchimento, halo, lavagem, degradê. Nunca texto — no tema
-     claro este valor não alcança contraste de leitura. */
+  /* Superfície: preenchimento, halo, lavagem, degradê. Nunca texto. */
   --cyan: #66cdff;
   /* Tinta de realce: texto, ícone funcional, borda de estado, anel de foco.
      É o par de --fg para quando a ênfase precisa de cor. */
@@ -248,11 +247,11 @@
 
 /* ---------- hover é do cursor, não do dedo ----------
    O `.cta` já nascia atrás deste portão e o resto da página não: `.cta--out`,
-   a pílula, a chave de tema, os canais do rodapé e os campos acendiam no
-   `:hover` também no celular. Em toque o `:hover` não existe como estado
-   passageiro — ele gruda no elemento tocado e só sai quando outro é tocado.
-   Resultado: a pessoa aperta a chave de tema, a página troca, e a chave fica
-   acesa pelo resto da visita como se ainda estivesse sendo apontada.
+   a pílula, os canais do rodapé e os campos acendiam no `:hover` também no
+   celular. Em toque o `:hover` não existe como estado passageiro — ele gruda
+   no elemento tocado e só sai quando outro é tocado. Resultado: a pessoa
+   aperta a pílula, a página troca, e a pílula da página anterior fica acesa
+   pelo resto da visita como se ainda estivesse sendo apontada.
 
    `:focus-visible` fica de fora do portão de propósito: teclado existe em
    qualquer aparelho, e é o único caminho de quem não usa nem cursor nem dedo. */
@@ -1295,7 +1294,7 @@
   padding: 0;
 }
 
-/* Mesmo material da chave de tema da barra do topo: os dois são botão de
+/* Mesmo material dos botões da barra do topo: os dois são botão de
    ícone da mesma página, e dois desenhos para o mesmo papel seria
    inconsistência, não variedade. */
 .rodape-redes a {
@@ -1430,8 +1429,8 @@
   /* A faixa do indicador de home do iPhone fica por baixo de qualquer coisa
      colada no rodapé; sem isto o botão encosta nela. */
   padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
-  /* Token e não valor cru: no tema claro a cor fixa deixava uma tarja preta
-     colada no rodapé de uma página de papel.
+  /* Token e não valor cru: a barra é a superfície da página vista através de
+     desfoque, e valor fixo aqui descola dela na primeira vez que `--bg` mudar.
 
      95% de opacidade com 10px de desfoque era desfoque decorativo: a essa
      densidade nada do conteúdo atravessa, e o que se via era uma tarja opaca
@@ -1852,15 +1851,6 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px -12px rgba(0, 0, 0, 0.9);
 }
 
-[data-tema="light"] .v5 .nav-pilulas {
-  background: color-mix(in srgb, #0b1116 4%, transparent);
-}
-
-[data-tema="light"] .v5 .pilula[aria-current="page"] {
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(11, 17, 22, 0.1), 0 6px 14px -10px rgba(11, 17, 22, 0.3);
-}
-
 .nav-acoes {
   display: flex;
   align-items: center;
@@ -1895,7 +1885,6 @@
 }
 
 .v5 .cta,
-.v5 .tema-switch,
 .v5 .orb-no {
   border-radius: 999px;
 }
@@ -2683,9 +2672,7 @@
    dedo. `any-pointer` e não `pointer`: num híbrido com mouse plugado o
    ponteiro primário é fino, mas a tela continua sendo tocada. */
 @media (any-pointer: coarse) {
-  .tema-switch,
-  /* Os botões de canal do rodapé são o mesmo material e o mesmo papel da chave
-     de tema — e estavam ficando em 42px enquanto ela crescia. Alvo de dedo é
+  /* Os botões de canal do rodapé são material de controle: alvo de dedo é
      regra do controle, não do componente. */
   .rodape-redes a {
     width: 44px;
@@ -3079,7 +3066,7 @@
 
    1. SUPERFÍCIE PRÓPRIA. `--bg-2` com fio de 1px e raio, e não recorte de
       fundo por gap. É o material que o resto da página usa para "isto é um
-      bloco", e sem ele a grade não tinha borda nenhuma no tema claro.
+      bloco", e sem ele a grade não tinha borda nenhuma.
    2. HIERARQUIA DENTRO DA CÉLULA. O rótulo é mono miúdo, o valor é display
       grande. Estavam a um degrau de distância (11px contra 22px); agora são
       dois, e o olho pega os quatro valores antes de ler qualquer rótulo.
@@ -3351,8 +3338,8 @@
 
 /* ---------- par flutuante, canto inferior direito ----------
    Cor, tipografia e estados vêm de `.cta` e `.cta--out`, os mesmos botões do
-   resto da página: é o que faz os dois seguirem o tema claro e o escuro sem
-   uma única cor escrita aqui. O que segue abaixo é só forma e posição. */
+   resto da página: é o que faz os dois seguirem a paleta sem uma única cor
+   escrita aqui. O que segue abaixo é só forma e posição. */
 
 .flut {
   position: fixed;

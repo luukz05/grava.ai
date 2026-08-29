@@ -1,5 +1,6 @@
-/* Root reset only. No fonts, no tokens, no theme.
-   Everything visual belongs to each page's own route layout. */
+/* Root reset only. No fonts, no tokens.
+   Everything visual belongs to each page's own route layout — com uma exceção,
+   logo abaixo: o chão do documento. */
 
 *,
 *::before,
@@ -7,10 +8,17 @@
   box-sizing: border-box;
 }
 
+/* O site é dark-only. `color-scheme` já diz isso ao navegador pelo `viewport`
+   do layout — é o que escurece barra de rolagem, autofill e controles nativos.
+   O que ele não garante é a área ALÉM do documento: no elástico de rolagem do
+   iOS e do macOS aparece o chão da raiz, e sem cor aqui ele sai branco por um
+   quadro em cima de uma página quase preta. O `.v5` não cobre isso porque a
+   cor dele para no fim do wrapper. */
 html,
 body {
   margin: 0;
   padding: 0;
+  background: #05090d;
 }
 
 body {

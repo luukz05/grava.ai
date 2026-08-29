@@ -36,7 +36,7 @@ export type Fundo = "topo";
    PNG de textura, nenhum byte a mais na rede. O `feColorMatrix` pinta o RGB de
    branco e joga o ruído no canal alfa — o `-0.32` corta tudo abaixo do
    meio-tom, então o que sobra são pontos claros esparsos, que é como grão se
-   comporta em sombra. No tema claro o CSS inverte e eles viram ponto escuro
+   comporta em sombra: ponto claro sobre escuro afunda em vez de saltar
    sobre papel.
 
    Vai num `<pattern>` de 320px em vez de cobrir a tela inteira: o navegador

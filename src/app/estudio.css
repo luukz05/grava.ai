@@ -6,7 +6,7 @@
    e é ela que troca para o layout de palco. Sem essa separação, o estado sem
    script herdaria posicionamento absoluto e apareceria tudo empilhado.
 
-   A CENA TEM FUNDO PRETO PRÓPRIO, NOS DOIS TEMAS. Os dois vídeos foram gerados
+   A CENA TEM FUNDO PRETO PRÓPRIO. Os dois vídeos foram gerados
    sobre vazio preto; qualquer outro fundo deixaria a borda do quadro visível.
    É também a leitura certa — isto é uma tomada, e tomada tem o próprio fundo. */
 
@@ -660,8 +660,3 @@
   background: radial-gradient(120% 90% at 50% 50%, #fff 0%, #eaf6ff 55%, #cfe9ff 100%);
 }
 
-/* ============ TEMA CLARO ============
-
-   A cena continua escura nos dois temas: os vídeos foram feitos sobre vazio
-   preto e a tomada tem o próprio fundo. Não sobrou texto fora dela para
-   acompanhar o tema — as legendas sobrepostas saíram. */

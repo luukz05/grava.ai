@@ -56,10 +56,16 @@ export const metadata: Metadata = {
 /* `viewportFit: "cover"` é o que faz as variáveis `env(safe-area-inset-*)`
    receberem valor no iPhone. Sem ele a barra fixa do rodapé calcula folga zero
    e encosta no indicador de home. */
+/* `colorScheme: "dark"` é o que faz o navegador pintar de escuro tudo que não
+   passa pelo CSS da página: a barra de rolagem, o fundo além do documento no
+   overscroll, os controles nativos de formulário e o autofill. O site é
+   dark-only — não existe chave de tema nem tema salvo —, então isso é uma
+   afirmação, não uma preferência. */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -68,23 +74,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    /* `suppressHydrationWarning`: o script abaixo escreve `data-tema` antes de
-       o React hidratar, então o atributo do servidor e o do cliente divergem
-       de propósito. Sem a marcação o React registra erro de hidratação no
-       console e avisa que não vai corrigir o atributo — que é exatamente o
-       comportamento desejado, só sem o erro. */
-    <html lang="pt-BR" data-tema="dark" suppressHydrationWarning>
+    /* Um tema só. Aqui existia `data-tema` mais um script bloqueante que lia o
+       tema salvo antes do primeiro paint — a máquina inteira de toggle claro/
+       escuro. Com o site dark-only não sobra estado nenhum para restaurar, e
+       sem divergência entre servidor e cliente também não é preciso
+       `suppressHydrationWarning`. */
+    <html lang="pt-BR">
       <head>
-        {/* Aplica o tema salvo antes do primeiro paint. Precisa ser bloqueante
-            e inline: qualquer coisa que rode depois da pintura mostra o tema
-            errado por um quadro, que é o defeito clássico de toggle de tema.
-            Só mexe no atributo do `<html>`, nada além disso. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('grava:tema');if(t==='light'||t==='dark'){document.documentElement.dataset.tema=t}}catch(e){}`,
-          }}
-        />
-
         {/* Quem é a organização, em dados. É o que permite ao Google ligar o
             site à marca em vez de tratá-lo como mais um domínio com texto — e é
             o que alimenta o painel lateral quando alguém busca "GRAVA.AI".

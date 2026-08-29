@@ -8,7 +8,7 @@
      em cima dela seria o terceiro botão idêntico na mesma tela, então abaixo
      de 780px só o de voltar ao topo aparece;
    — os dois usam as classes de botão da página (`.cta` e `.cta--out`) em vez
-     de cor e tipografia próprias: assim seguem o tema claro e escuro, o hover,
+     de cor e tipografia próprias: assim seguem a paleta da página, o hover,
      o estado ativo e a fonte pelo mesmo caminho que todos os outros botões. O
      `.flut-*` só cuida da forma e da posição.
 

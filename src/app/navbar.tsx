@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { TemaSwitch } from "./tema-switch";
 import { IcoWhatsApp } from "./icons";
 import "./navbar.css";
 
@@ -89,7 +88,6 @@ export function NavBar({ atual }: { atual: Pagina }) {
             <IcoWhatsApp className="nav-cta-ico" />
             <span className="nav-cta-rotulo">Falar no WhatsApp</span>
           </a>
-          <TemaSwitch />
         </div>
       </div>
     </div>

@@ -10,7 +10,6 @@
 import type { Metadata } from "next";
 import "../v5.css";
 import "../variacoes.css";
-import "../temas.css";
 import { Casca, Heroi, WHATSAPP } from "../casca";
 import { FundoFecho } from "../fundos";
 import { Ph } from "../ph";

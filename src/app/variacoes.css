@@ -456,12 +456,9 @@
    da página, e no rodapé ele desenharia uma faixa mais clara atravessando o
    fim do documento. O que fica é a carta sobre o fundo da própria página.
 
-   O seletor precisa do `.v5` e do `[data-tema]` para o tema CLARO: lá o
-   degradê vem de `[data-tema="light"] .v5 .fundo--topo` no `temas.css`, que
-   tem três níveis de especificidade e venceria `.fundo--fecho.fundo--topo`. É
-   a mesma razão pela qual as duas linhas abaixo existem em vez de uma. */
-.v5 .fundo--fecho.fundo--topo,
-[data-tema="light"] .v5 .fundo--fecho.fundo--topo {
+   O seletor precisa do `.v5` para bater a especificidade do degradê que
+   `.fundo--topo` traz. */
+.v5 .fundo--fecho.fundo--topo {
   background: none;
 }
 
@@ -480,19 +477,3 @@
    tela, e é o gesto de "a página começou aqui e seguiu adiante". No fim do
    documento não há nada adiante: a carta simplesmente termina com a máscara. */
 
-/* ---- tema claro ---- */
-
-/* No claro a carta é traço escuro sobre papel, e 0,5 de opacidade sobre branco
-   lê mais forte que os mesmos 0,5 sobre preto — o contraste do traço contra o
-   fundo é maior. Baixa mais um degrau. */
-[data-tema="light"] .v5 .fundo--fecho {
-  opacity: 0.34;
-}
-
-[data-tema="light"] .v5 .fundo--fecho .topo-luz {
-  background: radial-gradient(
-    58% 66% at 28% 34%,
-    rgba(44, 120, 168, 0.06),
-    transparent 68%
-  );
-}
