@@ -64,11 +64,40 @@
   min-height: 58px;
 }
 
-/* O botão nasce com 42px de altura: ele divide a
-   linha, e altura diferente entre os dois desalinha a barra inteira. */
+/* O BOTÃO, INTEIRO — forma e comportamento no mesmo lugar.
+
+   Metade disto morava no `v5.css` (`padding: .78rem 1.6rem`, `display`, `gap`,
+   `font-size`) e metade aqui, com a MESMA especificidade. Empate assim é
+   decidido pela ordem do bundle, e ela varia por rota — cada `page.tsx` importa
+   `v5.css` e a casca na ordem que quiser, e é a casca que arrasta este arquivo.
+   O resultado era o botão ficando oblongo na rolagem em vez de virar esfera, em
+   umas rotas e não em outras. Com um dono só não há empate.
+
+   A ALTURA É O LADO DO QUADRADO: 42px aqui, 42px de `min-width` quando condensa,
+   e o raio de 999px que todo `.cta` carrega fecha o círculo. Mexer num obriga a
+   mexer no outro, senão vira um oblongo pequeno. */
 .nav-cta {
   height: 42px;
-  padding-block: 0;
+  padding: 0 1.6rem;
+  font-size: 0.9375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 520px) {
+  .nav-cta {
+    font-size: 0.8125rem;
+    padding-inline: 0.9rem;
+  }
+}
+
+/* As ações não encolhem. Com o rótulo em `min-width: 0` (ver o bloco do
+   condensado), o mínimo automático deste grupo passou a ser zero também — e num
+   flex apertado ele seria o primeiro a ceder, cortando "Falar no WhatsApp" no
+   estado do topo. Quem cede é a cápsula dos links, que tem folga para isso. */
+.nav-acoes {
+  flex: none;
 }
 
 .nav-cta-ico {
@@ -155,7 +184,12 @@
        Só `min-width` varia. `width` continua automática: no topo sai do
        conteúdo, e no fim o mínimo manda porque o rótulo já encolheu a zero.
        Animar `width` a partir de `calc(0 * 42px)` zeraria o botão no topo — que
-       é justamente onde ele mais precisa existir. */
+       é justamente onde ele mais precisa existir.
+
+       PARA O MÍNIMO MANDAR, o conteúdo tem que caber dentro dele: são o
+       `min-width: 0` do rótulo e o `width` animado do ícone que garantem isso.
+       Sem os dois, este `min-width` vira um piso que nunca é alcançado — e o
+       botão fica oblongo a rolagem inteira. Foi o que aconteceu. */
     .nav-cta {
       min-width: calc(var(--nav-cond) * 42px);
       padding-inline: calc((1 - var(--nav-cond)) * 1.6rem);
@@ -165,9 +199,25 @@
     }
 
     /* O rótulo encolhe, e não é escondido: `display: none` deixaria a esfera sem
-       nome acessível — um alvo anônimo para leitor de tela. */
+       nome acessível — um alvo anônimo para leitor de tela.
+
+       `min-width: 0` É O QUE FAZ ISSO FUNCIONAR, e a falta dele mantinha o botão
+       oblongo em toda a rolagem.
+
+       O motivo: este span é filho de um `inline-flex`, e todo item de flex nasce
+       com `min-width: auto` — o tamanho mínimo automático, que com `nowrap` é a
+       frase inteira, "Falar no WhatsApp". E `min-width` VENCE `max-width` na
+       resolução do tamanho usado. O `max-width: 0` abaixo estava sendo calculado
+       corretamente e descartado em seguida: o rótulo mantinha os ~150px do
+       texto, o botão herdava essa largura, e o `overflow: hidden` do pai só
+       escondia o texto — deixando uma cápsula vazia do tamanho da frase.
+
+       Com o mínimo zerado, o rótulo chega de fato a zero, a largura do botão cai
+       para o `min-width: 42px` e ele fica quadrado — que, com o raio de 999px do
+       `.cta`, é o círculo. */
     .nav-cta-rotulo {
       display: inline-block;
+      min-width: 0;
       max-width: calc((1 - var(--nav-cond)) * 12rem);
       opacity: calc(1 - var(--nav-cond) * 1.6);
       overflow: hidden;

@@ -126,35 +126,39 @@ export function Landing() {
             seco. O cabeçalho aqui não é spoiler se disser o PERCURSO e não o
             desfecho: "do totem ao produto final" é o enquadramento, e o que
             acontece dentro dele continua sendo a cena que mostra. */}
-        <section className="hold sec" id="ia">
-          <div className="sec-cab">
-            <h2>
-              Do totem <mark>ao produto final.</mark>
-            </h2>
-            {/* O apoio absorveu a manchete que era das Frentes ("O nosso maior
-                diferencial: a IA"). Com as duas seções fundidas numa só, duas
-                manchetes de peso igual disputariam o mesmo assunto — e a
-                segunda chegaria depois de a cena já ter provado o que ela
-                afirmava.
+        {/* O `.breu` é a chegada na cena. A cena é uma chapa de preto puro
+            sangrada na tela inteira e a página em volta é #05090d, o que
+            desenhava uma moldura em torno do vídeo; este bloco apaga a página
+            até o preto dela ao longo do cabeçalho, e devolve a cor depois. Ver
+            `.breu` no `v5.css`. */}
+        <div className="breu">
+          <section className="hold sec" id="ia">
+            <div className="sec-cab">
+              <h2>
+                Do totem <mark>ao produto final.</mark>
+              </h2>
+              {/* O apoio absorveu a manchete que era das Frentes ("O nosso maior
+                  diferencial: a IA"). Com as duas seções fundidas numa só, duas
+                  manchetes de peso igual disputariam o mesmo assunto — e a
+                  segunda chegaria depois de a cena já ter provado o que ela
+                  afirmava.
 
-                NÃO DIZ MAIS "as quatro frentes". O percurso mostra a do totem
-                acontecendo (é a cena inteira) e nomeia as outras três; anunciar
-                uma contagem de quatro faria o visitante procurar quatro blocos
-                e achar três. A frase enumera em vez de contar — e enumerando ela
-                ainda entrega as quatro. */}
-            <p>
-              O cliente descreve em palavras, a IA desenha, o laser grava e a
-              peça sai pronta no balcão. A <strong>mesma inteligência</strong>{" "}
-              atende no totem, vende online, reporta à matriz e repõe o estoque —
-              ao mesmo tempo, o dia inteiro, sem ninguém no meio.
-            </p>
-          </div>
+                  NÃO DIZ MAIS "as quatro frentes". O percurso mostra a do totem
+                  acontecendo (é a cena inteira) e nomeia as outras três; anunciar
+                  uma contagem de quatro faria o visitante procurar quatro blocos
+                  e achar três. A frase enumera em vez de contar — e enumerando ela
+                  ainda entrega as quatro. */}
+              <p>
+                O cliente descreve em palavras, a IA desenha, o laser grava e a
+                peça sai pronta no balcão. A <strong>mesma inteligência</strong>{" "}
+                atende no totem, vende online, reporta à matriz e repõe o estoque —
+                ao mesmo tempo, o dia inteiro, sem ninguém no meio.
+              </p>
+            </div>
 
-          <Percurso />
-        </section>
-
-        {/* O sistema fechando o circuito. Reativo à rolagem: a arte fica presa
-            enquanto as seis estações passam ao lado dela. */}
+            <Percurso />
+          </section>
+        </div>
 
         {/* DUAS SEÇÕES VIRARAM UMA.
 
@@ -169,17 +173,24 @@ export function Landing() {
 
             A âncora `#numeros` fica com esta seção porque é para cá que apontam
             o botão do herói, o rodapé, a galeria e a página de perguntas — e é
-            aqui que os números passaram a morar. */}
-        <section className="hold sec" id="numeros">
-          <div className="sec-cab">
-            <h2>
-              Três modelos <mark>de unidade.</mark>
-            </h2>
-            <p>O que muda entre eles é o tamanho do ponto — e o que cada um custa.</p>
-          </div>
+            aqui que os números passaram a morar.
 
-          <Modelos />
-        </section>
+            O `.breu-saida` é a outra metade da chegada na cena: o preto do vídeo
+            se dissolve de volta no fundo da página ao longo do respiro e da
+            manchete daqui, sem gastar altura para isso. Ver `.breu` no
+            `v5.css`. */}
+        <div className="breu-saida">
+          <section className="hold sec" id="numeros">
+            <div className="sec-cab">
+              <h2>
+                Três modelos <mark>de unidade.</mark>
+              </h2>
+              <p>O que muda entre eles é o tamanho do ponto — e o que cada um custa.</p>
+            </div>
+
+            <Modelos />
+          </section>
+        </div>
 
       </div>
 

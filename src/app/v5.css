@@ -943,6 +943,63 @@
   border-bottom: 1px solid var(--hair);
 }
 
+/* ---------- a página apaga para entrar na cena ----------
+
+   A cena do percurso é uma chapa de #000 sangrada na tela inteira. A página em
+   volta é #05090d. São cinco pontos de diferença — pouco para chamar de cor,
+   suficiente para desenhar uma moldura: o olho lê o retângulo do vídeo antes de
+   ler o que está acontecendo dentro dele, e o efeito de "a cena tomou a tela"
+   vira "abriu um player".
+
+   Este bloco tira a moldura. A página escurece até o preto da cena ao longo do
+   cabeçalho da seção, entrega o vídeo sem emenda, e volta à cor depois.
+
+   SEM LINHA DO TEMPO DE ROLAGEM E SEM JAVASCRIPT. O degradê está no fluxo do
+   documento: é a rolagem que decide qual fatia dele está na tela, e escurecer
+   conforme se desce é o que um degradê parado já faz de graça. Uma
+   `animation-timeline` aqui pagaria `timeline-scope` — a seção é descendente de
+   quem teria de animar — para chegar no mesmo lugar.
+
+   A RAMPA FECHA ANTES DO PALCO, nunca em cima dele. Sobrar preto é invisível;
+   faltar preto é a moldura de volta. Por isso ela é medida em `vh` com teto
+   baixo: o cabeçalho tem altura de texto, não de tela, e uma rampa mais longa
+   que ele terminaria depois que a cena já entrou. */
+.breu {
+  --breu-rampa: clamp(160px, 30vh, 340px);
+  background-color: #000;
+  background-image: linear-gradient(180deg, var(--bg) 0%, #000 100%);
+  background-repeat: no-repeat;
+  background-size: 100% var(--breu-rampa);
+  background-position: top;
+}
+
+/* A VOLTA NÃO PODE SER ALTURA. Ela já foi um bloco vazio no fim do `.breu` —
+   até 260px de degradê sem nada dentro, empurrando a seção dos modelos para
+   longe do vídeo. Espaçador é o jeito caro de fazer isto: a dissolvência de
+   volta não precisa de espaço próprio, precisa de algo por onde acontecer.
+
+   Então ela é o FUNDO da seção seguinte, ancorado no topo dela. A cor volta ao
+   longo do respiro e da manchete que já estavam ali, o custo em altura é zero, e
+   o boundary entre as duas seções volta ao ritmo do resto da página.
+
+   Também não pode ser `background-position: bottom` no próprio `.breu`: o palco
+   ocupa o fim daquela seção e é opaco, então a rampa aconteceria atrás dele,
+   escondida, e o fim do vídeo cortaria de preto para o fundo da página num
+   pixel. */
+.breu-saida {
+  background-image: linear-gradient(180deg, #000 0%, var(--bg) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% clamp(120px, 22vh, 260px);
+  background-position: top;
+}
+
+/* O fio de baixo da seção sai. Em preto, uma hairline na largura da coluna logo
+   depois de um vídeo sangrado lê como risco, não como separação — e quem separa
+   aqui é a rampa, que é mais larga e mais clara que qualquer fio. */
+.breu .sec {
+  border-bottom: 0;
+}
+
 /* ---------- cabeçalho de seção ----------
    Manchete e linha de apoio, uma receita só para as treze seções das três
    rotas. Antes eram quatro receitas concorrentes, e o desenho denunciava:
@@ -1866,12 +1923,19 @@
   }
 }
 
-@media (max-width: 520px) {
-  .nav-cta {
-    font-size: 0.8125rem;
-    padding-inline: 0.9rem;
-  }
-}
+/* O `.nav-cta` MORA EM `navbar.css`, e só lá.
+
+   Ele era declarado nos dois arquivos com a mesma especificidade — aqui a forma
+   solta (`padding: .78rem 1.6rem`, `display: inline-flex`) e lá o
+   comportamento na rolagem (`padding-inline` animado até zero). Empate de
+   especificidade é decidido pela ORDEM DO BUNDLE, e ela não é a mesma em todas
+   as rotas: cada `page.tsx` importa `v5.css` e a casca na ordem que quiser, e a
+   casca é quem arrasta o `navbar.css`.
+
+   O sintoma foi o botão ficando oblongo na rolagem em vez de virar esfera —
+   numa rota, e não em todas. Com um dono só não existe empate para desempatar.
+
+   O mesmo vale para o `@media (max-width: 520px)` que ficava aqui. */
 
 /* ---------- nada quadrado ----------
    A página é arredondada por inteiro. Estes são os elementos que não tinham
@@ -1894,15 +1958,8 @@
   border-radius: 0;
 }
 
-/* O botão da barra acompanha a altura das pílulas: com o grupo mais alto, o
-   CTA no tamanho antigo ficava pequeno ao lado e desalinhava a linha. */
-.nav-cta {
-  padding: 0.78rem 1.6rem;
-  font-size: 0.9375rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+/* A forma do `.nav-cta` mudou de arquivo — ver a nota acima, junto do
+   `.nav-acoes`. Ela vive em `navbar.css` inteira, forma e comportamento. */
 
 /* A primeira seção entra logo abaixo do herói, com metade do respiro que as
    outras têm no topo. O herói já é o respiro dela, e o padding cheio empurrava
