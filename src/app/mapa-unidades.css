@@ -403,27 +403,4 @@
 .mapa-chave--prevista {
   border: 2px solid var(--blue);
 }
-
-/* ============ TEMA CLARO ============ */
-
-[data-tema="light"] .v5 .mapa-estado {
-  fill: rgba(44, 120, 168, 0.06);
-  stroke: rgba(44, 120, 168, 0.38);
-}
-
-[data-tema="light"] .v5 .mapa-ponto--prevista .mapa-pino {
-  fill: #f7f9fb;
-}
-
-/* O halo da prevista é lavagem sobre papel branco: no escuro ele acende, no
-   claro ele precisa de mais tinta para existir — mesma conta do eco de hexágono
-   do herói. */
-[data-tema="light"] .v5 .uni[data-estado="prevista"] .uni-foto {
-  background:
-    radial-gradient(
-      58% 62% at 50% 46%,
-      color-mix(in srgb, var(--cyan) 30%, transparent),
-      transparent 70%
-    ),
-    var(--bg);
 }

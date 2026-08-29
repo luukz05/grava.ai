@@ -1033,6 +1033,16 @@
   max-width: 72ch;
 }
 
+/* O destaque dentro do apoio. Ele veio do cabeçalho das Frentes, que era um
+   `.sec-cab` também, e ficou aqui quando aquela seção foi absorvida pelo
+   percurso: o realce liga uma expressão da frase ao que a seção desenha logo
+   abaixo, e isso serve a qualquer uma das treze. Só cor e peso — sublinhado ou
+   fundo aqui competiria com o `mark` da manchete, que é o destaque da vez. */
+.sec-cab > p strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
 @media (min-width: 1000px) {
   /* `auto` na primeira coluna e não `1fr`: com `1fr` a manchete ganharia metade
      da sobra e o apoio seria empurrado para dentro da página. Assim a manchete

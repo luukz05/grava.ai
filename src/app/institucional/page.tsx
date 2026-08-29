@@ -15,6 +15,7 @@ import "../variacoes.css";
 import "../temas.css";
 import "./institucional.css";
 import { Casca, Heroi } from "../casca";
+import { FundoFecho } from "../fundos";
 import { AsciiWaveHeader } from "../assets";
 import { AsciiEstado } from "./art";
 import { Rodape } from "../rodape";
@@ -259,6 +260,13 @@ export default function Institucional() {
         </div>
       </section>
 
+      {/* O fechamento leva a mesma carta do herói, mais ao fundo e sem os
+          gestos de abertura — ver `FundoFecho` em `fundos.tsx`. A
+          `.close-fundo` é a caixa de posicionamento: o `.fundo` é absoluto e
+          precisa de um ancestral posicionado que não seja o `<footer>`, que
+          carrega o `.hold` e pararia a carta na coluna de texto. */}
+      <div className="close-fundo">
+        <FundoFecho />
       <footer className="hold close" id="falar">
         <div className="sec-cab">
           <h2>
@@ -285,6 +293,7 @@ export default function Institucional() {
           ]}
         />
       </footer>
+      </div>
     </Casca>
   );
 }

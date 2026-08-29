@@ -12,6 +12,7 @@ import "../v5.css";
 import "../variacoes.css";
 import "../temas.css";
 import { Casca, Heroi, WHATSAPP } from "../casca";
+import { FundoFecho } from "../fundos";
 import { Ph } from "../ph";
 import { Rodape } from "../rodape";
 
@@ -73,6 +74,22 @@ export default function Galeria() {
       </Heroi>
 
       <section className="hold sec" id="pecas">
+        {/* O cabeçalho de seção estava faltando aqui, e era a única seção das
+            três rotas sem ele: a grade começava direto embaixo do herói, sem
+            nada dizendo o que aqueles seis blocos são. O `.sec-cab` é a receita
+            que as outras doze seções usam — manchete à esquerda, contexto à
+            direita — e é ela que dá o degrau entre 'o que sai do totem' (a
+            promessa, no herói) e os tipos de peça (a lista). */}
+        <div className="sec-cab">
+          <h2>
+            Seis peças, <mark>seis motivos.</mark>
+          </h2>
+          <p>
+            O mesmo equipamento e o mesmo insumo — o que muda de uma para outra é
+            a arte, e é a IA que a resolve na conversa com o cliente.
+          </p>
+        </div>
+
         <div className="lojas">
           {PECAS.map((p) => (
             <article className="loja" key={p.t}>
@@ -84,6 +101,9 @@ export default function Galeria() {
         </div>
       </section>
 
+      {/* Mesmo fechamento das outras duas rotas: a carta volta ao fundo. */}
+      <div className="close-fundo">
+        <FundoFecho />
       <footer className="hold close" id="falar">
         <div className="sec-cab">
           <h2>
@@ -104,6 +124,7 @@ export default function Galeria() {
           ]}
         />
       </footer>
+      </div>
     </Casca>
   );
 }

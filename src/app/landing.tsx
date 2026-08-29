@@ -8,7 +8,6 @@ import "./v5.css";
 import "./variacoes.css";
 import "./temas.css";
 import "./mapa-unidades.css";
-import "./frentes.css";
 import "./modelos.css";
 import "./gravidade.css";
 /* A arte ASCII segue inteira em `assets.tsx`. Ela saiu da página a pedido, para
@@ -20,8 +19,10 @@ import { FundoFecho } from "./fundos";
 import { Gravidade } from "./gravidade";
 import { Modelos } from "./modelos";
 import { MapaUnidades } from "./mapa-unidades";
-import { Frentes } from "./frentes";
-import { Estudio } from "./estudio";
+/* A cena do totem e o stepper das quatro frentes viraram um percurso só — ver o
+   cabeçalho de `percurso.tsx`. `estudio.tsx` e `frentes.tsx` seguem no
+   repositório, sem referência, para o caso de a divisão precisar voltar. */
+import { Percurso } from "./percurso";
 import { FormFranqueado } from "./form-franqueado";
 import { Rodape } from "./rodape";
 
@@ -133,15 +134,26 @@ export function Landing({ tema }: { tema?: Tema }) {
             <h2>
               Do totem <mark>ao produto final.</mark>
             </h2>
+            {/* O apoio absorveu a manchete que era das Frentes ("O nosso maior
+                diferencial: a IA"). Com as duas seções fundidas numa só, duas
+                manchetes de peso igual disputariam o mesmo assunto — e a
+                segunda chegaria depois de a cena já ter provado o que ela
+                afirmava.
+
+                NÃO DIZ MAIS "as quatro frentes". O percurso mostra a do totem
+                acontecendo (é a cena inteira) e nomeia as outras três; anunciar
+                uma contagem de quatro faria o visitante procurar quatro blocos
+                e achar três. A frase enumera em vez de contar — e enumerando ela
+                ainda entrega as quatro. */}
             <p>
               O cliente descreve em palavras, a IA desenha, o laser grava e a
-              peça sai pronta no balcão — sem encomenda e sem espera.
+              peça sai pronta no balcão. A <strong>mesma inteligência</strong>{" "}
+              atende no totem, vende online, reporta à matriz e repõe o estoque —
+              ao mesmo tempo, o dia inteiro, sem ninguém no meio.
             </p>
           </div>
 
-          <Estudio />
-
-          <Frentes />
+          <Percurso />
         </section>
 
         {/* O sistema fechando o circuito. Reativo à rolagem: a arte fica presa

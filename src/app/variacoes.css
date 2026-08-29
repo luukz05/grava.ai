@@ -41,9 +41,17 @@
 }
 
 /* Canto generoso e borda mais discreta: o canto arredondado já faz o trabalho
-   que a borda fazia na versão reta. */
+   que a borda fazia na versão reta.
+
+   O `.cellart` entrou nesta lista numa auditoria posterior. Ele é o cartão dos
+   três passos da institucional e dos quatro blocos de ícone — mesma família do
+   `.loja` e do `.scope`, mesmo material (fio de 1px sobre a superfície da
+   página) — e era o único que continuava com canto reto. Ao lado de uma
+   landing inteiramente arredondada, três retângulos de quina viva não leem
+   como variação: leem como bloco que ficou de fora quando a forma mudou. */
 .v5[data-forma="oblongo"] .scope,
 .v5[data-forma="oblongo"] .loja,
+.v5[data-forma="oblongo"] .cellart,
 .v5[data-forma="oblongo"] .form-fr,
 .v5[data-forma="oblongo"] .ph {
   border-radius: var(--r-lg);

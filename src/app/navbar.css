@@ -189,13 +189,6 @@
   }
 }
 
-/* No claro o oblongo é papel, não vidro escuro. */
-[data-tema="light"] .v5 .navbar {
-  background: rgba(255, 255, 255, calc(var(--nav-cond) * 0.78));
-  border-color: rgba(44, 120, 168, calc(var(--nav-cond) * 0.18));
-  box-shadow: 0 10px 34px -20px rgba(20, 40, 60, calc(var(--nav-cond) * 0.5));
-}
-
 /* Sem os links visíveis não existe o que recolher: a barra fica com marca e
    ações, e condensar isso não muda nada além de encolher o botão. */
 @media (max-width: 820px) {

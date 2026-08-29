@@ -563,52 +563,6 @@
   }
 }
 
-/* ---------- tema claro ----------
-   Sobre papel o eco perde o pouco de presença que tem: azul translúcido sobre
-   escuro clareia e aparece, sobre branco escurece de menos. Um passo a mais de
-   tinta, e a sombra da peça com menos preto para não virar borrão sujo. */
-[data-tema="light"] .v5 .grav-hex {
-  background: color-mix(in srgb, var(--cyan) 30%, transparent);
-}
-
-[data-tema="light"] .v5 .grav-massa--b .grav-hex {
-  background: color-mix(in srgb, var(--blue) 26%, transparent);
-}
-
-[data-tema="light"] .v5 .grav-massa--c .grav-hex {
-  background: color-mix(in srgb, var(--cyan) 20%, transparent);
-}
-
-[data-tema="light"] .v5 .grav-peca img {
-  filter: drop-shadow(0 22px 36px rgba(11, 17, 22, 0.24));
-}
-
-/* No escuro a fala se destaca subindo um passo acima do fundo; no claro isso se
-   inverte — sobre papel, uma pastilha mais clara que a página desaparece. O
-   contraste passa a vir de baixo: superfície escura, texto claro. É a mesma
-   ideia de "a fala se separa da cena", com o sinal trocado.
-
-   E a sombra afina junto: 50% de preto embaixo de qualquer coisa sobre papel
-   não é relevo, é sujeira. */
-[data-tema="light"] .v5 .grav-hud-ia,
-[data-tema="light"] .v5 .grav-hud-bico,
-[data-tema="light"] .v5 .grav-hud-fala {
-  background: color-mix(in srgb, #0b1116 92%, var(--cyan));
-  box-shadow: 0 10px 26px rgba(11, 17, 22, 0.18);
-}
-
-[data-tema="light"] .v5 .grav-hud-ia {
-  color: var(--cyan);
-}
-
-[data-tema="light"] .v5 .grav-hud-rotulo {
-  color: var(--cyan);
-}
-
-[data-tema="light"] .v5 .grav-hud-leitura {
-  color: rgba(242, 248, 255, 0.76);
-}
-
 /* ---------- coluna estreita ----------
    Abaixo de 900px o herói vira uma coluna só e o painel passa a ficar SOB o
    texto, não ao lado dele. Ali ele disputa a dobra com a manchete e com os dois

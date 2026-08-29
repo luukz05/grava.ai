@@ -1,0 +1,525 @@
+/* O PERCURSO — o que este arquivo acrescenta ao `estudio.css`.
+
+   A cena, o console e os vídeos continuam vindo INTEIROS de `estudio.css`: o
+   componente carrega os dois, e o elemento raiz leva as duas classes
+   (`.estudio.pcs`). Aqui mora só o que a fusão trouxe de novo — o texto nas
+   margens, a régua dos nove passos e o véu lateral que os separa da cena.
+
+   DOIS LAYOUTS NO MESMO MARCADO, como lá. O padrão é fluxo normal — é o que o
+   servidor manda e o que fica de pé sem JavaScript, com movimento reduzido ou se
+   o GSAP não carregar. A classe `est-vivo` só entra quando a animação vai mesmo
+   rodar. Sem essa separação, o estado sem script herdaria posicionamento
+   absoluto e os nove textos apareceriam empilhados uns sobre os outros. */
+
+/* ============ AJUSTES NA CENA HERDADA ============ */
+
+/* O CONSOLE ENCOLHEU. Em `estudio.css` ele tem 46rem porque ocupava a cena
+   sozinho; aqui ele divide a largura com duas colunas de texto, uma de cada
+   lado.
+
+   O `min()` é o teto, não a largura: quem manda de fato é o `100%`, e ele já
+   desconta as duas margens de texto pelo respiro lateral do `.est-ui` (ver
+   `--pcs-col`, mais abaixo). Em tela larga o console para nas 42rem; em tela
+   apertada ele encolhe junto com o corredor, em vez de passar por baixo da
+   legenda. */
+.pcs .est-console {
+  width: min(100%, 42rem);
+}
+
+/* O VÉU DO CONSOLE encolhe junto. O de lá abre em 120% da caixa, o que aqui
+   invadiria as colunas de texto e as deixaria com dois escurecimentos somados —
+   o dele e o das margens. Aqui ele fecha antes, e quem cuida das bordas é o
+   `.pcs-veu`. */
+.est-vivo.pcs .est-ui {
+  background: radial-gradient(
+    78% 84% at 50% 50%,
+    rgba(4, 8, 12, 0.93) 0%,
+    rgba(4, 8, 12, 0.8) 52%,
+    rgba(4, 8, 12, 0) 100%
+  );
+  z-index: 3;
+}
+
+/* O FEIXE E O ESTOURO acima do console.
+
+   Em `estudio.css` nenhum dos três tem `z-index`: os dois vinham depois do
+   console no marcado e isso bastava. Aqui o console precisou subir (para passar
+   à frente do véu lateral), e sem esta regra o feixe varreria POR TRÁS da
+   conversa — que é o oposto do que a batida do laser mostra.
+
+   Ficam abaixo das legendas de propósito: o estouro branco cobre a cena inteira
+   por meio segundo, e apagar o texto do passo junto com ela seria perder a única
+   coisa legível no quadro. */
+.est-vivo.pcs .est-feixe,
+.est-vivo.pcs .est-flash {
+  z-index: 4;
+}
+
+/* ============ O VÉU LATERAL ============
+
+   Dois gradientes horizontais, um de cada borda, transparentes no meio. É o que
+   garante contraste do texto claro contra QUALQUER quadro dos vídeos sem apagar
+   a cena — um véu chapado sobre tudo resolveria o contraste e mataria o assunto:
+   a cena ficaria atrás de vidro fosco durante os nove passos.
+
+   Ele fica acima dos vídeos e da foto (que tem `z-index: 1`) e abaixo do
+   console. Sem o `z-index` explícito ele cairia atrás da mesa, e as quatro
+   frentes — que rodam justamente com a mesa em cena — perderiam o contraste
+   inteiro. */
+.est-vivo .pcs-veu {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 7, 11, 0.92) 0%,
+      rgba(3, 7, 11, 0.62) 18%,
+      rgba(3, 7, 11, 0) 38%
+    ),
+    linear-gradient(
+      270deg,
+      rgba(3, 7, 11, 0.92) 0%,
+      rgba(3, 7, 11, 0.62) 18%,
+      rgba(3, 7, 11, 0) 38%
+    );
+}
+
+/* Sem palco não há margem para escurecer: o texto está embaixo, em fluxo
+   normal, sobre o fundo da página. */
+.pcs:not(.est-vivo) .pcs-veu {
+  display: none;
+}
+
+/* ============ O TEXTO NAS DUAS MARGENS ============
+
+   Três colunas: a da esquerda, o corredor do console e a da direita. Os seis
+   passos moram na MESMA célula do grid e se sobrepõem — é o que a troca por
+   opacidade precisa.
+
+   CADA PASSO USA AS DUAS MARGENS. O bloco principal fica de um lado e o apoio do
+   outro, e os dois trocam de lado a cada passo. Antes só uma margem era usada e
+   a outra ficava escura e vazia — o véu escurecia meia tela para não pôr nada
+   nela.
+
+   Por isso o `<li>` repete o mesmo template de três colunas do pai em vez de
+   morar numa delas: o par nasce alinhado no mesmo eixo, e a opacidade continua
+   com UM alvo por passo.
+
+   AS COLUNAS SÃO MEDIDAS, e o console é que se ajusta a elas — não o contrário.
+   Antes eram frações (`1fr 2.1fr 1fr`) com o console travado em 40rem, e as duas
+   coisas se encontravam no meio: em telas de 1100 a 1400px a coluna de texto
+   ficava com ~14 caracteres por linha OU o console entrava por baixo dela.
+
+   Com `--pcs-col` a conta passa a ser explícita: a coluna de texto tem a largura
+   que uma frase precisa, e o `.est-ui` ganha esse mesmo valor de respiro lateral
+   (logo abaixo), então o console encolhe sozinho quando as margens apertam. Não
+   existe largura de tela em que os dois se cruzem. */
+.pcs {
+  --pcs-col: clamp(15rem, 21vw, 26rem);
+  --pcs-borda: clamp(20px, 4vw, 64px);
+}
+
+.est-vivo .pcs-legendas {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0 var(--pcs-borda);
+  list-style: none;
+}
+
+/* O respiro do console é a coluna de texto mais uma folga. É esta regra que
+   garante que o console nunca chegue perto da legenda: ele é centrado dentro do
+   que sobra, e o que sobra já exclui as duas margens de texto. */
+.est-vivo.pcs .est-ui {
+  padding-inline: calc(var(--pcs-col) + var(--pcs-borda) + clamp(12px, 1.6vw, 32px));
+}
+
+/* Nenhuma legenda recebe clique: são textos, e o que está atrás delas é a cena.
+   Um bloco invisível (opacidade 0) capturando o ponteiro seria um buraco morto
+   na tela inteira durante o percurso. */
+.est-vivo .pcs-legenda {
+  /* Todos na mesma célula: é a sobreposição que a troca por opacidade pede. */
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--pcs-col))
+    minmax(0, 1fr)
+    minmax(0, var(--pcs-col));
+  align-items: center;
+  pointer-events: none;
+  /* Os seis nascem invisíveis para o caso de o GSAP demorar a assumir: sem isto
+     eles aparecem empilhados por um quadro, um sobre o outro. */
+  opacity: 0;
+}
+
+/* O bloco principal e o apoio ocupam margens opostas, e trocam junto. Sem
+   `max-width` própria em nenhum dos dois: quem limita a linha é a coluna
+   (`--pcs-col`), e um teto em `ch` somado a ela daria dois donos para a mesma
+   medida — o teto antigo de 34ch passou a cortar a frase antes de a coluna
+   acabar quando o corpo do texto cresceu, deixando um vão morto na margem. */
+.est-vivo .pcs-bloco,
+.est-vivo .pcs-apoio {
+  grid-row: 1;
+  display: grid;
+  justify-items: start;
+}
+
+.est-vivo .pcs-bloco {
+  gap: 0.4rem;
+}
+
+.est-vivo .pcs-legenda[data-lado="e"] .pcs-bloco,
+.est-vivo .pcs-legenda[data-lado="d"] .pcs-apoio {
+  grid-column: 1;
+}
+
+/* Alinhado à direita porque encosta na borda direita da tela: texto alinhado à
+   esquerda ali deixaria uma escada de bordas irregulares justamente contra a
+   margem, que é a linha mais visível da composição. */
+.est-vivo .pcs-legenda[data-lado="d"] .pcs-bloco,
+.est-vivo .pcs-legenda[data-lado="e"] .pcs-apoio {
+  grid-column: 3;
+  justify-items: end;
+  text-align: right;
+}
+
+/* ---- as partes de uma legenda ----
+
+   Três, e as mesmas nas nove. Saíram o número mono e o ícone em pílula das
+   frentes: o número repetia o que a régua já conta, e o ícone só existia em três
+   dos nove blocos — bastava isso para eles lerem como cartões de lista no fim de
+   uma cena, em vez da continuação dela. */
+
+.pcs-rot {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: #8fa6b8;
+}
+
+/* O CORPO SUBIU UM DEGRAU INTEIRO, título e frase.
+
+   Este texto não é legenda de figura: é o conteúdo da seção, lido a um metro de
+   distância enquanto o vídeo corre atrás. No tamanho antigo (17px de frase) ele
+   pedia atenção de leitura próxima e perdia para a cena — dois materiais
+   competindo, e o que se mexe ganha sempre.
+
+   Em 21px a frase se lê de relance, que é a única forma de leitura que uma cena
+   em movimento permite. */
+.pcs-tit {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.7vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  line-height: 1.12;
+  color: #f2f8ff;
+}
+
+.pcs-txt {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.0625rem, 1.45vw, 1.3125rem);
+  line-height: 1.5;
+  color: #c3d2de;
+  text-wrap: pretty;
+}
+
+/* ---- O REALCE ----
+
+   `<mark>` sem fundo, na cor da marca — a mesma convenção do `mark` das
+   manchetes (`.sec-cab > h2 mark` no `v5.css`), e o mesmo azul do console e do
+   feixe. O realce e a cena passam a falar a mesma língua.
+
+   O azul aqui é #66cdff, e não o `--fg-hot` do tema: o palco tem fundo preto
+   próprio nos dois temas (os vídeos foram gerados sobre vazio preto), então a
+   cor do texto sobre ele não pode acompanhar o tema claro — ela clarearia até
+   sumir. É a mesma razão pela qual o resto desta legenda também está em valor
+   fixo, e não em variável de tema.
+
+   Sem peso extra: o azul já é o contraste. Negrito somado à cor é dois destaques
+   para o mesmo pedaço de frase, e o segundo não acrescenta nada além de ruído. */
+.pcs-txt mark,
+.pcs-tit mark {
+  background: none;
+  color: #66cdff;
+}
+
+/* ---- O APOIO, NA MARGEM OPOSTA ----
+
+   Ele é OUTRA VOZ, não mais uma frase da mesma: o bloco principal narra o que
+   está acontecendo na cena, e o apoio diz o que está por trás — o que a rede
+   entrega, o que já vem junto, o que continua acontecendo depois.
+
+   Tudo aqui existe para essa distância ser visível sem ler: corpo menor, cor
+   mais fria, rótulo em maiúsculas pequenas e uma hairline separando o conjunto
+   da borda da tela. Se os dois tivessem o mesmo peso, seriam dois textos
+   brigando por um olho que ainda tem a cena para ver.
+
+   `list-style: none` e o marcador é o RÓTULO: um bullet ao lado de um rótulo em
+   azul seria o segundo marcador da mesma linha. */
+.pcs-apoio {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: clamp(1rem, 2.2vh, 1.6rem);
+}
+
+.pcs-apoio > li {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.pcs-apoio-rot {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #66cdff;
+}
+
+.pcs-apoio-txt {
+  font-size: clamp(0.875rem, 1.05vw, 0.9375rem);
+  line-height: 1.5;
+  color: #9db0c0;
+  text-wrap: pretty;
+}
+
+/* A hairline fica do lado de FORA — encostada na borda da tela, não no corredor
+   do console. É o que fecha a coluna contra a margem e a faz ler como um
+   aparte, e não como uma segunda coluna de leitura do mesmo texto. */
+.est-vivo .pcs-legenda[data-lado="d"] .pcs-apoio {
+  padding-left: clamp(0.9rem, 1.4vw, 1.4rem);
+  border-left: 1px solid rgba(102, 205, 255, 0.22);
+}
+
+.est-vivo .pcs-legenda[data-lado="e"] .pcs-apoio {
+  padding-right: clamp(0.9rem, 1.4vw, 1.4rem);
+  border-right: 1px solid rgba(102, 205, 255, 0.22);
+}
+
+/* ============ A RÉGUA ============
+
+   Um segmento por passo, atravessando a base do palco. Ela conta duas coisas
+   que um "passo 3 de 9" não conta: quanto falta para trocar, e que existe um
+   caminho inteiro atrás e à frente. Desde que o número saiu das legendas, é o
+   único lugar em que a posição no percurso aparece desenhada.
+
+   As colunas são automáticas (`grid-auto-flow: column`) e não `repeat(9, …)`:
+   a quantidade de passos é decidida no componente, e uma contagem repetida aqui
+   é o tipo de coisa que fica para trás quando um passo entra ou sai — foi
+   exatamente o que aconteceu quando "Atende e desenha" foi cortado.
+
+   Não existe `animation` aqui de propósito — o preenchimento é `scaleX(var(--p))`
+   e o `--p` é escrito pelo `onUpdate` da linha do tempo. Um segundo relógio, em
+   CSS, medindo o mesmo intervalo, dessincroniza sempre; e este aqui não é
+   relógio nenhum: é a posição da rolagem. */
+.est-vivo .pcs-regua {
+  position: absolute;
+  z-index: 5;
+  left: var(--pcs-borda);
+  right: var(--pcs-borda);
+  bottom: clamp(18px, 3.5vh, 34px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: clamp(4px, 0.6vw, 9px);
+  pointer-events: none;
+}
+
+.pcs-seg {
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(160, 205, 235, 0.18);
+  overflow: hidden;
+}
+
+.pcs-enche {
+  --p: 0;
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  /* Origem à esquerda: a barra enche no sentido da leitura. */
+  transform: scaleX(var(--p));
+  transform-origin: left center;
+  background: #66cdff;
+}
+
+/* Sem palco a régua não tem o que medir: quem rola não está mais preso numa
+   linha do tempo, está lendo nove blocos de texto em ordem. */
+.pcs:not(.est-vivo) .pcs-regua {
+  display: none;
+}
+
+/* ============ O ESTADO SEM SCRIPT ============
+
+   Sem `est-vivo` nada é escondido: a composição da cena fica em fluxo normal
+   (com o console montado e o pedido já escrito, herdado de `estudio.css`) e os
+   seis passos viram duas colunas de texto embaixo dela.
+
+   Duas colunas, e não uma lista longa: seis blocos com apoio empilhados numa
+   coluna só dariam três telas de rolagem para um conteúdo que é a legenda de uma
+   cena. */
+.pcs:not(.est-vivo) .pcs-legendas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  margin: clamp(1.75rem, 4vw, 2.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Sem palco o apoio não tem margem oposta para ocupar: ele desce e fica embaixo
+   do bloco, que é a ordem em que está escrito no marcado. A hairline passa para
+   o TOPO — deitada, ela ainda separa as duas vozes, que é a única coisa que ela
+   fazia em pé. */
+.pcs:not(.est-vivo) .pcs-legenda {
+  display: grid;
+  justify-items: start;
+  gap: 0.9rem;
+}
+
+.pcs:not(.est-vivo) .pcs-bloco {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pcs:not(.est-vivo) .pcs-apoio {
+  display: grid;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--hair);
+}
+
+.pcs:not(.est-vivo) .pcs-apoio-rot {
+  color: var(--fg-hot);
+}
+
+.pcs:not(.est-vivo) .pcs-apoio-txt {
+  color: var(--fg-2);
+}
+
+.pcs:not(.est-vivo) .pcs-tit {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--fg);
+}
+
+.pcs:not(.est-vivo) .pcs-txt {
+  color: var(--fg-2);
+}
+
+.pcs:not(.est-vivo) .pcs-rot {
+  color: var(--fg-2);
+}
+
+/* Sem palco, o realce volta à cor do tema: aqui o texto está sobre o fundo da
+   PÁGINA, que acompanha claro e escuro, e o azul fixo da cena ficaria berrante
+   no tema claro. É a mesma cor que o `mark` das manchetes usa. */
+.pcs:not(.est-vivo) .pcs-txt mark,
+.pcs:not(.est-vivo) .pcs-tit mark {
+  color: var(--fg-hot);
+}
+
+/* ============ ESTREITO ============
+
+   Abaixo de 1100px as duas colunas laterais somam menos que uma linha de texto
+   legível, e o console no meio não tem para onde encolher. O texto desce para o
+   rodapé do palco, sobre a cena, ocupando a largura inteira — a alternância de
+   lado perde o sentido quando não há dois lados.
+
+   O APOIO PASSA A SER UMA LINHA, e não uma coluna: empilhado embaixo do bloco
+   ele empurraria o texto principal para o meio da tela, e é ele que precisa
+   estar por baixo. Deitado, os dois itens dividem a largura e a hairline vira
+   uma linha de topo separando as duas vozes.
+
+   O véu vira vertical pelo mesmo motivo do texto: o contraste passou a ser
+   preciso embaixo, não nas bordas. */
+@media (max-width: 1100px) {
+  .est-vivo .pcs-legendas {
+    align-items: end;
+    padding: 0 clamp(20px, 6vw, 44px) clamp(58px, 12vh, 96px);
+  }
+
+  .est-vivo .pcs-legenda {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(0.9rem, 2.4vh, 1.4rem);
+    align-items: start;
+    max-width: 46ch;
+  }
+
+  .est-vivo .pcs-legenda[data-lado="e"] .pcs-bloco,
+  .est-vivo .pcs-legenda[data-lado="d"] .pcs-bloco,
+  .est-vivo .pcs-legenda[data-lado="e"] .pcs-apoio,
+  .est-vivo .pcs-legenda[data-lado="d"] .pcs-apoio {
+    grid-column: 1;
+    grid-row: auto;
+    justify-items: start;
+    text-align: left;
+    /* Só as laterais: a hairline vertical de cada lado sai, e a de topo que a
+       regra seguinte põe no apoio sobrevive. Zerar `border` inteiro aqui a
+       apagaria — esta regra tem especificidade maior que a de lá. */
+    padding-inline: 0;
+    border-inline: 0;
+  }
+
+  .est-vivo .pcs-apoio {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: clamp(0.9rem, 3vw, 1.6rem);
+    padding-top: clamp(0.7rem, 1.6vh, 1rem);
+    border-top: 1px solid rgba(102, 205, 255, 0.22);
+  }
+
+  .est-vivo .pcs-veu {
+    background: linear-gradient(
+      0deg,
+      rgba(3, 7, 11, 0.94) 0%,
+      rgba(3, 7, 11, 0.72) 26%,
+      rgba(3, 7, 11, 0) 52%
+    );
+  }
+
+  /* O console sobe: embaixo dele agora tem texto. Sem isto a conversa e o campo
+     ficariam atrás da legenda em telas baixas.
+
+     E o respiro lateral VOLTA AO NORMAL: em três colunas ele descontava a
+     largura das duas margens de texto, mas aqui não existe texto na margem
+     nenhuma — mantê-lo espremeria o console à toa, num tamanho de tela em que
+     ele já não tem folga sobrando. */
+  .est-vivo.pcs .est-ui {
+    align-content: start;
+    padding-top: clamp(28px, 7vh, 64px);
+    padding-inline: clamp(20px, 6vw, 44px);
+  }
+
+  .est-vivo.pcs .est-console {
+    width: min(100%, 34rem);
+  }
+
+  .est-vivo .est-topo {
+    height: clamp(150px, 26vh, 260px);
+  }
+}
+
+/* Abaixo de 640px cada segmento da régua tem ~30px, e a folga entre eles come
+   quase um terço disso. O vão encolhe para 3px: com a barra tão curta, o que
+   ainda se lê é a linha inteira enchendo — e é ela que precisa sobreviver. */
+@media (max-width: 640px) {
+  .est-vivo .pcs-regua {
+    gap: 3px;
+  }
+
+  /* Em coluna única o título tem a largura inteira da tela e não precisa do
+     corpo das três colunas — mas continua um degrau acima do que era antes do
+     texto crescer, pelo mesmo motivo de lá: ele é lido de relance, com vídeo
+     correndo atrás. */
+  .pcs-tit {
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+  }
+
+  .pcs-txt {
+    font-size: clamp(1rem, 4.2vw, 1.125rem);
+  }
+}

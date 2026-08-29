@@ -285,16 +285,6 @@
   }
 }
 
-/* ---- tema claro ---- */
-
-[data-tema="light"] .v5 .mod-det {
-  background: rgba(255, 255, 255, 0.9);
-}
-
-[data-tema="light"] .v5 .mod-det dd {
-  color: #16202a;
-}
-
 /* ---------- a seção reagindo à rolagem ----------
 
    A landing inteira anima por `animation-timeline: view()` — a posição do
