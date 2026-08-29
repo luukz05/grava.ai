@@ -41,16 +41,48 @@
    Pausa quando a seção sai da tela, quando a aba vai para o fundo e quando o
    ponteiro ou o foco está no quadro. Este último não é economia de bateria: é a
    válvula de escape exigida por qualquer coisa que troca de conteúdo sozinha —
-   ninguém deve perder o texto no meio da leitura porque um cronômetro venceu. */
+   ninguém deve perder o texto no meio da leitura porque um cronômetro venceu.
+
+   ───────────────────────────────────────────────────────────────────────────
+   O QUE VEM DEPOIS DA QUARTA: O FECHO
+
+   As quatro frentes dizem o que a IA FAZ. Nenhuma delas diz o que sai disso —
+   e é essa a pergunta que decide a franquia na cabeça de quem está avaliando:
+   "gravar o quê, exatamente?".
+
+   Por isso o ciclo não volta direto da 04 para a 01. Ele passa por um quinto
+   quadro que não é uma frente: a mesa inteira, com as peças de verdade e as
+   gravações de verdade — o Arthur, a Mariana, "Mãe te amo para sempre", o
+   cachorro da Luna, a data de casamento. É a resposta em uma imagem só.
+
+   ELE NÃO É UMA ABA, e essa distinção é o desenho todo. As quatro abas são
+   lugares onde a IA opera; o fecho é o resultado. Virar uma quinta aba faria
+   duas coisas erradas de uma vez: contradiria a manchete ("as quatro frentes")
+   e poria o produto no mesmo nível dos processos que o produzem. Então o
+   `tablist` continua com quatro botões e a 04 continua selecionada enquanto o
+   fecho está em cena — o que muda é só o conteúdo do painel. */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { IcoTotem, IcoOnline, IcoCrm, IcoEstoque } from "./icons";
 import { Ph } from "./ph";
+/* A foto do FECHO — ver o bloco "O QUE VEM DEPOIS DA QUARTA" logo abaixo.
+
+   JPEG e não PNG: é fotografia de cena, com fundo próprio, e não peça
+   recortada precisando de canal alfa. Em PNG o mesmo arquivo pesava 3 MB
+   contra 165 KB aqui, para representar exatamente a mesma imagem. */
+import mesa from "./produtos/mesa-completa.jpg";
 
 /* Quanto cada frente fica na tela. Medido pelo texto mais longo (o do CRM, 96
    caracteres): ~4s de leitura mais um respiro para o vídeo terminar de dizer o
    que tem a dizer antes de sair. */
 const DURACAO = 6500;
+
+/* O fecho fica MAIS TEMPO, e a razão é a densidade da imagem: as quatro frentes
+   mostram um clipe com um assunto cada, lido de relance; a mesa tem trinta e
+   poucos objetos e umas vinte gravações diferentes — nomes, datas, frases,
+   desenhos. Ninguém varre isso em 6,5 s. */
+const DURACAO_FECHO = 9000;
 
 type Frente = {
   id: string;
@@ -103,7 +135,25 @@ const FRENTES: Frente[] = [
 ];
 
 export function Frentes() {
-  const [ativo, setAtivo] = useState(0);
+  /* `passo` vai de 0 a FRENTES.length: os índices das frentes, mais UM no fim
+     que é o fecho. `ativo` é a aba SELECIONADA, derivada dele — no fecho ela
+     continua sendo a última.
+
+     A separação é o que mantém o resto do componente sem saber que o fecho
+     existe: o `tablist`, o `aria-selected`, o teclado e a pintura dos
+     segmentos leem `ativo` e continuam vendo quatro frentes. */
+  const [passo, setPasso] = useState(0);
+  const noFecho = passo === FRENTES.length;
+  /* A ABA marcada. No fecho continua sendo a última: ele não é aba, e deixar o
+     `tablist` sem nenhuma selecionada seria pior que mantê-la. */
+  const ativo = noFecho ? FRENTES.length - 1 : passo;
+  /* O SLOT DE MÍDIA visível, que NÃO é a mesma coisa que a aba marcada.
+
+     Durante o fecho nenhuma frente está em cena — quem ocupa a caixa é a foto.
+     Sem esta separação, o slot da quarta frente ficava com `data-ativo` (por
+     ler `ativo`) ao mesmo tempo que o fecho, e como o clipe e o placeholder
+     são opacos a foto ficava embaixo, invisível. */
+  const slotAtivo = noFecho ? -1 : passo;
 
   const quadroRef = useRef<HTMLDivElement>(null);
   /* Os elementos que recebem o `--p`. Um por segmento; escritos a cada quadro,
@@ -119,9 +169,11 @@ export function Frentes() {
      mesma função nos dois casos, então a diferença mora aqui. */
   const decorrido = useRef(0);
 
+  /* Clique e teclado escolhem uma FRENTE, nunca o fecho: ele não é aba e não
+     tem controle próprio — chega no fim do ciclo, como conclusão. */
   const ir = useCallback((i: number) => {
     decorrido.current = 0;
-    setAtivo(((i % FRENTES.length) + FRENTES.length) % FRENTES.length);
+    setPasso(((i % FRENTES.length) + FRENTES.length) % FRENTES.length);
   }, []);
 
   /* ---- o relógio ---- */
@@ -134,12 +186,19 @@ export function Frentes() {
        principal sozinho é justamente o que `reduce` pede para não acontecer. */
     const mm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+    /* Durante o fecho os quatro segmentos ficam CHEIOS: as quatro frentes já
+       passaram, e é isso que a régua conta. Um quinto segmento enchendo diria
+       que existe uma quinta frente; a régua parada no meio diria que o relógio
+       travou. */
     const pintar = (p: number) => {
       trilhas.current.forEach((el, i) => {
         if (!el) return;
-        el.style.setProperty("--p", i < ativo ? "1" : i > ativo ? "0" : p.toFixed(4));
+        const v = noFecho ? "1" : i < ativo ? "1" : i > ativo ? "0" : p.toFixed(4);
+        el.style.setProperty("--p", v);
       });
     };
+
+    const duracao = noFecho ? DURACAO_FECHO : DURACAO;
 
     if (mm.matches) {
       pintar(1);
@@ -158,18 +217,21 @@ export function Frentes() {
       if (p.fora || p.oculta || p.lendo) return;
 
       decorrido.current += dt;
-      if (decorrido.current >= DURACAO) {
+      if (decorrido.current >= duracao) {
         /* Não chama `ir`: o clique reinicia, o ciclo só continua. Zerar aqui e
-           deixar o `setAtivo` remontar o efeito dá o mesmo resultado com uma
-           volta a menos. */
+           deixar o `setPasso` remontar o efeito dá o mesmo resultado com uma
+           volta a menos.
+
+           O módulo é sobre `FRENTES.length + 1`: depois da quarta frente vem o
+           fecho, e só depois dele o ciclo volta à primeira. */
         decorrido.current = 0;
-        setAtivo((a) => (a + 1) % FRENTES.length);
+        setPasso((a) => (a + 1) % (FRENTES.length + 1));
         return;
       }
-      pintar(decorrido.current / DURACAO);
+      pintar(decorrido.current / duracao);
     };
 
-    pintar(decorrido.current / DURACAO);
+    pintar(decorrido.current / duracao);
     id = requestAnimationFrame(passo);
 
     /* A seção fora da tela não gasta quadro — e, mais importante, não consome o
@@ -194,7 +256,7 @@ export function Frentes() {
       io.disconnect();
       document.removeEventListener("visibilitychange", aoVisibilidade);
     };
-  }, [ativo]);
+  }, [ativo, noFecho]);
 
   /* ---- o vídeo ----
 
@@ -204,7 +266,10 @@ export function Frentes() {
   useEffect(() => {
     videos.current.forEach((v, i) => {
       if (!v) return;
-      if (i === ativo) {
+      /* No fecho NENHUM toca. Sem esta condição o clipe da quarta frente
+         continuaria rodando por trás da foto — invisível, decodificando quadro
+         a cada volta do ciclo, sem ninguém para ver. */
+      if (i === slotAtivo) {
         v.currentTime = 0;
         /* `play()` rejeita quando a aba está no fundo ou a política de
            autoplay muda de ideia. Não é erro que mereça console. */
@@ -213,7 +278,7 @@ export function Frentes() {
         v.pause();
       }
     });
-  }, [ativo]);
+  }, [slotAtivo]);
 
   /* ---- teclado ----
 
@@ -325,7 +390,7 @@ export function Frentes() {
                     videos.current[i] = el;
                   }}
                   className="fre-slot"
-                  data-ativo={i === ativo || undefined}
+                  data-ativo={i === slotAtivo || undefined}
                   src={item.video}
                   muted
                   loop
@@ -337,31 +402,70 @@ export function Frentes() {
                 <div
                   key={item.id}
                   className="fre-slot"
-                  data-ativo={i === ativo || undefined}
-                  aria-hidden={i !== ativo}
+                  data-ativo={i === slotAtivo || undefined}
+                  aria-hidden={i !== slotAtivo}
                 >
                   <Ph ratio="16 / 10" label={`Vídeo — ${item.rotulo}`} />
                 </div>
               ),
             )}
+
+            {/* O FECHO ocupa o mesmo slot dos clipes e se revela por opacidade,
+                como eles. É o que faz a mesa parecer o último quadro da mesma
+                sequência, e não um bloco novo aparecendo embaixo.
+
+                `data-ativo` no slot em vez de `hidden`: a transição de
+                opacidade precisa dos dois estados no DOM. */}
+            <div className="fre-slot fre-fecho" data-ativo={noFecho || undefined}>
+              <Image
+                src={mesa}
+                alt=""
+                /* `eager` porque o slot inativo vive em `opacity: 0`, e o
+                   Chrome não dispara carregamento adiado dentro de subárvore
+                   transparente — a foto chegaria branca na primeira volta.
+                   `low` porque ela só aparece depois de ~26 s de ciclo: tem
+                   toda a folga do mundo para carregar. */
+                loading="eager"
+                fetchPriority="low"
+                sizes="(max-width: 900px) 92vw, 55vw"
+              />
+            </div>
           </div>
 
           {/* Texto à direita. `key` no painel remonta o bloco a cada troca, que
               é o que re-dispara a animação de entrada — sem isso o texto trocava
-              no lugar, sem transição nenhuma. */}
+              no lugar, sem transição nenhuma. A `key` muda para "fecho" no
+              último quadro, então ele entra com a mesma animação das frentes. */}
           <div
             className="fre-texto"
             id="fre-painel"
             role="tabpanel"
             aria-labelledby={`fre-aba-${f.id}`}
-            key={f.id}
+            key={noFecho ? "fecho" : f.id}
           >
-            <span className="fre-ico" aria-hidden="true">
-              <f.Icone />
-            </span>
-            <span className="fre-onde mono">{f.rotulo}</span>
-            <h3 className="fre-tit">{f.titulo}</h3>
-            <p className="fre-faz">{f.faz}</p>
+            {noFecho ? (
+              <>
+                {/* SEM ÍCONE e sem o rótulo mono de lugar. Os dois marcam "esta
+                    é a frente tal"; aqui não há frente nenhuma — há o resultado
+                    das quatro. Repetir o desenho de uma aba faria o fecho ler
+                    como a quinta, que é justamente o que ele não é. */}
+                <h3 className="fre-tit">É isto que sai da máquina</h3>
+                <p className="fre-faz">
+                  Nome, data, frase, desenho — cada peça sai diferente da
+                  anterior. É o mesmo equipamento e o mesmo insumo; o que muda é
+                  a arte, e é a IA que a resolve em segundos.
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="fre-ico" aria-hidden="true">
+                  <f.Icone />
+                </span>
+                <span className="fre-onde mono">{f.rotulo}</span>
+                <h3 className="fre-tit">{f.titulo}</h3>
+                <p className="fre-faz">{f.faz}</p>
+              </>
+            )}
           </div>
         </div>
       </div>

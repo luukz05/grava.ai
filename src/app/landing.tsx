@@ -16,6 +16,7 @@ import "./gravidade.css";
    AsciiWaveHeader / AsciiMeter / AsciiTotem / AsciiCircuito no lugar de quem
    herdou o espaço deles. */
 import { Casca, Heroi, WHATSAPP } from "./casca";
+import { FundoFecho } from "./fundos";
 import { Gravidade } from "./gravidade";
 import { Modelos } from "./modelos";
 import { MapaUnidades } from "./mapa-unidades";
@@ -173,7 +174,18 @@ export function Landing({ tema }: { tema?: Tema }) {
 
       </div>
 
-      <footer className="hold close" id="falar">
+      {/* O fechamento leva a mesma carta topográfica do herói, mais ao fundo e
+          sem os gestos de abertura — ver `FundoFecho` em `fundos.tsx`.
+
+          A `.close-fundo` é a caixa de posicionamento: o `.fundo` é
+          `position: absolute`, e sem um ancestral posicionado ele se penduraria
+          na viewport em vez de no rodapé. O `<footer>` não serve para isso
+          porque é ele que tem o `.hold` (largura máxima e respiro lateral) — a
+          carta precisa sangrar de borda a borda, e não parar na coluna de
+          texto. */}
+      <div className="close-fundo">
+        <FundoFecho />
+        <footer className="hold close" id="falar">
         <div className="close-duo">
           <div>
             {/* A marca empilhada, que é a versão do documento do cliente para
@@ -221,7 +233,8 @@ export function Landing({ tema }: { tema?: Tema }) {
             { href: "/galeria", rotulo: "Galeria" },
           ]}
         />
-      </footer>
+        </footer>
+      </div>
     </Casca>
   );
 }

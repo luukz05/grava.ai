@@ -382,3 +382,109 @@
    `v5.css`, e as duas versões ainda eram sobrescritas por `.v5 .ph` mais
    abaixo no mesmo arquivo. Três declarações para um placeholder é a receita
    para alguém mudar a errada. Ficou uma, no `v5.css`. */
+
+/* ============ A CARTA NO FECHAMENTO ============
+
+   A página abre com o terreno vivo e fechava em fundo chapado — o material da
+   marca ficava preso ao herói, e quem rola até o fim (que é quem está
+   decidindo) chegava numa página que perdeu a assinatura pelo caminho. Aqui ela
+   volta, e fecha o arco.
+
+   O componente é o mesmo (`FundoFecho` em `fundos.tsx`, com a mesma
+   `CartaViva`); o que muda são as regras abaixo. A intenção é o MESMO terreno
+   visto mais ao fundo — e não um terreno diferente, que é o que sairia de mexer
+   nos parâmetros do shader. */
+
+/* A caixa de posicionamento do rodapé.
+
+   O `<footer>` não serve para isso: é ele que carrega o `.hold`, com largura
+   máxima e respiro lateral, e a carta precisa sangrar de borda a borda em vez
+   de parar na coluna de texto. Daí o invólucro.
+
+   `isolation: isolate` cria contexto de empilhamento próprio: sem ele, a carta
+   do rodapé e a do herói disputariam a mesma pilha em telas onde as duas caixas
+   chegam a se aproximar. */
+.close-fundo {
+  position: relative;
+  isolation: isolate;
+}
+
+/* O conteúdo por cima da carta. Sem isto o formulário e o rodapé ficariam no
+   mesmo nível do fundo, e a ordem de pintura passaria a depender da ordem do
+   HTML — que é exatamente o tipo de coisa que quebra quando alguém move um
+   bloco. */
+.close-fundo > .close {
+  position: relative;
+  z-index: 1;
+}
+
+/* MAIS FRACA QUE NO HERÓI, e por um motivo concreto: lá a carta divide a tela
+   com uma manchete e dois botões; aqui ela fica atrás de um FORMULÁRIO, que é a
+   única conversão da página. Fundo competindo com campo de texto custa lead.
+
+   A entrada é longa e a saída também: a carta nasce do nada na costura com a
+   seção anterior e se apaga antes do fim do documento, em vez de bater numa
+   borda reta. No herói a máscara só apaga embaixo, porque lá em cima ela
+   encosta na barra — aqui ela tem página dos dois lados. */
+.fundo--fecho {
+  opacity: 0.72;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 26%,
+    #000 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 26%,
+    #000 82%,
+    transparent 100%
+  );
+}
+
+/* O degradê de chão do herói não vale aqui: ele existe para dar corpo ao topo
+   da página, e no rodapé ele desenharia uma faixa mais clara atravessando o
+   fim do documento. O que fica é a carta sobre o fundo da própria página.
+
+   O seletor precisa do `.v5` e do `[data-tema]` para o tema CLARO: lá o
+   degradê vem de `[data-tema="light"] .v5 .fundo--topo` no `temas.css`, que
+   tem três níveis de especificidade e venceria `.fundo--fecho.fundo--topo`. É
+   a mesma razão pela qual as duas linhas abaixo existem em vez de uma. */
+.v5 .fundo--fecho.fundo--topo,
+[data-tema="light"] .v5 .fundo--fecho.fundo--topo {
+  background: none;
+}
+
+/* A luz fixa também baixa. Ela existe para a carta não virar textura uniforme —
+   esse trabalho continua sendo necessário —, mas no herói ela é o brilho que
+   puxa o olho para a manchete, e aqui o olho tem que ir para o formulário. */
+.fundo--fecho .topo-luz {
+  background: radial-gradient(
+    58% 66% at 28% 34%,
+    rgba(102, 205, 255, 0.07),
+    transparent 68%
+  );
+}
+
+/* Sem varredura de saída no rodapé. `tpApagar` acompanha o herói SAINDO da
+   tela, e é o gesto de "a página começou aqui e seguiu adiante". No fim do
+   documento não há nada adiante: a carta simplesmente termina com a máscara. */
+
+/* ---- tema claro ---- */
+
+/* No claro a carta é traço escuro sobre papel, e 0,5 de opacidade sobre branco
+   lê mais forte que os mesmos 0,5 sobre preto — o contraste do traço contra o
+   fundo é maior. Baixa mais um degrau. */
+[data-tema="light"] .v5 .fundo--fecho {
+  opacity: 0.34;
+}
+
+[data-tema="light"] .v5 .fundo--fecho .topo-luz {
+  background: radial-gradient(
+    58% 66% at 28% 34%,
+    rgba(44, 120, 168, 0.06),
+    transparent 68%
+  );
+}

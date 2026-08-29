@@ -12,6 +12,18 @@
 .fre {
   display: grid;
   gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  /* O RESPIRO ACIMA DO CABEÇALHO.
+
+     Este bloco vem logo depois da cena do totem, dentro da MESMA seção — as
+     duas dividem o `#ia`, e por isso não existe o `padding-block` do `.sec`
+     entre elas para separar. Sem esta margem, a manchete "O nosso maior
+     diferencial" nascia colada no último quadro da cena, e duas coisas de peso
+     visual muito diferente encostadas leem como uma só.
+
+     É maior que o `gap` interno de propósito: o espaço que separa dois
+     ASSUNTOS tem que ser visivelmente maior que o que separa as partes de um
+     deles. Aqui termina a cena e começa a explicação do que a opera. */
+  margin-top: clamp(3rem, 8vw, 6rem);
 }
 
 /* ---- a IA em evidência ----
@@ -271,5 +283,46 @@
 
   .fre-midia {
     aspect-ratio: 4 / 3;
+  }
+}
+
+/* ---------- o fecho da sequência ----------
+
+   Depois das quatro frentes, a mesa: as peças de verdade com as gravações de
+   verdade. Ela ocupa o mesmo slot dos clipes e se revela por opacidade, como
+   eles — é o último quadro da mesma sequência, não um bloco novo.
+
+   `object-fit: cover` como os vídeos: a caixa é 16/10 e a foto é 3/2, então o
+   corte é de poucos por cento na altura. A foto tem peça em toda a superfície,
+   então não existe canto que não possa ser cortado. */
+.fre-fecho img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A aproximação mínima enquanto a foto está em cena.
+
+   Ela existe por um motivo específico: as quatro frentes são VÍDEO, e vídeo se
+   mexe sozinho. Uma foto parada entrando no mesmo slot, depois de quatro
+   clipes, lê como o carrossel ter travado no último quadro. O movimento lento
+   diz "isto é uma fotografia, e é assim de propósito".
+
+   Lento e curto de propósito: 9 s para 2,5% de escala é quase imperceptível
+   por quadro, e é essa lentidão que separa "cena viva" de "efeito Ken Burns de
+   apresentação de slides". Não volta ao ponto de partida — `alternate` faria a
+   foto respirar, e respiração é o que um objeto vivo faz, não uma mesa posta. */
+@media (prefers-reduced-motion: no-preference) {
+  .fre-fecho[data-ativo] img {
+    animation: fre-aproxima 9s var(--e-ui) both;
+  }
+}
+
+@keyframes fre-aproxima {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.025);
   }
 }

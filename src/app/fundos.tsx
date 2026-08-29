@@ -97,3 +97,52 @@ export function FundoTopo() {
     </div>
   );
 }
+
+/* A MESMA CARTA, NO FECHAMENTO DA PÁGINA.
+
+   A página abre com o terreno vivo e fechava em fundo chapado. Isso deixava o
+   material da marca preso ao herói: quem rola até o fim — que é quem está
+   decidindo — chega numa página que perdeu a assinatura pelo caminho. Aqui ela
+   volta, e fecha o arco.
+
+   NÃO É UMA CÓPIA DO FUNDO DO HERÓI, e as diferenças são todas deliberadas:
+
+   — MAIS FRACA. Lá a carta divide a tela com uma manchete e dois botões; aqui
+     ela fica atrás de um FORMULÁRIO, que é a única conversão da página. Fundo
+     que compete com campo de texto custa lead. A opacidade da camada e a
+     máscara resolvem isso sem tocar nos parâmetros do shader — mexer neles
+     daria um terreno diferente, e o que se quer é o MESMO terreno mais ao
+     fundo.
+
+   — SEM LANTERNA E SEM PARALLAX DE PONTEIRO. Os dois são gesto de abertura:
+     convidam a mexer, a explorar. No fechamento o gesto que se pede é outro —
+     preencher e enviar —, e um fundo que reage ao cursor rouba justamente a
+     atenção que o formulário precisa. Sem o `SeguirPonteiro`, as variáveis
+     `--tp-*` ficam no estado de repouso e a lanterna nasce apagada.
+
+   — SEM MARCOS COTADOS. Eles carregam os números que a carta do herói exibe
+     como legenda de terreno. Repetidos aqui, viram enfeite: a mesma piada
+     contada duas vezes na mesma página.
+
+   — MÁSCARA INVERTIDA. No herói a carta some para BAIXO, entregando a página
+     ao conteúdo. Aqui ela nasce de cima e some para baixo também, mas com a
+     entrada mais longa: o fechamento recebe a carta gradualmente, em vez de
+     ela começar cheia bem na costura com a seção anterior.
+
+   O CUSTO DE GPU É ZERO NA PRÁTICA: o `topography.tsx` pausa o
+   `requestAnimationFrame` quando o canvas sai da tela (`IntersectionObserver`)
+   e quando a aba vai para o fundo. Herói e fechamento nunca estão visíveis ao
+   mesmo tempo, então nunca há dois laços rodando juntos — o que existe são dois
+   contextos WebGL alocados, que é barato ao lado de um laço de render. */
+export function FundoFecho() {
+  return (
+    <div className="fundo fundo--topo fundo--fecho" aria-hidden="true">
+      <div className="topo-camada topo-camada--gl">
+        <CartaViva marcos={false} />
+      </div>
+
+      <div className="topo-luz" />
+      <GraoFilme />
+    </div>
+  );
+}

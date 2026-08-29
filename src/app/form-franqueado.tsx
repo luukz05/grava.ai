@@ -10,7 +10,7 @@
    de captação pode fazer. Quando houver CRM, o `onSubmit` troca de destino e o
    resto da peça continua igual. */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const WHATSAPP = "5515996610916";
 
@@ -29,8 +29,36 @@ export function FormFranqueado() {
      é a única coisa que este formulário faz, e ele estava terminando em nada. */
   const [aberto, setAberto] = useState(false);
 
+  /* O estado do BOTÃO, que é diferente do estado do envio.
+
+     São três: parado, enviando e enviado. O `enviando` dura de propósito —
+     240ms — e essa espera é a única coisa artificial nesta peça. A razão: o
+     trabalho real aqui é montar uma string e chamar `window.open`, o que
+     leva menos de um quadro. Sem a pausa, o botão saltaria direto de "Receber
+     material" para o check, e o olho leria isso como glitch, não como
+     resposta. É o mesmo motivo pelo qual um botão de pagamento mostra o
+     spinner por um instante mesmo quando a resposta volta na hora.
+
+     Uma tentativa anterior de estado `enviando` foi removida deste arquivo
+     porque ligava e desligava dentro do mesmo `onSubmit` síncrono — o React
+     agrupava as duas escritas e o botão nunca chegava a renderizar. Aqui ele
+     passa por `setTimeout`, então cada estado tem o próprio quadro. */
+  const [fase, setFase] = useState<"parado" | "enviando" | "enviado">("parado");
+  const relogios = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  /* Quem cria timer limpa timer. Sem isto, sair da página entre o clique e o
+     check chama `setState` num componente desmontado. */
+  useEffect(() => {
+    const atuais = relogios;
+    return () => {
+      atuais.current.forEach(clearTimeout);
+      atuais.current = [];
+    };
+  }, []);
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (fase === "enviando") return;
 
     const d = new FormData(e.currentTarget);
     const linhas = [
@@ -49,6 +77,22 @@ export function FormFranqueado() {
     }
     setResgate(aba ? null : url);
     setAberto(Boolean(aba));
+
+    /* O bloqueio de pop-up é FALHA, e falha não ganha check. O botão volta ao
+       repouso e quem fala é o link de resgate logo abaixo. */
+    if (!aba) {
+      setFase("parado");
+      return;
+    }
+
+    setFase("enviando");
+    relogios.current.push(
+      setTimeout(() => setFase("enviado"), 240),
+      /* Volta ao repouso depois de ler. O formulário continua ali e a pessoa
+         pode enviar de novo — um botão que fica travado em "enviado" para
+         sempre é um formulário que perdeu a segunda tentativa. */
+      setTimeout(() => setFase("parado"), 3600),
+    );
   }
 
   return (
@@ -97,9 +141,59 @@ export function FormFranqueado() {
       </div>
 
       <div className="form-fr-pe">
-        <button className="cta cta--lg" type="submit">
-          Receber material no WhatsApp
+        {/* UM BOTÃO, TRÊS ESTADOS, E A CAIXA NÃO MUDA DE TAMANHO.
+
+            Os três rótulos vivem empilhados no mesmo lugar por grade — todos na
+            célula `1 / 1` —, e a largura do botão é a do mais largo dos três.
+            É o que impede a peça de encolher quando o texto vira "Enviado": um
+            botão que muda de tamanho no meio da confirmação puxa o layout ao
+            redor e desfaz a sensação de que a ação deu certo.
+
+            `aria-live` no invólucro para o leitor de tela acompanhar a troca,
+            e os rótulos inativos ficam `aria-hidden` — senão os três seriam
+            lidos em sequência. */}
+        <button
+          className="cta cta--lg form-fr-enviar"
+          type="submit"
+          data-fase={fase}
+          disabled={fase === "enviando"}
+        >
+          <span className="form-fr-rotulos" aria-live="polite">
+            <span className="form-fr-rotulo" aria-hidden={fase !== "parado"}>
+              Receber material no WhatsApp
+            </span>
+            <span className="form-fr-rotulo" aria-hidden={fase !== "enviando"}>
+              Abrindo a conversa…
+            </span>
+            <span className="form-fr-rotulo" aria-hidden={fase !== "enviado"}>
+              {/* O CHECK.
+
+                  `pathLength={100}` normaliza o comprimento do caminho para
+                  100, e o `stroke-dasharray` do CSS conta na MESMA escala —
+                  então o traço se desenha sem ninguém medir a geometria. É o
+                  mesmo recurso do traço dos ícones da página, e o desenho
+                  acontece no CSS.
+
+                  100 e NÃO 1: o dasharray é resolvido em unidades de usuário,
+                  que o Chrome trata como px. Com `pathLength="1"`, um
+                  dasharray de 1 cobria 1px de um caminho de ~22 e o traço
+                  ficava invisível — o check simplesmente nunca aparecia. */}
+              <svg className="form-fr-check" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  pathLength={100}
+                  d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Enviado
+            </span>
+          </span>
         </button>
+
         <p className="form-fr-aviso">
           Seus dados vão direto para a conversa. Nada é publicado e não existe
           cadastro em lista.

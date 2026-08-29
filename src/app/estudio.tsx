@@ -221,6 +221,7 @@ export function Estudio() {
 
           const vTotem = um<HTMLVideoElement>(".est-vid--totem");
           const vPecas = um<HTMLVideoElement>(".est-vid--pecas");
+          const imgMesa = um<HTMLImageElement>(".est-vid--mesa");
           const ui = um(".est-ui");
           const consola = um(".est-console");
           const digitado = um(".est-digitado");
@@ -304,6 +305,7 @@ export function Estudio() {
           gsap.set(q(".est-feixe"), { autoAlpha: 0 });
           gsap.set(q(".est-flash"), { autoAlpha: 0 });
           gsap.set(vPecas, { autoAlpha: 0 });
+          gsap.set(imgMesa, { autoAlpha: 0 });
           digitado.textContent = "";
 
           const tl = gsap.timeline({
@@ -472,6 +474,27 @@ export function Estudio() {
             .to(q(".est-flash"), { autoAlpha: 0, duration: 0.7 }, "pecas+=0.1")
             .to(chPecas.alvo, { ...chPecas.fim, duration: 3 }, "pecas");
 
+          /* 11 — O FECHO. A cena terminava aqui, no último quadro do vídeo das
+             peças: a câmera parada no meio de um movimento de aproximação.
+             Quadro congelado de vídeo não lê como fim — lê como travamento, e
+             era o que ficava na tela enquanto a pessoa decidia se continuava.
+
+             A foto entra por cima, esmaecendo, nos últimos 20% do movimento de
+             câmera. A sobreposição é deliberada: se ela entrasse depois do
+             vídeo parar, existiria um instante de imagem travada — que é
+             exatamente o defeito que este bloco existe para remover. Entrando
+             enquanto a câmera ainda anda, o movimento do vídeo se dissolve no
+             repouso da fotografia.
+
+             O vídeo é apagado DEPOIS da troca terminar. Ele fica por baixo
+             durante a passagem, e some quando já não se vê — apagar junto
+             deixaria o fundo do palco aparecendo no meio do cross-fade.
+
+             `autoAlpha` e não `opacity`: ele leva o `visibility` junto, então a
+             foto sai do caminho de verdade enquanto está apagada. */
+          tl.to(imgMesa, { autoAlpha: 1, duration: 1.2 }, "pecas+=2.2")
+            .set(vPecas, { autoAlpha: 0 }, "pecas+=3.4");
+
           /* A classe `est-vivo` sangra a seção para a largura da tela, e isso
              muda a altura do documento. O ScrollTrigger já mediu antes disso —
              ele não observa mudanças de layout que ele próprio não causou — e
@@ -540,6 +563,40 @@ export function Estudio() {
             muted
             playsInline
             preload="none"
+            aria-hidden="true"
+          />
+
+          {/* O FECHO DA CENA.
+
+              O vídeo das peças terminava congelado no último quadro, com a
+              câmera parada no meio do zoom — e quadro parado de vídeo lê como
+              travamento, não como fim. É o pior lugar possível para isso
+              acontecer: é o último frame da cena, o que fica na tela enquanto a
+              pessoa decide se continua rolando.
+
+              No lugar dele entra a mesa: as peças de verdade, com as gravações
+              de verdade. A cena inteira vinha construindo "a máquina grava";
+              esta foto responde a pergunta que sobra — grava O QUÊ. Nome, data,
+              frase, desenho.
+
+              É `<img>` e não `<video>` de propósito: uma fotografia parada é um
+              fim de cena legítimo, um vídeo parado é um defeito.
+
+              Fora do `next/image` porque este palco é sangrado para a largura
+              da tela por JavaScript (`--est-sangria`) e a caixa muda de tamanho
+              depois da montagem — o `sizes` do otimizador seria um palpite
+              errado a cada redimensionamento. O arquivo tem 165 KB e é servido
+              como está.
+
+              `loading="eager"`: ela vive em `opacity: 0` até a última batida, e
+              o Chrome não dispara carregamento adiado dentro de subárvore
+              transparente — chegaria branca justamente no quadro final. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="est-vid est-vid--mesa"
+            src="/cena/mesa-completa.jpg"
+            alt=""
+            loading="eager"
             aria-hidden="true"
           />
 

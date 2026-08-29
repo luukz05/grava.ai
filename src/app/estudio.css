@@ -85,10 +85,26 @@
   object-fit: cover;
 }
 
-/* Sem script, o segundo vídeo fica escondido: dois players empilhados em fluxo
-   normal seriam dois retângulos pretos sem explicação. */
-.estudio:not(.est-vivo) .est-vid--pecas {
+/* Sem script, só o primeiro fica: os outros dois empilhados em fluxo normal
+   seriam um retângulo preto e uma foto solta, sem explicação. A cena inteira
+   depende do GSAP, e o estado sem ele é o primeiro quadro — não a pilha toda.
+
+   A foto do fecho entra na mesma regra pelo mesmo motivo. */
+.estudio:not(.est-vivo) .est-vid--pecas,
+.estudio:not(.est-vivo) .est-vid--mesa {
   display: none;
+}
+
+/* A foto do fecho ocupa a mesma caixa dos vídeos e recorta igual — é o último
+   quadro da mesma cena, não um bloco novo. O que a distingue é ela ser parada:
+   quadro congelado de VÍDEO lê como travamento; uma fotografia lê como fim.
+
+   Fica acima dos dois vídeos na pilha (`z-index`) porque ela entra POR CIMA do
+   vídeo das peças enquanto ele ainda está se movendo — a passagem é um
+   cross-fade, e sem isto a foto apareceria por baixo do quadro que ela deveria
+   estar substituindo. */
+.est-vivo .est-vid--mesa {
+  z-index: 1;
 }
 
 /* ============ O CONSOLE ============

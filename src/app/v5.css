@@ -1071,9 +1071,20 @@
     display: block;
   }
 
+  /* O reset precisa desfazer TAMBÉM o `justify-self` e o `grid-area`, e não
+     só a tipografia. `justify-self` vale para caixa de bloco nos navegadores
+     atuais, não apenas para item de grade: com `end` herdado da regra de
+     cima, o parágrafo encolhia para o tamanho do próprio texto (410px numa
+     coluna de 652) e ia para a direita — desalinhado da manchete logo acima,
+     que começa na borda esquerda. Era o desalinho visível no fechamento.
+
+     `grid-area: auto` pelo mesmo motivo: sobrava apontando para a coluna 2 de
+     uma grade que aqui não existe mais. */
   .close-duo .sec-cab > p {
+    grid-area: auto;
+    justify-self: start;
     margin: 0.85rem 0 0;
-    max-width: 72ch;
+    max-width: 52ch;
     font-size: inherit;
     text-align: left;
     padding-top: 0;
@@ -1483,9 +1494,18 @@
 .form-fr {
   border: 1px solid var(--hair);
   background: var(--bg-2);
-  padding: clamp(1.15rem, 3vw, 1.9rem);
+  border-radius: var(--r-lg, 24px);
+  padding: clamp(1.35rem, 3.2vw, 2.25rem);
   display: grid;
-  gap: clamp(1rem, 2.5vw, 1.4rem);
+  /* O ritmo interno é de UM valor, e não de margens por elemento: cabeçalho,
+     campos e pé são três blocos de mesmo peso, e o que os separa é sempre a
+     mesma distância. Antes cada um trazia a própria margem e o espaçamento
+     variava de par para par. */
+  gap: clamp(1.15rem, 2.6vw, 1.6rem);
+  /* Alinha o topo do formulário com o topo da marca na coluna ao lado: o
+     `.close-duo` alinha por `start`, e sem isto o cartão nasce colado no
+     texto acima dele. */
+  align-content: start;
 }
 
 .form-fr-head h3 {
@@ -1512,7 +1532,10 @@
 .form-fr-campos {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.85rem;
+  /* Mais largo que o respiro interno do campo (0,35rem entre rótulo e caixa):
+     é o que faz "rótulo + campo" ler como uma unidade, e não os quatro
+     elementos como uma lista de quatro. */
+  gap: 1rem;
 }
 
 @media (max-width: 560px) {
@@ -1602,7 +1625,7 @@
 
 .form-fr-pe {
   display: grid;
-  gap: 0.65rem;
+  gap: 0.8rem;
 }
 
 .form-fr-pe .cta {
@@ -1612,9 +1635,148 @@
   font-family: var(--f-txt), system-ui, sans-serif;
 }
 
-.form-fr-pe .cta:disabled {
-  opacity: 0.6;
+/* ---------- o botão de envio, em três estados ----------
+
+   A regra da casa é a da Apple: a resposta ao dedo é imediata e o que se move
+   depois tem massa. O `.cta` já traz o aperto em 90ms lineares e a volta na
+   mola; o que este bloco acrescenta é o que acontece DEPOIS do clique.
+
+   A CAIXA NÃO MUDA DE TAMANHO em nenhum dos três estados. Os rótulos estão
+   empilhados na mesma célula de grade, então a largura do botão é a do mais
+   largo dos três e permanece a mesma quando o texto vira "Enviado". Botão que
+   encolhe no meio da confirmação empurra o aviso abaixo dele e desfaz a
+   sensação de conclusão — o layout tremendo no exato momento em que a pessoa
+   procura por certeza. */
+.form-fr-enviar {
+  position: relative;
+  overflow: hidden;
+  /* A troca de cor do fundo acompanha a fase; o `transform` continua vindo do
+     `.cta`, e por isso não é redeclarado aqui. */
+  transition: background-color var(--t-mov) var(--e-ui),
+    color var(--t-mov) var(--e-ui);
+}
+
+.form-fr-enviar:disabled {
   cursor: progress;
+  /* Sem `opacity`: o botão desbotado dizia "indisponível", que é o oposto do
+     que está acontecendo — ele está justamente trabalhando. Quem diz isso é o
+     rótulo, que muda para "Abrindo a conversa…". */
+}
+
+/* Os três rótulos ocupam a MESMA célula. É isto que trava a largura. */
+.form-fr-rotulos {
+  display: grid;
+  place-items: center;
+}
+
+.form-fr-rotulo {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  /* O que sai e o que entra: o de saída sobe, o de entrada vem de baixo. É a
+     mesma direção do relógio de um cartão da Apple — o conteúdo novo empurra o
+     antigo para cima, e não os dois cruzando no mesmo ponto. */
+  opacity: 0;
+  translate: 0 0.6rem;
+  transition: opacity 160ms var(--e-ui), translate var(--t-mov) var(--e-mola);
+}
+
+/* `aria-hidden="false"` marca o rótulo da vez — o mesmo atributo que o leitor
+   de tela usa é o que o CSS lê, então não existe estado duplicado entre os
+   dois. */
+.form-fr-rotulo[aria-hidden="false"] {
+  opacity: 1;
+  translate: none;
+}
+
+/* O rótulo que saiu vai para CIMA, não volta para baixo de onde veio. */
+.form-fr-rotulo[aria-hidden="true"] {
+  translate: 0 -0.6rem;
+  pointer-events: none;
+}
+
+/* ---------- o estado enviado ----------
+   O botão vira confirmação: fundo na cor da marca em cheio e o check se
+   desenhando. Aqui a cor NÃO é decoração — é o que separa "a página respondeu"
+   de "o texto mudou".
+
+   O SELETOR PRECISA DE DUAS CLASSES, e isto não é preciosismo de
+   especificidade: logo acima, `.cta:hover` e `.cta:focus-visible` pintam o
+   botão de #57b6f0 com peso (0,2,0) — e depois de um clique o botão FICA com o
+   cursor em cima e, no teclado, com o foco. Escrito com uma classe só, a
+   confirmação perdia para o hover e o fundo continuava azul de botão comum,
+   que é exatamente o estado que ela existe para não parecer.
+
+   `.cta.form-fr-enviar[data-fase]` dá (0,3,0) e ganha das duas sem
+   `!important` — a página inteira não usa nenhum, e não é aqui que começa. */
+.cta.form-fr-enviar[data-fase="enviado"] {
+  background: var(--fg-hot);
+  color: #04131e;
+}
+
+.form-fr-check {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+}
+
+/* O traço do check é desenhado, não aparecido. `pathLength="1"` no SVG
+   normaliza o comprimento do caminho, então estes dois valores não dependem da
+   geometria — é o mesmo recurso do traço dos ícones da página. */
+.form-fr-check path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .form-fr-enviar[data-fase="enviado"] .form-fr-check path {
+    animation: checkRisca 420ms var(--e-ui) both;
+    /* `both` segura o quadro final ENQUANTO a regra vale. Ela só vale na fase
+       "enviado", e é o que se quer: ao voltar para "parado" o traço se desfaz
+       junto com o rótulo que o carrega, e o próximo envio desenha de novo em
+       vez de encontrar um check já pronto. */
+  }
+
+  /* O pulso do fundo no instante da confirmação. Um só, curto, e é o que dá o
+     "peso" da coisa acontecendo — o equivalente visual do toque háptico que a
+     Apple dispara junto de uma confirmação.
+
+     `box-shadow` e não `transform`: o botão não pode crescer, senão a
+     largura que o resto deste bloco trabalha para travar se mexeria. */
+  .form-fr-enviar[data-fase="enviado"] {
+    animation: enviouPulso 620ms var(--e-ui) both;
+  }
+}
+
+/* Sem movimento, o check já está desenhado. O estado final é o que importa: a
+   pessoa precisa ver que enviou, e é o traço que diz isso — o que sai é ele se
+   formando, não ele existir. */
+@media (prefers-reduced-motion: reduce) {
+  .form-fr-enviar[data-fase="enviado"] .form-fr-check path {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkRisca {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes enviouPulso {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--fg-hot) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--fg-hot) 0%, transparent);
+  }
 }
 
 .form-fr-aviso {

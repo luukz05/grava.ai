@@ -298,7 +298,14 @@ function MarcosCotados({ registrar }: { registrar: (fn: (a: Amostrador) => void)
   );
 }
 
-export function CartaViva() {
+/* `marcos` existe por causa do fechamento da página, que usa a mesma carta sem
+   as cotas: elas são legenda de terreno e, repetidas no rodapé, viram enfeite —
+   a mesma piada contada duas vezes na mesma página. Ver `FundoFecho` em
+   `fundos.tsx`.
+
+   Padrão `true` para o herói, que é quem tinha o comportamento antes de este
+   parâmetro existir: acrescentar opção não deve mudar quem já estava lá. */
+export function CartaViva({ marcos = true }: { marcos?: boolean } = {}) {
   const tema = useTema();
   const cor = PALETA[tema];
 
@@ -347,7 +354,7 @@ export function CartaViva() {
            inteiro é `pointer-events: none` — o canvas nem receberia o evento. */
         mouseInteraction={false}
       />
-      <MarcosCotados registrar={registrar} />
+      {marcos ? <MarcosCotados registrar={registrar} /> : null}
     </>
   );
 }
