@@ -54,6 +54,15 @@
 
 .mapa-pino {
   fill: var(--fg-hot);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--t-mov) var(--e-mola);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mapa-ponto:hover .mapa-pino {
+    transform: scale(1.25);
+  }
 }
 
 .mapa-halo {
@@ -207,14 +216,15 @@
 .uni {
   margin: 0;
   border: 1px solid var(--hair);
-  border-radius: 18px;
+  border-radius: 24px;
   overflow: hidden;
   background: var(--bg-2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14), 0 14px 30px -18px rgba(0, 0, 0, 0.5);
 }
 
 /* A foto tem proporção fixa, e é isso que sustenta o ciclo: unidade com foto
    alta e unidade com foto larga fariam o painel crescer e encolher a cada 5s, e
-   a página inteira abaixo dele pularia junto. */
+   a página inteira abaixo dela pularia junto. */
 .uni-foto {
   position: relative;
   aspect-ratio: 16 / 10;

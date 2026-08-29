@@ -2540,12 +2540,16 @@
    ideia do índice na margem — a referência não pode sair de cena enquanto o
    detalhe é lido. */
 
+/* O fio de topo saiu quando os dois lados ganharam superfície: régua cortando
+   por cima de dois cartões é moldura em volta de moldura. O gap entre eles
+   passou a ser o que separa, e ele encolheu — 4rem de vão fazia sentido entre
+   duas colunas de texto solto, mas entre dois blocos com borda própria o vão
+   grande desfaz o par. */
 .num-quadro {
   padding-block: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 3vw, 2rem);
-  border-top: 1px solid var(--hair);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
+  gap: clamp(1rem, 2.4vw, 1.75rem);
   align-items: start;
 }
 
@@ -2556,11 +2560,56 @@
   }
 }
 
+/* ---------- o lado do valor ----------
+   O número é o argumento da seção, e até aqui ele flutuava sobre o fundo da
+   página como texto solto. Agora tem chão próprio, e o chão é a cor da marca:
+   uma lavagem de ciano subindo do pé do cartão, mais forte que a dos quatro
+   percentuais porque este é o bloco que eles qualificam.
+
+   O gradiente vai por `background-image` sobre `--bg-2`, e não numa camada
+   separada: o cartão é sticky, e camada posicionada dentro de sticky é uma
+   fonte de repintura a cada quadro de rolagem sem nada em troca. */
+.num-face {
+  padding: clamp(1.25rem, 3vw, 1.9rem);
+  background:
+    radial-gradient(
+      130% 90% at 50% 112%,
+      color-mix(in srgb, var(--cyan) 16%, transparent),
+      transparent 66%
+    ),
+    var(--bg-2);
+  border: 1px solid var(--hair-hot);
+  border-radius: var(--r-lg, 24px);
+}
+
 @media (min-width: 901px) {
   .num-face {
     position: sticky;
     /* Barra do topo mais o respiro que o resto dos sticky da página usa. */
     top: 6rem;
+  }
+}
+
+/* O halo enquanto a contagem corre. Ele respira até o número pousar e some
+   depois — é o único jeito de o CARTÃO participar da contagem sem mover nada
+   de lugar. O componente liga `data-pousou` quando o valor chega, e a partir
+   dali o cartão fica parado: brilho que pulsa para sempre atrás do preço vira
+   anúncio piscando.
+
+   `box-shadow` e não filtro: sombra é composta pela GPU e não força
+   repintura do conteúdo do cartão a cada quadro. */
+@media (prefers-reduced-motion: no-preference) {
+  .num-face:not([data-pousou]) {
+    animation: numPulsa 1.2s var(--e-ui) infinite alternate;
+  }
+}
+
+@keyframes numPulsa {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cyan) 0%, transparent);
+  }
+  to {
+    box-shadow: 0 0 34px -6px color-mix(in srgb, var(--cyan) 34%, transparent);
   }
 }
 
@@ -2610,27 +2659,48 @@
    largura somavam mais altura que o resto do bloco todo, e nenhum deles tem
    texto que justifique uma linha própria na página.
 
-   O fio de baixo fechando o quadro do investimento mudou de lugar junto — ele
-   estava no `.num-quadro` e agora fecha embaixo desta faixa, senão haveria uma
-   régua cortando entre as parcelas e o que continua sendo o mesmo assunto. */
+   Não há mais fio fechando o bloco por baixo: os cartões desenham a si mesmos,
+   e a régua embaixo do último cartão duplicaria a borda dele. Quem separa esta
+   seção da próxima é o `border-bottom` do `.sec`. */
 .num-juntos-bloco {
   padding-block: 0 clamp(1.5rem, 4vw, 2.5rem);
-  border-bottom: 1px solid var(--hair);
+}
+
+/* A composição é o par do cartão do valor e veste o mesmo material — sem a
+   lavagem de ciano, que é do lado que carrega o número. */
+.num-composicao {
+  padding: clamp(1.25rem, 3vw, 1.9rem);
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-lg, 24px);
 }
 
 .num-parcelas {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--hair);
 }
 
+/* As linhas são divididas por fio ENTRE elas, não em volta de cada uma: dentro
+   de um cartão que já tem borda, régua no topo da primeira e no pé da última
+   duplica a moldura. */
 .num-parcelas li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.1rem 1rem;
   padding-block: clamp(0.85rem, 2vw, 1.1rem);
-  border-bottom: 1px solid var(--hair);
+}
+
+.num-parcelas li + li {
+  border-top: 1px solid var(--hair);
+}
+
+.num-parcelas li:first-child {
+  padding-top: 0;
+}
+
+.num-parcelas li:last-child {
+  padding-bottom: 0;
 }
 
 .num-parcela-rot {
@@ -2714,42 +2784,55 @@
   }
 }
 
+/* Cada um vira cartão, pelo mesmo motivo que o resto da seção virou: o fio de
+   2px no topo era o único desenho que estes cinco tinham, e ele funcionava
+   enquanto nada em volta tinha superfície. Ao lado de três blocos com borda e
+   raio, cinco riscos soltos leem como conteúdo que ficou de fora.
+
+   O que o fio fazia continua sendo feito, e por dois meios: a cor de realce
+   agora é um PONTO à esquerda do título, e o material é visivelmente mais leve
+   que o do cartão das parcelas — fundo sem borda contra fundo com borda. Ali
+   cada linha é uma quantia, aqui nenhuma é, e os dois grupos continuam sem se
+   confundir. */
 .num-juntos li {
   display: grid;
   gap: 0.2rem;
   align-content: start;
-  /* O fio mudou da esquerda para o topo quando a lista virou faixa. Numa
-     coluna, fio à esquerda é o que amarra os itens; numa fileira, ele viraria
-     cinco riscos verticais brigando com a leitura horizontal. Em cima, os cinco
-     fios formam uma régua tracejada que diz "estes são pares" — que é
-     exatamente a informação.
-
-     O que ele não pode deixar de fazer é separar este grupo das parcelas: ali
-     cada linha é uma quantia, aqui nenhuma é. Dois grupos com o mesmo desenho
-     leriam como a mesma lista, e a soma pararia de fechar na cabeça de quem lê.
-     Fio na horizontal, na cor de realce, continua dizendo isso. */
-  padding-top: clamp(0.7rem, 1.6vw, 0.9rem);
-  border-top: 2px solid var(--hair-hot);
+  padding: clamp(0.85rem, 2vw, 1.1rem);
+  background: color-mix(in srgb, var(--fg) 3.5%, transparent);
+  border-radius: var(--r-md, 16px);
+  transition: background-color var(--t-ui) var(--e-ui);
 }
 
-/* Empilhado o fio volta para a esquerda: cinco réguas horizontais uma embaixo
-   da outra leriam como cinco seções, não como cinco itens de uma lista. */
-@media (max-width: 760px) {
-  .num-juntos li {
-    padding-top: 0;
-    padding-left: clamp(0.85rem, 2vw, 1.15rem);
-    border-top: 0;
-    border-left: 2px solid var(--hair-hot);
+@media (hover: hover) and (pointer: fine) {
+  .num-juntos li:hover {
+    background: color-mix(in srgb, var(--cyan) 8%, transparent);
   }
 }
 
+/* O ponto que substitui o fio. `::before` e não um elemento: é decoração
+   pura, e o texto do item já está inteiro no HTML. */
 .num-junto-tit {
+  position: relative;
+  padding-left: 0.95rem;
   font-size: 0.9375rem;
   font-weight: 700;
   color: var(--fg);
 }
 
+.num-junto-tit::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--fg-hot);
+}
+
 .num-junto-txt {
+  padding-left: 0.95rem;
   color: var(--fg-2);
   font-size: 0.875rem;
   max-width: 48ch;
@@ -2813,14 +2896,33 @@
   }
 }
 
+/* ---------- os quatro percentuais do contrato ----------
+   Eram quatro células de um bloco de `gap: 1px` sobre fundo — a mesma régua
+   de tabela que a página usa para dado dentro de tabela. Aqui não é tabela: é
+   o degrau seguinte do preço, logo abaixo do quadro do investimento, e ele
+   estava lendo como rodapé de planilha ao lado de um número de 5,5rem.
+
+   Três coisas mudaram, e as três são a mesma decisão — estes quatro são
+   CARTÃO, como o painel do mapa e o cartão da seção sobre:
+
+   1. SUPERFÍCIE PRÓPRIA. `--bg-2` com fio de 1px e raio, e não recorte de
+      fundo por gap. É o material que o resto da página usa para "isto é um
+      bloco", e sem ele a grade não tinha borda nenhuma no tema claro.
+   2. HIERARQUIA DENTRO DA CÉLULA. O rótulo é mono miúdo, o valor é display
+      grande. Estavam a um degrau de distância (11px contra 22px); agora são
+      dois, e o olho pega os quatro valores antes de ler qualquer rótulo.
+   3. O PAYBACK É O PRIMEIRO E NÃO É IGUAL AOS OUTROS. "6 a 12 meses" é a
+      resposta que o candidato procura; royalties e taxa de marketing são o
+      custo que ele aceita depois de ver a resposta. Ele acende no ciano da
+      marca, com um halo fraco atrás — os outros três ficam na tinta cheia.
+
+   O raio vem de `--r-lg`, o mesmo token do `.sobre-card`. */
+
 .num-grade {
-  margin-inline: -1rem;
   margin-block: 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--hair);
-  border-bottom: 1px solid var(--hair);
+  gap: clamp(0.6rem, 1.4vw, 1rem);
 }
 
 @media (max-width: 860px) {
@@ -2836,7 +2938,7 @@
 
   .num-item {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
   }
@@ -2851,8 +2953,36 @@
 }
 
 .num-item {
-  background: var(--bg);
-  padding: clamp(1rem, 2.4vw, 1.4rem) 1rem;
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-lg, 24px);
+  padding: clamp(1rem, 2.4vw, 1.4rem) clamp(1rem, 2vw, 1.25rem);
+  /* Só a borda transiciona: o cartão não se move nem cresce no cursor. Estes
+     quatro não são clicáveis, e bloco que reage como botão a algo que não
+     clica é promessa quebrada — a mesma razão pela qual o nó da órbita perdeu
+     o `cursor: pointer`. */
+  transition: border-color var(--t-ui) var(--e-ui),
+    background-color var(--t-ui) var(--e-ui);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .num-item:hover {
+    border-color: var(--hair-hot);
+  }
+}
+
+/* O primeiro cartão é a resposta, não mais um custo. Halo fraco subindo do
+   pé, do mesmo jeito que o brilho do arco da órbita: dá peso sem somar uma
+   segunda cor de borda ao lado dos outros três. */
+.num-item:first-child {
+  border-color: var(--hair-hot);
+  background:
+    radial-gradient(
+      120% 100% at 50% 118%,
+      color-mix(in srgb, var(--cyan) 13%, transparent),
+      transparent 68%
+    ),
+    var(--bg-2);
 }
 
 .num-rot {
@@ -2862,12 +2992,22 @@
 }
 
 .num-grade .num-val {
-  margin: 0.4rem 0 0;
-  font-size: clamp(1.0625rem, 2vw, 1.375rem);
+  margin: 0.55rem 0 0;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  /* Um degrau acima do que era (1,375rem de teto): estes quatro vinham do
+     mesmo corpo do texto de apoio e sumiam ao lado do quadro do
+     investimento. */
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
   color: var(--fg);
+  text-wrap: balance;
+}
+
+.num-item:first-child .num-val {
+  color: var(--fg-hot);
 }
 
 .num-nota {
@@ -3377,24 +3517,41 @@
        O que continua sendo rolagem é a grade dos quatro percentuais, que é
        texto parado. */
 
-    /* Mesmo motivo da lista da órbita: a grade dos quatro números é feita de
-       `gap: 1px` sobre fundo, então quem sobe é o texto dentro da célula. */
-    .v5 .num-item > * {
+    /* Quem entra é o cartão inteiro. Enquanto a grade era `gap: 1px` sobre
+       fundo, mover a célula deixava a tira de 1px aparecendo por baixo e só o
+       texto podia subir; com cartões separados por gap de verdade, o bloco
+       entra como entram `.loja` e `.sobre-card`. */
+    .v5 .num-grade > .num-item {
       animation: sobeCurto linear both;
       animation-timeline: view();
       animation-range: entry 10% cover 30%;
     }
 
-    .v5 .num-grade > .num-item:nth-child(2) > * {
+    .v5 .num-grade > .num-item:nth-child(2) {
       animation-range: entry 13% cover 33%;
     }
 
-    .v5 .num-grade > .num-item:nth-child(3) > * {
+    .v5 .num-grade > .num-item:nth-child(3) {
       animation-range: entry 16% cover 36%;
     }
 
-    .v5 .num-grade > .num-item:nth-child(4) > * {
+    .v5 .num-grade > .num-item:nth-child(4) {
       animation-range: entry 19% cover 39%;
+    }
+
+    /* Os dois cartões do quadro entram como par, e não em cascata: eles são
+       uma frase só — "este é o preço" à esquerda, "e é disto que ele é feito"
+       à direita. Escalonar os dois faria a composição chegar depois do valor,
+       que é exatamente a leitura que o bloco existe para desfazer.
+
+       Faixa curta e passo curto: o cartão da esquerda é `sticky`, e elemento
+       que gruda entrando com deslocamento longo briga com a própria rolagem
+       que o prende. */
+    .v5 .num-face,
+    .v5 .num-composicao {
+      animation: sobeCurto linear both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 26%;
     }
   }
 }

@@ -14,6 +14,24 @@
    a pessoa se interessa, e nada na tela diz que um perdeu.
 
    ───────────────────────────────────────────────────────────────────────────
+   O PAINEL FECHADO MOSTRA NOME E PREÇO, E MAIS NADA
+
+   Havia aqui um ícone em bolinha acima do nome e uma linha de resumo abaixo do
+   preço ("Ilha no corredor, atendimento pelos quatro lados"). Os dois saíram a
+   pedido, e o desenho ficou melhor por dois motivos além do pedido:
+
+   — o ÍCONE não distinguia nada. Os três eram um pictograma genérico de lugar,
+     e a foto logo atrás dele já diz o que cada modelo é, com mais precisão do
+     que 16px de traço conseguem.
+   — o RESUMO já era conteúdo em fuga: ele desaparecia no hover justamente
+     porque repetia, pior, o que o detalhe diz melhor. Uma linha que existe para
+     sumir assim que a pessoa demonstra interesse é uma linha que a seção não
+     precisava ter.
+
+   O que sobra no painel fechado é a hierarquia mínima que a escolha pede: qual
+   modelo é, e quanto custa. O resto entra quando o painel abre.
+
+   ───────────────────────────────────────────────────────────────────────────
    VEIO DE UM COMPONENTE DE GALERIA, E FOI PORTADO — NÃO COPIADO
 
    A referência era React com Tailwind, shadcn e framer-motion. Nenhum dos três
@@ -39,27 +57,22 @@
    compacta" porque ela ainda não nomeou. */
 
 import { Ph } from "./ph";
-import { IcoShopping, IcoMercado, IcoAeroporto } from "./icons";
 
 type Modelo = {
   id: string;
   nome: string;
-  resumo: string;
   /* PROVISÓRIO — aguardando a franqueadora. */
   investimento: string;
   imagem: string;
   detalhes: { rotulo: string; valor: string }[];
-  Icone: (p: { className?: string }) => React.ReactElement;
 };
 
 const MODELOS: Modelo[] = [
   {
     id: "aberto",
     nome: "Quiosque aberto",
-    resumo: "Ilha no corredor, atendimento pelos quatro lados.",
     investimento: "R$ 99.900",
     imagem: "Quiosque aberto no corredor",
-    Icone: IcoShopping,
     detalhes: [
       { rotulo: "Área", valor: "≈ 4 m²" },
       { rotulo: "Onde funciona", valor: "Corredor de shopping e frente de caixa" },
@@ -70,10 +83,8 @@ const MODELOS: Modelo[] = [
   {
     id: "fechado",
     nome: "Quiosque fechado",
-    resumo: "Cabine com vitrine, estoque e balcão próprios.",
     investimento: "R$ 139.900",
     imagem: "Quiosque fechado com vitrine",
-    Icone: IcoMercado,
     detalhes: [
       { rotulo: "Área", valor: "≈ 9 m²" },
       { rotulo: "Onde funciona", valor: "Shopping, aeroporto e rodoviária" },
@@ -85,10 +96,8 @@ const MODELOS: Modelo[] = [
     id: "compacta",
     /* NOME PROVISÓRIO: a franqueadora ainda não batizou o terceiro modelo. */
     nome: "Loja compacta",
-    resumo: "Ponto com porta, para praça de maior permanência.",
     investimento: "R$ 189.900",
     imagem: "Loja compacta com fachada",
-    Icone: IcoAeroporto,
     detalhes: [
       { rotulo: "Área", valor: "≈ 18 m²" },
       { rotulo: "Onde funciona", valor: "Rua e praça de alimentação" },
@@ -119,16 +128,8 @@ export function Modelos() {
             </div>
 
             <div className="mod-corpo">
-              <span className="mod-ico" aria-hidden="true">
-                <m.Icone />
-              </span>
-
               <h3 className="mod-nome">{m.nome}</h3>
               <p className="mod-preco">{m.investimento}</p>
-
-              {/* Some quando o painel abre: com o detalhe na tela, o resumo vira
-                  a mesma informação dita duas vezes. */}
-              <p className="mod-resumo">{m.resumo}</p>
 
               <dl className="mod-detalhes">
                 {m.detalhes.map((d) => (

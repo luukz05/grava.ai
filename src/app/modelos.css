@@ -25,7 +25,10 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  border-radius: 14px;
+  /* O mesmo token do resto da página. Eram 14px crus, e ao lado dos cartões de
+     `.mod-comuns` logo abaixo — que desenham em `--r-lg` — a diferença de
+     raio entre dois blocos vizinhos lê como descuido, não como variação. */
+  border-radius: var(--r-lg, 24px);
   background: var(--bg-2);
   cursor: default;
   transition: flex 520ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -88,23 +91,6 @@
   padding: clamp(1rem, 1.8vw, 1.6rem);
 }
 
-.mod-ico {
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  margin-bottom: 0.35rem;
-  border-radius: 999px;
-  border: 1px solid var(--hair-hot);
-  color: var(--fg-hot);
-  background: rgba(4, 8, 12, 0.5);
-}
-
-.mod-ico svg {
-  width: 1rem;
-  height: 1rem;
-}
-
 .mod-nome {
   margin: 0;
   font-size: clamp(1.0625rem, 1.7vw, 1.35rem);
@@ -122,26 +108,6 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--fg-hot);
-}
-
-.mod-resumo {
-  margin: 0.2rem 0 0;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: var(--fg-2);
-  /* Sai quando o detalhe entra: os dois dizem a mesma coisa, e o detalhe diz
-     melhor. */
-  max-height: 4rem;
-  opacity: 1;
-  transition: max-height 380ms ease, opacity 240ms ease;
-}
-
-.mod-painel:hover .mod-resumo,
-.mod-painel:focus-within .mod-resumo {
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0;
-  overflow: hidden;
 }
 
 /* ---- o detalhe, que só existe aberto ---- */
@@ -202,18 +168,61 @@
 
 /* ---- o que é igual nos três ---- */
 
+/* ---------- o que é igual nos três modelos ----------
+   Eram quatro células de `gap: 1px` sobre fundo — a régua de tabela que a
+   página usa para dado DENTRO de tabela. Aqui não é tabela: é o que o
+   candidato leva embora depois de escolher o modelo, logo abaixo de três
+   painéis com foto, raio e sombra. Ao lado deles, quatro retângulos retos com
+   fio de 1px leem como rodapé de planilha.
+
+   Três decisões, e as três são a mesma:
+
+   1. CARTÃO. Superfície `--bg-2`, fio próprio e raio `--r-lg` — o material
+      que o resto da página usa para "isto é um bloco", separados por gap de
+      verdade em vez de recorte de fundo.
+   2. HIERARQUIA. O valor sobe de 1,0625rem para a display da marca em
+      1,75rem. Rótulo e valor estavam a um degrau de distância; agora são dois,
+      e o olho pega os quatro números antes de ler qualquer rótulo.
+   3. O PAYBACK NÃO É IGUAL AOS OUTROS TRÊS. "6 a 12 meses" é a resposta que a
+      pessoa veio buscar; royalties e taxa de marketing são o custo que ela
+      aceita depois de ver a resposta. Ele acende no ciano com um halo fraco
+      subindo do pé — os outros três ficam na tinta cheia. Se os quatro
+      acendessem, nenhum acenderia. */
 .mod-comuns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 1px;
+  gap: clamp(0.6rem, 1.4vw, 1rem);
   margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
-  background: var(--hair);
-  border: 1px solid var(--hair);
 }
 
 .mod-comum {
-  background: var(--bg);
-  padding: 1.1rem 1.25rem;
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-lg, 24px);
+  padding: clamp(1rem, 2.4vw, 1.35rem) clamp(1rem, 2vw, 1.25rem);
+  /* Só a borda reage ao cursor: estes quatro não clicam, e bloco que cresce ou
+     se move sob o cursor promete um clique que não existe. */
+  transition: border-color var(--t-ui) var(--e-ui);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mod-comum:hover {
+    border-color: var(--hair-hot);
+  }
+}
+
+/* O primeiro é a resposta, não mais um custo. Halo subindo do pé, como o
+   brilho na origem do arco da órbita: dá peso sem somar uma segunda cor de
+   borda ao lado dos outros três. */
+.mod-comum:first-child {
+  border-color: var(--hair-hot);
+  background:
+    radial-gradient(
+      120% 100% at 50% 118%,
+      color-mix(in srgb, var(--cyan) 14%, transparent),
+      transparent 68%
+    ),
+    var(--bg-2);
 }
 
 .mod-comum dt {
@@ -224,9 +233,21 @@
 }
 
 .mod-comum dd {
-  margin: 0.35rem 0 0;
-  font-size: 1.0625rem;
+  margin: 0.5rem 0 0;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  /* Algarismos de mesma largura: são quatro valores empilhados lado a lado, e
+     largura variável desalinha a leitura vertical dos números. */
+  font-variant-numeric: tabular-nums;
   color: var(--fg);
+  text-wrap: balance;
+}
+
+.mod-comum:first-child dd {
+  color: var(--fg-hot);
 }
 
 .mod-nota {
@@ -256,13 +277,6 @@
     min-height: 24rem;
   }
 
-  .mod-resumo,
-  .mod-painel:hover .mod-resumo {
-    max-height: none;
-    opacity: 1;
-    overflow: visible;
-  }
-
   .mod-detalhes,
   .mod-painel:hover .mod-detalhes {
     grid-template-rows: 1fr;
@@ -281,6 +295,79 @@
   color: #16202a;
 }
 
-[data-tema="light"] .v5 .mod-ico {
-  background: rgba(255, 255, 255, 0.75);
+/* ---------- a seção reagindo à rolagem ----------
+
+   A landing inteira anima por `animation-timeline: view()` — a posição do
+   próprio elemento contra a viewport, e não delay de carregamento. Esta seção
+   era a única do percurso sem nada disso: os três painéis e os quatro cartões
+   simplesmente existiam quando a pessoa chegava.
+
+   As três regras do `v5.css` valem aqui igual:
+
+   1. A linha do tempo é a POSIÇÃO. Metade desta seção está abaixo da dobra, e
+      animação com delay em conteúdo fora da tela termina antes de alguém ver.
+   2. Faixa CURTA — o movimento fecha logo depois do elemento entrar. Faixa
+      longa vira scrub, e aí o conteúdo fica meio transparente enquanto está
+      sendo lido.
+   3. Passo curto e nada nascendo de `scale(0)`. Um deslocamento de 0,7rem
+      basta para o olho ler "isto chegou agora".
+
+   O `@supports` não é detalhe: sem ele, num navegador sem linha do tempo de
+   rolagem, o `both` deixaria a seção inteira parada em `opacity: 0`. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Os três painéis entram em cascata, da esquerda para a direita — a ordem
+       em que são lidos, e a ordem de tamanho de ponto que eles descrevem. O
+       escalonamento é medido em faixa de rolagem, e não em milissegundos: em
+       tempo, ele mudaria de sensação conforme a velocidade da rolagem.
+
+       Quem anima é o painel, e o `translate` não colide com o `flex` que faz a
+       expansão sob o cursor — são propriedades diferentes, e por isso a
+       entrada e o hover convivem sem uma desfazer a outra. */
+    .v5 .mod > .mod-painel {
+      animation: modSobe linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 30%;
+    }
+
+    .v5 .mod > .mod-painel:nth-child(2) {
+      animation-range: entry 12% cover 34%;
+    }
+
+    .v5 .mod > .mod-painel:nth-child(3) {
+      animation-range: entry 16% cover 38%;
+    }
+
+    /* Os quatro cartões chegam depois dos painéis, também em cascata. Eles são
+       a consequência da escolha de cima — o que vale para os três modelos
+       depois de escolhido qualquer um deles —, então entram atrás. */
+    .v5 .mod-comuns > .mod-comum {
+      animation: modSobe linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 32%;
+    }
+
+    .v5 .mod-comuns > .mod-comum:nth-child(2) {
+      animation-range: entry 13% cover 35%;
+    }
+
+    .v5 .mod-comuns > .mod-comum:nth-child(3) {
+      animation-range: entry 16% cover 38%;
+    }
+
+    .v5 .mod-comuns > .mod-comum:nth-child(4) {
+      animation-range: entry 19% cover 41%;
+    }
+  }
+}
+
+@keyframes modSobe {
+  from {
+    opacity: 0;
+    translate: 0 0.7rem;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
 }

@@ -186,7 +186,12 @@ export function NumerosQuadro() {
   return (
     <>
     <div className="num-quadro" ref={quadroRef}>
-      <div className="num-face">
+      {/* `data-pousou` acende enquanto a contagem corre e apaga quando ela
+          chega. O halo do cartão vive nesse atributo — ver `.num-face` no
+          `v5.css`. Ele nasce ligado, como o resto: sem JavaScript, com
+          movimento reduzido ou antes da hidratação, o cartão está no estado
+          final e nada pulsa. */}
+      <div className="num-face" data-pousou={pousou ? "1" : undefined}>
         <span className="num-rot mono">Investimento total</span>
         {/* Só `num-conta`: o `num-val` que existia aqui perdeu as regras junto
             com o `.num-destaque`, e classe sem regra é pista falsa. O `.num-val`
