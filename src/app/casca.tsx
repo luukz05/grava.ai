@@ -48,11 +48,22 @@ const brand = Rajdhani({
 
 export const WHATSAPP = "https://wa.me/5515996610916";
 
+/* `leitura` marca as páginas que abrem sem painel ao lado — /institucional e
+   /galeria. O herói delas é uma coluna de texto sozinha, e encostada à esquerda
+   numa tela larga ela deixa metade do viewport vazio à direita sem nada
+   ocupando esse vazio; centrada, não deixa.
+
+   VALE SÓ PARA O HERÓI. O resto das duas páginas segue a receita da landing,
+   encostada à esquerda: o eixo central é assinatura de abertura, e estendê-lo
+   às seções de conteúdo transformaria duas páginas de leitura em duas páginas
+   de convite. Ver `[data-leitura="centro"]` no `v5.css`. */
 export function Casca({
   atual,
+  leitura,
   children,
 }: {
   atual: Pagina;
+  leitura?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -60,6 +71,7 @@ export function Casca({
       className={`${grotesk.variable} ${mono.variable} ${brand.variable} v5`}
       data-forma="oblongo"
       data-fundo="topo"
+      data-leitura={leitura ? "centro" : undefined}
     >
       <main>
         {/* Aqui vinha a `TrilhaTopo`: curvas de nível rasas atrás da página

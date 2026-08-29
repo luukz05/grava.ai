@@ -22,16 +22,33 @@
    nota na página. */
 .v5[data-forma="oblongo"] .cta {
   border-radius: var(--r-pill);
-  padding-inline: 1.35rem;
   font-weight: 600;
   letter-spacing: -0.005em;
 }
 
-/* O botão redondo de voltar ao topo é `.cta` para herdar tinta, borda e
-   estados, mas não pode herdar a folga lateral da cápsula: com 1,35rem de cada
-   lado, sobravam 6,8px de caixa de conteúdo dentro dos 52px do círculo — a
-   seta encolhia e ainda saía do centro. A exceção vive aqui porque é a regra
-   acima, com três níveis de especificidade, que ela precisa vencer. */
+/* A FOLGA LATERAL DA CÁPSULA, e quem não a recebe.
+
+   Ela saiu da regra acima e ganhou uma própria por causa das duas exceções.
+   Botão com geometria própria — quadrado, círculo, ou que muda de largura com a
+   rolagem — não pode herdar respiro de cápsula: aqui a folga é o que DEFINE a
+   largura, e não um detalhe dentro dela.
+
+   `.flut-topo` é o botão redondo de voltar ao topo. Com 1,35rem de cada lado
+   sobravam 6,8px de caixa de conteúdo dentro dos 52px do círculo — a seta
+   encolhia e ainda saía do centro.
+
+   `.nav-cta` é o mesmo caso, e custou caro para achar. Ele encolhe até virar
+   uma esfera de 42px quando a barra condensa, e para isso o `navbar.css` anima
+   o `padding-inline` até zero. Só que esta regra tem TRÊS níveis de
+   especificidade contra o `.nav-cta` de lá, que tem um: os 1,35rem venciam em
+   qualquer ordem de bundle, o botão ficava com 21,6px de cada lado somados ao
+   ícone de 20px, e a esfera nunca fechava — 63,2px de oblongo, sempre.
+
+   Nenhum dos dois perde a pílula: o raio vem do `.v5 .cta` no `v5.css`. */
+.v5[data-forma="oblongo"] .cta:not(.flut-topo):not(.nav-cta) {
+  padding-inline: 1.35rem;
+}
+
 .v5[data-forma="oblongo"] .flut-topo {
   padding: 0;
 }

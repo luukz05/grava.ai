@@ -15,7 +15,6 @@ import "../variacoes.css";
 import "./institucional.css";
 import { Casca, Heroi } from "../casca";
 import { FundoFecho } from "../fundos";
-import { AsciiWaveHeader } from "../assets";
 import { AsciiEstado } from "./art";
 import { Rodape } from "../rodape";
 import {
@@ -55,7 +54,17 @@ const WHATSAPP = "https://wa.me/5515996610916";
 
 export default function Institucional() {
   return (
-    <Casca atual="home">
+    <Casca atual="home" leitura>
+      {/* Herói do mesmo tamanho do da landing, centrado. Esta página é da
+          marca, e por um tempo ela abriu com um herói colapsado — a manchete
+          um degrau menor, na quina de uma tela larga. Abrir menor que a página
+          de franqueado fazia a marca ler como anexo dela.
+
+          O que continua fora: a segunda coluna (a onda em ASCII dentro de um
+          `.scope`) e os dois botões grandes, que eram cópia exata do
+          fechamento lá embaixo. O WhatsApp segue na barra do topo, no par
+          flutuante e na barra fixa do celular. Sem painel à direita, a coluna
+          vai para o meio — ver `[data-leitura="centro"]` no `v5.css`. */}
       <Heroi>
         <header className="hold hero" id="topo">
           <div>
@@ -67,18 +76,7 @@ export default function Institucional() {
               produtos exclusivos na hora — onde tem gente em movimento em busca
               de algo especial.
             </p>
-            <div className="row">
-              <a className="cta cta--lg" href="#marca">
-                Conheça a GRAVA.AI
-              </a>
-              <a className="cta cta--lg cta--out" href={WHATSAPP}>
-                Fale conosco no WhatsApp
-              </a>
-            </div>
           </div>
-          <figure className="scope" style={{ margin: 0 }}>
-            <AsciiWaveHeader />
-          </figure>
         </header>
       </Heroi>
 

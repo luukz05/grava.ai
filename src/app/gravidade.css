@@ -9,7 +9,34 @@
   min-width: 0;
 }
 
+/* ---------- as três curvas do balão ----------
+
+   O balão nascia com uma só, `--e-ui`, que é a saída padrão da página: sai
+   rápido e chega devagar. Ela serve para responder a um clique — o gesto começa
+   com energia porque a energia veio do dedo. Não serve para uma coisa que
+   aparece sozinha: ali não há dedo nenhum, e partir na velocidade máxima é
+   exatamente o que se lê como estalo.
+
+   `--e-mola-solta` é a mola do sistema com o amortecimento afrouxado —
+   ζ = 0,62 contra o 1,0 de `--e-mola`, resposta de 0,42s —, amostrada em 27
+   pontos de `x(t) = 1 − e^⁻ᶻᵂᵗ(cos ω_d t + (ζω/ω_d) sen ω_d t)`. O pico dá
+   1,083: é o mesmo excesso que o keyframe de 62% desenhava na mão, agora com a
+   volta que faltava. Densidade alta de propósito — `linear()` interpola RETO
+   entre as amostras, e uma mola descrita em 13 pontos sobre um salto de escala
+   grande vira polilinha visível.
+
+   `--e-abre` é para o recorte da pílula: parte do repouso e chega no repouso,
+   porque revelar é um movimento que ninguém começou e ninguém interrompe.
+
+   `--e-luz` é para as opacidades. Com `--e-ui` uma fusão de 380ms passa de 80%
+   nos primeiros 90ms — o olho não lê isso como fusão, lê como piscada.
+
+   Onde `linear()` não existe, a declaração inteira é descartada e a mola volta
+   a valer `--e-mola`, como no `v5.css`. */
 .grav {
+  --e-mola-solta: var(--e-mola);
+  --e-abre: cubic-bezier(0.42, 0, 0.18, 1);
+  --e-luz: cubic-bezier(0.35, 0, 0.3, 1);
   position: relative;
   width: 100%;
   /* Altura em svh e não proporção: o painel divide o primeiro viewport com a
@@ -20,6 +47,40 @@
   /* `isolation` cria contexto de empilhamento próprio: as massas borradas
      ficam presas aqui e não sobem por cima da carta topográfica do herói. */
   isolation: isolate;
+}
+
+@supports (animation-timing-function: linear(0, 1)) {
+  .grav {
+    --e-mola-solta: linear(
+      0,
+      0.0546,
+      0.1859,
+      0.3531,
+      0.5264,
+      0.6859,
+      0.8204,
+      0.925,
+      0.9999,
+      1.048,
+      1.0741,
+      1.0833,
+      1.0807,
+      1.0708,
+      1.0573,
+      1.0428,
+      1.0291,
+      1.0173,
+      1.008,
+      1.0012,
+      0.9967,
+      0.9942,
+      0.9931,
+      0.9931,
+      0.9939,
+      0.9949,
+      1
+    );
+  }
 }
 
 /* ---------- as massas líquidas ---------- */
@@ -257,13 +318,24 @@
 /* O anel de escuta em volta do avatar. Vai no pseudoelemento e não na sombra do
    círculo porque durante a fusão ele estaria por cima da pílula, desenhando uma
    circunferência dentro da massa e entregando que ali são duas peças. Separado,
-   ele tem opacidade própria e só acende depois que as duas se soltam. */
+   ele tem opacidade própria e só acende depois que as duas se soltam.
+
+   BORDA, E NÃO `box-shadow` COM ESPALHAMENTO. O anel pulsa para sempre, e o
+   pulso era feito crescendo o espalhamento da sombra: `box-shadow` não é
+   propriedade de compositor, então aquilo era um repinte a cada quadro, sem
+   parar, enquanto o herói ainda tem canvas de WebGL e três hexágonos borrados
+   se mexendo ao lado. Uma borda de espessura fixa numa caixa que já é do
+   tamanho final deixa o pulso ser `transform` e `opacity` — as duas que o
+   compositor resolve sozinho, sem tocar no layout nem repintar.
+
+   `inset: -0.28rem` com borda da mesma medida põe o anel exatamente onde o
+   espalhamento o punha: encostado por dentro no círculo, 0,28rem para fora. */
 .grav-hud-ia::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -0.28rem;
   border-radius: 50%;
-  box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--cyan) 15%, transparent);
+  border: 0.28rem solid color-mix(in srgb, var(--cyan) 15%, transparent);
 }
 
 /* O bico. Quadrado girado 45°: metade entra por baixo da pílula pela margem
@@ -400,46 +472,84 @@
      precisa dizer: alguém está olhando para esta peça AGORA. Ver a legenda
      pronta e a marca chegar depois contaria o contrário — que o texto já estava
      lá e a máquina veio carimbar. */
-  /* Primeiro o avatar, e sozinho no quadro. */
+  /* Primeiro o avatar, e sozinho no quadro.
+
+     DUAS ANIMAÇÕES E NÃO UMA, porque a luz e o corpo não têm o mesmo tempo. O
+     círculo acende em 240ms e cresce em 620ms: quando ele ainda está assentando
+     já está inteiro de cor, que é como uma coisa física chega. Uma animação só
+     obrigaria os dois a compartilhar duração e curva, e a opacidade herdaria o
+     excesso da mola — sobra invisível, mas paga o mesmo tempo do corpo e deixa
+     o círculo meio transparente enquanto é pequeno, que é a leitura oposta.
+
+     Elas animam propriedades diferentes, então não disputam nada.
+
+     `will-change` escopado no `[data-ativo]`: a promessa de camada vale durante
+     a montagem e sai junto com ela. Declarada no estado de repouso, seriam
+     quatro camadas paradas na cena o tempo todo. */
   .grav-peca[data-ativo] .grav-hud-ia {
-    animation: grav-surge 520ms var(--e-mola) 120ms both;
+    animation:
+      grav-le 240ms var(--e-luz) 120ms both,
+      grav-corpo 620ms var(--e-mola-solta) 120ms both;
+    will-change: transform;
   }
 
   /* A marca acende com o círculo ainda assentando: o avatar chega vazio e ganha
      dono no quadro seguinte. */
   .grav-peca[data-ativo] .grav-hud-ia svg {
-    animation: grav-le 300ms var(--e-ui) 420ms both;
+    animation: grav-le 300ms var(--e-luz) 420ms both;
   }
 
   /* E então a pílula se abre A PARTIR do avatar. Ela começa fechada rente à
      borda que encosta nele: o que se vê é a fala saindo de quem fala, não uma
-     caixa aparecendo do lado. */
+     caixa aparecendo do lado.
+
+     640ms e não 560: `clip-path` não é propriedade de compositor — cada quadro
+     do recorte é um repinte, e aqui ele acontece por cima de uma cena que já
+     tem canvas de WebGL e três hexágonos borrados se mexendo. Alongar não
+     conserta um quadro perdido, mas dilui: a mesma falha custa menos distância
+     quando a distância por quadro é menor. */
   .grav-peca[data-ativo] .grav-hud-fala {
-    animation: grav-abre 560ms var(--e-ui) 480ms both;
+    animation: grav-abre 640ms var(--e-abre) 480ms both;
+    will-change: clip-path;
   }
 
   /* O bico entra com a pílula já aberta o bastante para recebê-lo. Antes disso
      ele seria um dente solto no vão. */
   .grav-peca[data-ativo] .grav-hud-bico {
-    animation: grav-le 240ms var(--e-ui) 760ms both;
+    animation: grav-le 240ms var(--e-luz) 760ms both;
   }
 
   /* O texto entra depois da forma, e não com ela: durante a abertura a pílula
      ainda está recortada, e o texto apareceria cortado no meio da palavra junto
-     com a borda que o revela. */
+     com a borda que o revela.
+
+     Ele SOBE um quarto de rem enquanto acende. Opacidade pura em texto curto
+     não tem como ser suave: não há distância percorrida, então não há nada para
+     o olho seguir, e o que sobra é o instante em que a linha passou a existir.
+     A distância é mínima de propósito — o suficiente para haver trajetória, não
+     o bastante para o texto parecer que veio de outro lugar.
+
+     Vai em `translate`, e não em `transform`: a pílula é `display: grid` e
+     nenhum dos dois usa `transform`, mas manter as duas propriedades separadas
+     é o que deixa o bico (que É um `transform: rotate`) seguir a mesma receita
+     sem conflito. */
   .grav-peca[data-ativo] .grav-hud-rotulo {
-    animation: grav-le 380ms var(--e-ui) 700ms both;
+    animation: grav-sobe 420ms var(--e-mola) 700ms both;
   }
 
   .grav-peca[data-ativo] .grav-hud-leitura {
-    animation: grav-le 380ms var(--e-ui) 820ms both;
+    animation: grav-sobe 420ms var(--e-mola) 820ms both;
   }
 
   /* E o anel de escuta por último, já pulsando. É o que diz que a leitura
-     acontece agora e não é etiqueta impressa. */
+     acontece agora e não é etiqueta impressa.
+
+     As duas animam `opacity`, e é de propósito: a de trás na lista vence onde
+     as duas valem. `grav-le` termina em 1,2s e é exatamente onde `grav-pulsa`
+     começa, então a passagem de uma para a outra acontece no mesmo quadro. */
   .grav-peca[data-ativo] .grav-hud-ia::after {
     animation:
-      grav-le 300ms var(--e-ui) 900ms both,
+      grav-le 300ms var(--e-luz) 900ms both,
       grav-pulsa 2.6s ease-in-out 1.2s infinite;
   }
 }
@@ -488,25 +598,45 @@
 /* ---------- a fala se montando ----------
 
    O avatar chegando: de um ponto ao círculo cheio, passando um pouco do tamanho
-   antes de assentar. O excesso é o que separa "apareceu" de "acendeu" — com a
-   mola do sistema (`--e-mola`) ele chega com peso, como coisa que entra em cena,
-   e não como opacidade subindo.
+   antes de assentar. O excesso é o que separa "apareceu" de "acendeu" — ele
+   chega com peso, como coisa que entra em cena, e não como opacidade subindo.
 
    Ele NÃO desliza de lugar nenhum. Balão que entra deslizando pede uma origem, e
    a origem aqui seria a peça, que está bem atrás dele: o gesto acabaria dizendo
-   que a leitura veio de fora do quadro. */
-@keyframes grav-surge {
+   que a leitura veio de fora do quadro.
+
+   DOIS QUADROS, E O EXCESSO SAIU DAQUI. Isto era `grav-surge`: um keyframe em
+   62% que subia até 1,09 e voltava, com `--e-mola` por cima. `--e-mola` já é uma
+   mola inteira, e uma curva de easing se aplica a CADA trecho de um keyframe —
+   então o que rodava eram duas molas completas emendadas, uma de 0,3 a 1,09 em
+   322ms e outra de volta em 198ms. Cada uma partia na velocidade máxima e
+   terminava parada, e a emenda em 62% era uma descontinuidade de velocidade no
+   meio do gesto: acelera, trava, acelera, trava. Era esse o estalo.
+
+   Agora o excesso é a própria curva (`--e-mola-solta`, ζ = 0,62), o keyframe tem
+   dois quadros e a velocidade é contínua do começo ao fim.
+
+   E parte de 0,52, não de 0,3. Um círculo que triplica de tamanho é pipoca por
+   construção, e nenhuma curva conserta amplitude: metade do tamanho ainda lê
+   como "cresceu até aqui" e cabe na distância que a mola tem para percorrer. */
+@keyframes grav-corpo {
+  from {
+    transform: scale(0.52);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Acender subindo. Ver o comentário do rótulo, acima. */
+@keyframes grav-sobe {
   from {
     opacity: 0;
-    transform: scale(0.3);
-  }
-  62% {
-    opacity: 1;
-    transform: scale(1.09);
+    translate: 0 0.25rem;
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    translate: 0 0;
   }
 }
 
@@ -541,14 +671,24 @@
 }
 
 /* O ponto vivo. Só o halo respira; o miolo fica firme, senão o ponto pisca
-   inteiro e vira alerta em vez de sinal de leitura em curso. */
+   inteiro e vira alerta em vez de sinal de leitura em curso.
+
+   O anel se abre e esmaece junto, que é o mesmo par que o espalhamento fazia
+   antes (0,28rem a 16% indo para 0,52rem a 4%) — agora escrito nas duas
+   propriedades que o compositor anima sem repintar. Ver `.grav-hud-ia::after`.
+
+   `ease-in-out` e não a mola: isto respira, não chega. Movimento que se repete
+   para sempre precisa ser simétrico nas duas pontas, senão cada volta tem um
+   lado que puxa e o ciclo passa a ser audível. */
 @keyframes grav-pulsa {
   0%,
   100% {
-    box-shadow: 0 0 0 0.28rem color-mix(in srgb, var(--cyan) 16%, transparent);
+    transform: scale(1);
+    opacity: 1;
   }
   50% {
-    box-shadow: 0 0 0 0.52rem color-mix(in srgb, var(--cyan) 4%, transparent);
+    transform: scale(1.17);
+    opacity: 0.28;
   }
 }
 

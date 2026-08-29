@@ -206,7 +206,12 @@ export function Landing() {
       <div className="close-fundo">
         <FundoFecho />
         <footer className="hold close" id="falar">
-        <div className="close-duo">
+        {/* O FORMULÁRIO É O FECHAMENTO INTEIRO — ver o cabeçalho de
+            `form-franqueado.tsx`. A coluna de texto entra como `children` dele
+            porque o `<form>` é quem monta o par de colunas. O `.close-duo` que
+            fazia esse papel saiu junto: quem monta as colunas agora é o
+            `.form-fr-duo`. */}
+        <FormFranqueado>
           <div>
             {/* A marca empilhada, que é a versão do documento do cliente para
                 assinatura. No topo ela é símbolo mais wordmark em linha; aqui,
@@ -228,22 +233,18 @@ export function Landing() {
               <h2>
                 Leve a unidade <mark>para a sua região.</mark>
               </h2>
-              {/* A frase antiga dizia "não com um formulário". Com o formulário
-                    ao lado, ela passou a contradizer a própria página: o que se
-                    promete agora é que do outro lado tem gente, não que não
-                    existe campo para preencher. A instrução de como usar o
-                    formulário saiu daqui — ela já está escrita dentro dele. */}
-              <p>Quem responde é quem opera a rede, não um atendente.</p>
+              {/* Sem linha de apoio. Havia aqui "Quem responde é quem opera a
+                  rede, não um atendente" — saiu a pedido. A manchete e o
+                  formulário ao lado já dizem o que fazer, e a promessa sobre
+                  quem atende é de um tipo que a página não tem como provar. */}
             </div>
-            <div className="row" style={{ marginTop: 0 }}>
-              <a className="cta cta--lg" href={WHATSAPP}>
-                Falar no WhatsApp
-              </a>
-            </div>
+            {/* Havia aqui um segundo "Falar no WhatsApp". Ele saiu: dois botões
+                para a mesma conversa, lado a lado, é escolha onde não havia
+                escolha — e este ainda pulava o formulário, abrindo a conversa
+                sem nome nem e-mail. Ficou o que qualifica, agora atravessando o
+                fechamento inteiro. */}
           </div>
-
-          <FormFranqueado />
-        </div>
+        </FormFranqueado>
         <Rodape
           links={[
             { href: "/perguntas", rotulo: "Perguntas frequentes" },

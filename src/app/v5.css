@@ -1557,20 +1557,52 @@
    do corpo. Nada de sombra colorida nem campo com fundo mais claro que o
    contêiner — a página inteira se define por borda, e o formulário também. */
 
+/* O `<form>` É O FECHAMENTO INTEIRO, e não a caixa desenhada.
+
+   Ele envolve as duas colunas — texto à esquerda, cartão à direita — e o botão
+   de envio embaixo, atravessando as duas. O porquê está no cabeçalho de
+   `form-franqueado.tsx`: `submit` só envia o formulário que o contém, e o botão
+   precisava sair da coluna.
+
+   Quem tem borda e fundo agora é o `.form-fr-cartao`. */
 .form-fr {
+  display: grid;
+  gap: clamp(1.15rem, 2.6vw, 1.6rem);
+}
+
+/* O par de colunas. Herda as medidas do antigo `.close-duo`, que existia só
+   para isto e saiu junto — a segunda coluna era este formulário. */
+.form-fr-duo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(1.75rem, 5vw, 4rem);
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .form-fr-duo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A CAIXA. Mesmo material dos cartões da página: fio de 1px, fundo do painel,
+   tipografia do corpo. Nada de sombra colorida nem campo com fundo mais claro
+   que o contêiner — a página inteira se define por borda, e o formulário
+   também. */
+.form-fr-cartao {
   border: 1px solid var(--hair);
   background: var(--bg-2);
   border-radius: var(--r-lg, 24px);
   padding: clamp(1.35rem, 3.2vw, 2.25rem);
   display: grid;
-  /* O ritmo interno é de UM valor, e não de margens por elemento: cabeçalho,
-     campos e pé são três blocos de mesmo peso, e o que os separa é sempre a
-     mesma distância. Antes cada um trazia a própria margem e o espaçamento
-     variava de par para par. */
+  /* O ritmo interno é de UM valor, e não de margens por elemento: cabeçalho e
+     campos são blocos de mesmo peso, e o que os separa é sempre a mesma
+     distância. Antes cada um trazia a própria margem e o espaçamento variava de
+     par para par. */
   gap: clamp(1.15rem, 2.6vw, 1.6rem);
-  /* Alinha o topo do formulário com o topo da marca na coluna ao lado: o
-     `.close-duo` alinha por `start`, e sem isto o cartão nasce colado no
-     texto acima dele. */
+  /* Alinha o topo do cartão com o topo da marca na coluna ao lado: o
+     `.form-fr-duo` alinha por `start`, e sem isto ele nasce colado no texto
+     acima dele. */
   align-content: start;
 }
 
@@ -1689,13 +1721,26 @@
   border-color: #d6604a;
 }
 
+/* O PÉ FICA DENTRO DO CARTÃO. Ele já foi irmão do `.form-fr-duo` e atravessava
+   as duas colunas; agora é o último bloco da caixa, na largura dela. O botão é
+   o passo seguinte dos campos — entre o último campo e a ação não cabe uma
+   borda no meio. */
 .form-fr-pe {
   display: grid;
   gap: 0.8rem;
 }
 
+/* O botão vai de ponta a ponta, e antes ele era `justify-self: start`.
+
+   Mudou porque mudou a função: ele dividia a atenção com um "Falar no WhatsApp"
+   na coluna ao lado e era um entre dois. Agora é a ÚNICA ação do fechamento —
+   toda a página termina nele. Botão de largura de conteúdo no fim de uma página
+   de conversão lê como mais um link; atravessando, lê como o fim do caminho.
+
+   `width: 100%` e não `justify-self: stretch`: o botão empilha os três rótulos
+   por grade interna, e o `stretch` de um item de grade não chega até eles. */
 .form-fr-pe .cta {
-  justify-self: start;
+  width: 100%;
   border: 0;
   cursor: pointer;
   font-family: var(--f-txt), system-ui, sans-serif;
@@ -1961,10 +2006,30 @@
 /* A forma do `.nav-cta` mudou de arquivo — ver a nota acima, junto do
    `.nav-acoes`. Ela vive em `navbar.css` inteira, forma e comportamento. */
 
-/* A primeira seção entra logo abaixo do herói, com metade do respiro que as
-   outras têm no topo. O herói já é o respiro dela, e o padding cheio empurrava
-   o título inteiro para fora da dobra. O `top` do trilho do índice acompanha
-   este mesmo valor, senão o índice deixa de nascer na linha do título. */
+/* A PRIMEIRA SEÇÃO DEPOIS DO HERÓI ENTRA COM METADE DO RESPIRO.
+
+   O herói já é o respiro dela, e o padding cheio do `.sec` empurrava o título
+   inteiro para fora da dobra — o primeiro viewport fechava sem nada dizendo
+   que a página continua. Com o padding pela metade, sobra a manchete da seção
+   acima da dobra, que é o que diz "tem mais aqui embaixo" melhor do que
+   qualquer seta de rolagem. É o motivo do `min-height: 80svh` do `.hero` (e
+   não 100), e sem esta regra aqueles 20svh não viram nada.
+
+   ERA `#esperar`, e valia numa página só. A landing tinha o ajuste; as outras
+   duas rotas abriam com o mesmo herói de 80svh e a primeira seção começando
+   72px abaixo dele — a manchete nascia fora da tela, e o herói lia como página
+   inteira. Agora a regra é do PADRÃO (`.herowrap + .sec`), então quem herda é
+   qualquer rota que abra com herói: a landing por `#esperar`, /institucional e
+   /galeria pela adjacência, e a próxima sem ninguém precisar lembrar.
+
+   `#esperar` continua escrito porque na landing a primeira seção é filha de
+   `.corpo` e não irmã do `.herowrap` — o seletor de adjacência não a alcança.
+   As duas declarações são o MESMO valor de propósito: mudar o respiro do
+   primeiro título é mudar os dois.
+
+   O `top` do trilho do índice acompanha este mesmo valor, senão o índice deixa
+   de nascer na linha do título. */
+.herowrap + .sec,
 #esperar {
   padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
 }
@@ -3537,6 +3602,80 @@
   html {
     scroll-behavior: smooth;
   }
+}
+
+/* ---------- o herói das páginas de leitura ----------
+
+   Três rotas abrem com herói. A do franqueado é a página de conversão: painel
+   ao lado, manchete de 4,75rem, dois botões grandes — ele existe para parar
+   alguém, e ocupa 80svh por isso.
+
+   A da marca e a da galeria abriram por um tempo com `.hero--calmo`: altura
+   colapsada, manchete um degrau menor. O argumento era que quem chega nelas já
+   está dentro do site e o que decide vem depois da abertura. O que aquilo
+   produziu na prática foi outra coisa: as duas abriam MENORES que a landing,
+   com a manchete pequena na quina de uma tela larga e o resto do viewport
+   vazio — e a marca lendo como anexo da página de franqueado.
+
+   A RECEITA AGORA É A DA LANDING, e o herói é o único bloco que muda de eixo:
+   sem painel à direita, a coluna vai para o meio em vez de ficar na borda.
+   Herói de mesma altura nas três rotas é o que faz as três lerem como um site
+   só, e o centro é o único lugar onde uma coluna sozinha não deixa buraco.
+
+   O QUE NÃO MUDA É O RESTO DA PÁGINA. Os cabeçalhos de seção, os cartões e o
+   fechamento continuam na receita da landing, encostados à esquerda: o eixo
+   central é a assinatura de uma ABERTURA, e estender isso a dez seções de
+   conteúdo transformaria duas páginas de leitura em duas páginas de convite.
+
+   `.hero--curto` continua logo abaixo e `/perguntas` ainda usa: aquela página
+   é uma lista de perguntas, e ali a abertura curta faz sentido — a primeira
+   pergunta é que precisa aparecer na primeira tela. */
+
+/* O sinal vem do atributo da casca (ver `casca.tsx`) e não de uma classe no
+   `<header>`, porque é a página que decide o eixo da própria abertura — o
+   `<header>` é escrito uma vez em cada arquivo de rota, mas quem sabe se a
+   rota é de leitura é a rota, não o bloco.
+
+   `.hero` já é grade de duas colunas; aqui vira uma, e o conteúdo dela centra
+   no eixo do `.hold`. */
+[data-leitura="centro"] .hero {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
+}
+
+/* CADA UM COM A SUA MEDIDA, e as duas centradas no mesmo eixo.
+
+   O `.hero h1` da landing trava em 15ch e o `p` em 46ch — medidas pensadas para
+   texto encostado à esquerda ao lado de um painel, onde a coluna já é estreita
+   por causa da grade. Centrado e sozinho o bloco ocupa a página inteira, então
+   as duas medidas sobem: a manchete a 18ch (quebra em duas ou três linhas, que
+   é o que dá massa a um título centrado) e o apoio a 52ch, de leitura corrida.
+
+   A trava NÃO vai na coluna que envolve os dois: uma medida só, a mais estreita
+   das duas, esganaria o parágrafo — e a mais larga soltaria a manchete em
+   linhas compridas. O que alinha os dois é o `margin-inline: auto` de cada um
+   dentro do mesmo `.hold`, não uma caixa comum. */
+[data-leitura="centro"] .hero h1 {
+  max-width: 18ch;
+  margin-inline: auto;
+}
+
+/* O apoio é mais largo que a manchete de propósito: é ele que carrega o
+   assunto, e centrado ele lê como a base do bloco. */
+[data-leitura="centro"] .hero p {
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
+/* A fila de botões, quando houver, centra junto. Nenhuma das duas páginas tem
+   uma hoje — as duas perderam os botões do herói de propósito, porque eram
+   cópia do fechamento —, e a regra existe para o dia em que uma voltar a ter:
+   `.row` é `flex` com início à esquerda, e sem isto ela seria a única coisa
+   fora do eixo. A regra é escopada ao `.hero`: a `.row` do fechamento fica
+   onde está. */
+[data-leitura="centro"] .hero .row {
+  justify-content: center;
 }
 
 /* Herói de uma coluna. A landing tem painel à direita e precisa dos 80svh;

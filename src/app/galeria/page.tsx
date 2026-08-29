@@ -48,11 +48,17 @@ const PECAS = [
 
 export default function Galeria() {
   return (
-    <Casca atual="galeria">
+    <Casca atual="galeria" leitura>
       {/* Mesma abertura das outras rotas: a carta topográfica atrás do primeiro
-          bloco, com a barra do topo flutuando sobre ela. */}
+          bloco, com a barra do topo flutuando sobre ela.
+
+          Herói do mesmo tamanho do da landing, centrado: as três rotas abrem
+          na mesma altura, e é isso que faz as três lerem como um site só. Os
+          dois botões grandes seguem fora — repetiam o fechamento desta mesma
+          página. Sem painel à direita, a coluna vai para o meio; ver
+          `[data-leitura="centro"]` no `v5.css`. */}
       <Heroi>
-        <header className="hold hero hero--curto" id="topo">
+        <header className="hold hero" id="topo">
           <div>
             <h1>O que sai do totem.</h1>
             <p>
@@ -60,14 +66,6 @@ export default function Galeria() {
               termina gravada. As imagens entram quando a rede enviar o material
               de fotografia.
             </p>
-            <div className="row">
-              <a className="cta cta--lg" href={WHATSAPP}>
-                Falar no WhatsApp
-              </a>
-              <a className="cta cta--lg cta--out" href="/#numeros">
-                Ver os números
-              </a>
-            </div>
           </div>
         </header>
       </Heroi>
