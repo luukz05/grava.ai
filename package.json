@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4040",
+    "dev:log": "node scripts/dev-log.mjs",
     "build": "next build",
     "start": "next start -p 4040",
     "lint": "eslint",

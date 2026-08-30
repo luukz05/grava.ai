@@ -79,7 +79,7 @@ export default function RootLayout({
        escuro. Com o site dark-only não sobra estado nenhum para restaurar, e
        sem divergência entre servidor e cliente também não é preciso
        `suppressHydrationWarning`. */
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-scroll-behavior="smooth">
       <head>
         {/* Quem é a organização, em dados. É o que permite ao Google ligar o
             site à marca em vez de tratá-lo como mais um domínio com texto — e é
