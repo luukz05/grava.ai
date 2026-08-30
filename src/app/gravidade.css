@@ -43,7 +43,7 @@
      manchete, e uma caixa por proporção cresce com a LARGURA da coluna — em
      tela larga e baixa ela empurrava o herói para fora da dobra, que é
      exatamente o que o `min-height: 80svh` do herói tenta evitar. */
-  height: clamp(320px, 54svh, 560px);
+  height: clamp(360px, 60svh, 640px);
   /* `isolation` cria contexto de empilhamento próprio: as massas borradas
      ficam presas aqui e não sobem por cima da carta topográfica do herói. */
   isolation: isolate;

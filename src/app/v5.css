@@ -305,9 +305,9 @@
 
 .hero h1 {
   font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
-  font-size: clamp(2.25rem, 6.6vw, 4.75rem);
+  font-size: clamp(2.6rem, 7.4vw, 5.6rem);
   font-weight: 600;
-  line-height: 0.98;
+  line-height: 0.96;
   /* tracking apertado no display, como na referência escura do acervo */
   letter-spacing: -0.045em;
   margin: 0;
@@ -322,9 +322,23 @@
 }
 
 .hero p {
-  margin: 1.15rem 0 0;
+  margin: 1.35rem 0 0;
   max-width: 46ch;
+  /* O parágrafo herdava o corpo de texto padrão da página. No herói ele divide
+     o espaço com uma manchete grande — no mesmo corpo do resto do site lia como
+     legenda. Sobe junto com o h1 para continuar sendo a segunda voz. */
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  line-height: 1.5;
   color: var(--fg-2);
+}
+
+/* Os botões do herói são maiores que os `.cta--lg` do resto da página: aqui
+   ancoram um bloco de manchete maior, e no tamanho padrão ficavam soltos
+   embaixo dela. Escopado ao `.hero` de propósito — o `.cta--lg` global segue
+   sendo o mesmo botão nas outras seções. */
+.hero .cta--lg {
+  padding: 1.15rem 2.25rem;
+  font-size: 1.08rem;
 }
 
 .row {
