@@ -1,0 +1,556 @@
+/* O CENTRO — texto rolando à esquerda, desenho grudado à direita.
+
+   A ROLAGEM É LIVRE. Esta seção já foi um palco preso (`pin`, cena sangrada na
+   tela inteira, texto trocando por opacidade dentro dela) e foi refeita: não
+   existe mais nada aqui que segure a página. O desenho acompanha a leitura com
+   `position: sticky`, que é trabalho do navegador — sem espaçador, sem altura
+   inventada, sem quadro gasto.
+
+   O layout é O MESMO com ou sem script. `.ctr-vivo` não troca estrutura: ela
+   só liga o que existe em movimento (rastro, cabeça, ecos, o esmaecimento do
+   bloco que não está sendo lido). Sem script, o desenho aparece montado no
+   estado final e os cinco blocos ficam todos legíveis — a mesma informação sem
+   a encenação. */
+
+/* ============ A GRADE ============
+
+   Duas colunas de peso igual. O texto não pode ser mais estreito que o desenho
+   aqui: são cinco blocos que a pessoa vai LER, e a coluna de leitura manda —
+   o desenho se ajusta a ela, nunca o contrário.
+
+   A ALTURA DAS COLUNAS FICA NO PADRÃO (`stretch`), e isso é o que faz o grude
+   funcionar: a `.ctr-lado` estica com a linha inteira, ganhando a altura da
+   coluna de texto, e a `.ctr-visual` dentro dela desliza nessa folga. Com
+   `align-items: start` a coluna encolheria para a altura do desenho e não
+   sobraria percurso nenhum — o desenho passaria direto, sem grudar. É o erro
+   clássico deste layout, e ele é silencioso: nada quebra, só não gruda.
+
+   O `order` põe o texto à esquerda. Na marcação o desenho vem primeiro, para o
+   celular herdar a ordem certa em fluxo de bloco (ver o bloco de uma coluna
+   lá embaixo). */
+.ctr-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 5rem);
+}
+
+.ctr-passos {
+  order: 1;
+}
+
+.ctr-lado {
+  order: 2;
+}
+
+/* ---- ESQUERDA: os cinco blocos ---- */
+
+.ctr-passos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A ALTURA MÍNIMA É O QUE AMARRA TEXTO E DESENHO.
+
+   Cinco blocos de mesma altura dividem a rolagem em cinco fatias iguais, e as
+   cinco batidas da linha do tempo têm a mesma duração — então o bloco 03 está
+   no meio da tela enquanto o desenho desenha o passo 03. Não há gatilho por
+   bloco fazendo essa conta: são duas divisões iguais sobre o mesmo intervalo.
+
+   78svh e não 100: um bloco de tela cheia deixa o texto sozinho no meio de um
+   vazio e faz a seção parecer cinco páginas em vez de uma leitura. Abaixo de
+   ~70 os blocos começam a caber dois na tela, e aí duas batidas disputam a
+   mesma atenção. */
+.ctr-passo {
+  display: grid;
+  align-content: center;
+  min-height: 78svh;
+}
+
+/* O primeiro e o último respiram menos: o de cima já tem o cabeçalho da seção
+   acima dele, e o de baixo tem o fim da seção. Sem isto a seção abre e fecha
+   com meia tela de nada. */
+.ctr-passo:first-child {
+  min-height: 62svh;
+  align-content: end;
+  padding-bottom: clamp(1rem, 4vh, 3rem);
+}
+
+.ctr-passo:last-child {
+  min-height: 62svh;
+  align-content: start;
+  padding-top: clamp(1rem, 4vh, 3rem);
+}
+
+/* O bloco que não está sendo lido recua. É ESTADO, não animação: muda em
+   `--t-mov` pela curva padrão da página, e não raspado pela rolagem — texto
+   piscando junto com o gesto é ruído em cima de leitura.
+
+   Só com `.ctr-vivo`: sem script, ou com movimento reduzido, os cinco ficam
+   legíveis o tempo todo. Um texto apagado que nunca acende é um texto perdido,
+   e essa é a única coisa desta seção que não pode falhar. */
+.ctr-vivo .ctr-passo {
+  opacity: 0.34;
+  transition: opacity var(--t-mov) var(--e-ui);
+}
+
+.ctr-vivo .ctr-passo.e-ativo {
+  opacity: 1;
+}
+
+.ctr-bloco {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  max-width: 44ch;
+  border-left: 1px solid var(--hair);
+  padding-left: clamp(1rem, 2.5vw, 1.75rem);
+  transition: border-color var(--t-mov) var(--e-ui);
+}
+
+/* O fio da margem acende junto com o bloco. É o mesmo papel do número na régua
+   do desenho: dizer qual dos cinco é o de agora, sem escrever "3 de 5". */
+.ctr-vivo .e-ativo .ctr-bloco {
+  border-color: var(--hair-hot);
+}
+
+.ctr-rot {
+  color: var(--fg-2);
+}
+
+.ctr-tit {
+  margin: 0;
+  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+}
+
+.ctr-txt {
+  margin: 0;
+  font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+/* Um realce por bloco, no máximo dois: realce que se repete deixa de ser
+   realce, e o olho volta a ter que ler tudo para achar o que importa. */
+.ctr-txt mark {
+  background: none;
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* ---- DIREITA: o desenho grudado ---- */
+
+.ctr-visual {
+  position: sticky;
+  /* A barra do topo mais a folga dela, mais um respiro. Mesma conta do
+     `padding-top` do herói no `v5.css` — o desenho não pode grudar por baixo
+     da barra flutuante. */
+  top: calc(var(--nav-gap) + 58px + clamp(1rem, 4vh, 2.5rem));
+  display: grid;
+  gap: clamp(0.85rem, 2.2vh, 1.5rem);
+}
+
+/* A cena é quadrada porque o sistema de coordenadas é: os nós são posicionados
+   em porcentagem sobre o mesmo `0–100` do `viewBox`. Mudar o tamanho aqui move
+   o desenho inteiro junto, sem recalcular nada.
+
+   A ALTURA MANDA (`svh`), não a largura: o desenho precisa caber na tela
+   inteiro enquanto está grudado, e uma caixa medida em `vw` estoura para fora
+   dela em tela larga e baixa — que é o formato de qualquer notebook. */
+.ctr-cena {
+  position: relative;
+  width: min(100%, 62svh);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  will-change: transform;
+}
+
+/* A aura. Único fundo do desenho: um halo de luz atrás do centro que ganha
+   força conforme o anel fecha.
+
+   Em degradê e não em `box-shadow` porque ela precisa dissolver ao longo de
+   meia cena — sombra com esse raio custa cara para repintar e ainda encosta
+   numa borda visível. O `opacity` é escrito pela linha do tempo. */
+.ctr-aura {
+  position: absolute;
+  inset: -18%;
+  background: radial-gradient(
+    circle at center,
+    rgba(102, 205, 255, 0.2) 0%,
+    rgba(102, 205, 255, 0.07) 30%,
+    rgba(59, 165, 232, 0.03) 50%,
+    transparent 68%
+  );
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.ctr-tracado {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Os ecos passam do `viewBox` ao se abrir. Cortá-los desenharia um quadrado
+     no ar justamente no quadro em que a peça encaixa. */
+  overflow: visible;
+}
+
+/* ---- os raios ----
+
+   Do centro a cada nó. São o que transforma um anel com marcações numa coisa
+   girando EM TORNO de alguém — a frase da seção, desenhada.
+
+   Bem apagados: eles são relação, não conteúdo. Se disputassem com o anel, o
+   desenho passaria a ter duas linhas dizendo coisas diferentes com o mesmo
+   peso. */
+.ctr-raio,
+.ctr-raio-pilar {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+}
+
+.ctr-raio {
+  stroke: rgba(102, 205, 255, 0.3);
+  stroke-width: 0.22;
+}
+
+/* Os dos pilares são ainda mais fracos: eles sustentam, não conduzem. */
+.ctr-raio-pilar {
+  stroke: rgba(242, 248, 255, 0.16);
+  stroke-width: 0.18;
+}
+
+/* O hexágono é o lugar; o anel é o percurso. Daí a diferença de peso e de cor:
+   um é estrutura (fio fino, quase apagado), o outro é o que está acontecendo
+   agora (traço cheio, na cor da marca).
+
+   O hexágono só ACENDE na última batida, quando o assunto passa a ser a
+   estrutura — é a linha do tempo que sobe a opacidade e a espessura. */
+.ctr-hex {
+  fill: none;
+  stroke: rgba(242, 248, 255, 0.22);
+  stroke-width: 0.35;
+  stroke-dasharray: 6;
+  stroke-linejoin: round;
+}
+
+.ctr-anel {
+  fill: none;
+  stroke: #66cdff;
+  stroke-width: 0.6;
+  stroke-dasharray: 3;
+  stroke-linecap: round;
+  /* O anel é a única linha com brilho. Ele é a IA, e é a coisa que está
+     acontecendo — o resto é onde ela acontece. */
+  filter: drop-shadow(0 0 1.4px rgba(102, 205, 255, 0.7));
+}
+
+/* O rastro corre por cima do anel, logo atrás da cabeça. Mais claro e mais
+   grosso: é o traço no instante em que nasce, antes de esfriar para a cor do
+   anel. `dasharray` curto + gap do comprimento inteiro = um traço só. */
+.ctr-rastro {
+  fill: none;
+  stroke: #d8f1ff;
+  stroke-width: 0.75;
+  stroke-dasharray: 0.34 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px rgba(102, 205, 255, 0.9));
+}
+
+/* O eco de chegada. Anel fino que se abre e some no vértice em que a peça
+   encaixou — pontuação, não elemento do desenho. */
+.ctr-eco,
+.ctr-fecho {
+  fill: none;
+  stroke: #66cdff;
+  stroke-width: 0.5;
+  opacity: 0;
+}
+
+.ctr-cabeca-halo {
+  fill: rgba(102, 205, 255, 0.16);
+}
+
+.ctr-cabeca-disco {
+  fill: #66cdff;
+  filter: drop-shadow(0 0 2.5px rgba(102, 205, 255, 0.85));
+}
+
+/* ---- o cliente, no centro ---- */
+
+.ctr-eu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* `translate` na propriedade própria, e não dentro de `transform`: o GSAP
+     escreve a matriz inteira de `transform` ao animar a escala, e as duas
+     coisas juntas ali seriam reescritas por ele no primeiro quadro — a peça
+     saltaria para a quina superior esquerda assim que a cena começasse. */
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.ctr-eu-glifo {
+  display: grid;
+  place-items: center;
+  width: clamp(3rem, 7.5svh, 4.5rem);
+  aspect-ratio: 1;
+  color: var(--fg);
+  border: 1px solid var(--hair-hot);
+  border-radius: 999px;
+  background: rgba(11, 18, 25, 0.72);
+  /* O halo separa o centro da aura atrás dele sem precisar de chapa opaca. */
+  box-shadow: 0 0 0 6px rgba(102, 205, 255, 0.06),
+    0 0 34px rgba(102, 205, 255, 0.18);
+}
+
+.ctr-eu-glifo svg {
+  width: 58%;
+  height: 58%;
+}
+
+.ctr-eu-rot {
+  color: var(--fg-2);
+  letter-spacing: 0.16em;
+}
+
+/* A marca acima do centro. Pequena de propósito: ela assina o percurso, e uma
+   marca do tamanho do assunto passa a ser o assunto. */
+.ctr-marca {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% calc(-50% - clamp(3.1rem, 7.5svh, 4.6rem));
+  display: block;
+  width: clamp(0.85rem, 1.9svh, 1.2rem);
+  color: rgba(102, 205, 255, 0.55);
+}
+
+.ctr-marca svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---- os três passos ---- */
+
+.ctr-no {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  width: max-content;
+  max-width: clamp(5.5rem, 14svh, 8.5rem);
+  text-align: center;
+}
+
+/* O número é a única coisa em caixa e cor na pílula: é ele que carrega a
+   ordem, e ordem é a informação do stepper. */
+.ctr-no-n {
+  display: grid;
+  place-items: center;
+  min-width: 2.05rem;
+  padding: 0.3rem 0.5rem;
+  color: #66cdff;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(102, 205, 255, 0.34);
+  border-radius: 999px;
+  background: rgba(6, 12, 18, 0.86);
+}
+
+.ctr-no-nome {
+  font-size: clamp(0.75rem, 1.5svh, 0.9375rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  text-shadow: 0 1px 10px rgba(5, 9, 13, 0.9);
+}
+
+/* ---- os três pilares ---- */
+
+.ctr-pilar {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  width: max-content;
+  max-width: clamp(5rem, 13svh, 8rem);
+  text-align: center;
+}
+
+.ctr-pilar-ico {
+  display: grid;
+  place-items: center;
+  width: clamp(1.6rem, 3.8svh, 2.2rem);
+  aspect-ratio: 1;
+  color: var(--fg-2);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: rgba(6, 12, 18, 0.86);
+}
+
+.ctr-pilar-ico svg {
+  width: 62%;
+  height: 62%;
+}
+
+.ctr-pilar-nome {
+  font-size: clamp(0.6875rem, 1.35svh, 0.8125rem);
+  line-height: 1.24;
+  color: var(--fg-2);
+  text-shadow: 0 1px 10px rgba(5, 9, 13, 0.9);
+}
+
+/* ============ A RÉGUA ============
+
+   Um segmento por tópico, embaixo do desenho. Conta duas coisas que um "passo
+   3 de 5" não conta: quanto falta para trocar, e que existe um caminho inteiro
+   atrás e à frente.
+
+   Sem `animation` de propósito — o preenchimento é `scaleX(var(--p))` e o
+   `--p` vem do `onUpdate` da linha do tempo. Um segundo relógio em CSS medindo
+   o mesmo intervalo dessincroniza sempre; e este não é relógio nenhum, é a
+   posição da rolagem. */
+.ctr-regua {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: clamp(4px, 0.6vw, 9px);
+  width: min(100%, 62svh);
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.ctr-seg {
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(160, 205, 235, 0.18);
+  overflow: hidden;
+}
+
+.ctr-enche {
+  --p: 0;
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  /* Origem à esquerda: a barra enche no sentido da leitura. */
+  transform: scaleX(var(--p));
+  transform-origin: left center;
+  background: #66cdff;
+}
+
+/* Sem script a régua não tem o que medir: quem rola não está preso a uma linha
+   do tempo, está lendo cinco blocos de texto em ordem. */
+.ctr:not(.ctr-vivo) .ctr-regua {
+  display: none;
+}
+
+/* Sem script o desenho aparece montado no estado final. Sai o que só existe em
+   movimento: a cabeça a meio caminho, o rastro atrás dela e os ecos de
+   chegada — todos são o instante de uma transição, e transição parada não é um
+   estado, é um erro de desenho. A aura sai pelo mesmo motivo: parada em força
+   máxima vira uma mancha azul atrás de um diagrama estático. */
+.ctr:not(.ctr-vivo) .ctr-aura,
+.ctr:not(.ctr-vivo) .ctr-rastro,
+.ctr:not(.ctr-vivo) .ctr-cabeca,
+.ctr:not(.ctr-vivo) .ctr-eco,
+.ctr:not(.ctr-vivo) .ctr-fecho {
+  display: none;
+}
+
+/* ============ UMA COLUNA SÓ ============
+
+   Abaixo de 900px o desenho vai para cima e o texto passa por baixo dele. Ele
+   continua grudado — é assim que a pessoa vê o passo 02 sendo desenhado
+   enquanto lê o passo 02 — mas encolhe e ganha CHÃO PRÓPRIO: sem o fundo
+   opaco, as cinco linhas de texto passariam atrás do hexágono.
+
+   A GRADE VIRA FLUXO DE BLOCO e a `.ctr-lado` some com `display: contents`.
+   Os dois andam juntos e pelo mesmo motivo: em uma coluna, o invólucro seria
+   uma linha própria com a altura exata do desenho, e um elemento grudado dentro
+   de uma caixa do próprio tamanho não desliza. Sem o invólucro, a `.ctr-visual`
+   passa a ser filha direta da `.ctr-grade` e desliza pela altura dela toda —
+   que é o desenho mais os cinco blocos.
+
+   O `order` sai de cena junto: em fluxo de bloco quem manda é a marcação, e lá
+   o desenho já vem primeiro. */
+@media (max-width: 900px) {
+  .ctr-grade {
+    display: block;
+  }
+
+  .ctr-lado {
+    display: contents;
+  }
+
+  .ctr-visual {
+    position: sticky;
+    top: calc(var(--nav-gap) + 58px);
+    z-index: 2;
+    gap: 0.75rem;
+    padding-bottom: clamp(0.75rem, 2vh, 1.25rem);
+    background: var(--bg);
+  }
+
+  /* A borda de baixo do bloco grudado não pode ser um corte: o texto que passa
+     por trás sumiria de repente num fio reto. Ele se dissolve. */
+  .ctr-visual::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: clamp(24px, 5vh, 48px);
+    background: linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .ctr-cena,
+  .ctr-regua {
+    width: min(100%, 42svh);
+  }
+
+  .ctr-passo,
+  .ctr-passo:first-child,
+  .ctr-passo:last-child {
+    min-height: 52svh;
+    align-content: center;
+    padding: 0;
+  }
+
+  .ctr-passos {
+    /* O primeiro bloco não pode nascer atrás do desenho grudado. */
+    padding-top: clamp(1rem, 3vh, 2rem);
+  }
+}
+
+/* Abaixo de 640px o nome do passo ao lado do número não cabe sem quebrar em
+   três linhas dentro do desenho. O número fica — ele é o stepper —, e o nome
+   sai: ele está no bloco de texto daquela batida, grande, logo abaixo. O do
+   pilar continua, porque o pilar não tem número que o identifique. */
+@media (max-width: 640px) {
+  .ctr-regua {
+    gap: 3px;
+  }
+
+  .ctr-vivo .ctr-no-nome {
+    display: none;
+  }
+
+  .ctr-pilar {
+    max-width: 5.5rem;
+  }
+}

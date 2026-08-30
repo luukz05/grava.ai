@@ -11,78 +11,16 @@
   }
 }
 
-/* Os três estados: a arte manda na altura, então cada passo é uma coluna
-   com a chapa em cima e o texto embaixo. */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(1rem, 2.5vw, 1.75rem);
-}
+/* `.steps`/`.step` e `.creed` SAÍRAM daqui.
 
-@media (max-width: 780px) {
-  .steps {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+   Os três cartões da seção "Da ideia ao produto" e o parágrafo de citação do
+   credo foram absorvidos pela cena da marca — os três passos viraram os nós do
+   hexágono e o credo virou a primeira batida dela. As duas receitas ficariam
+   sem nenhum elemento na página, e regra de CSS sem dono é o que faz a próxima
+   pessoa reconstruir um bloco que já não existe.
 
-.step {
-  border: 1px solid var(--hair);
-  /* Os tempos e as curvas vêm dos tokens do `v5.css`: uma página institucional
-     com o próprio 150ms escrito à mão é uma segunda gramática de movimento na
-     mesma marca. */
-  transition: border-color var(--t-ui) var(--e-ui);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .step:hover {
-    border-color: var(--hair-hot);
-  }
-}
-
-.step figure {
-  margin: 0;
-  border-bottom: 1px solid var(--hair);
-}
-
-.step .txt {
-  padding: clamp(0.9rem, 2.2vw, 1.3rem);
-}
-
-.step h3 {
-  margin: 0.5rem 0 0.25rem;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--fg);
-}
-
-.step p {
-  margin: 0;
-  color: var(--fg-2);
-  font-size: 0.9375rem;
-}
-
-/* O número do passo em ciano é a única cor da seção: é ele que carrega a
-   ordem, e ordem é a informação desta parte da página. */
-.step .num {
-  color: var(--cyan);
-}
-
-/* Bloco de citação da marca: fio à esquerda, texto em display médio.
-   É a frase de propósito — precisa de peso sem virar manchete. */
-/* Sem margem no topo: quem dá o respiro entre o cabeçalho da seção e o que vem
-   depois dele é o `.sec-cab`, para as treze seções de uma vez. Dois donos para
-   o mesmo espaço somariam, e esta seção abriria mais que as outras. */
-.creed {
-  margin: 0;
-  border-left: 2px solid var(--hair-hot);
-  padding-left: clamp(1rem, 2.5vw, 1.75rem);
-  font-size: clamp(1.125rem, 2.4vw, 1.5rem);
-  line-height: 1.34;
-  letter-spacing: -0.02em;
-  color: var(--fg);
-  max-width: 40ch;
-}
+   O estilo delas está em `centro.css` (`.ctr-no`, `.ctr-legenda`), agora com um
+   dono só. Se a divisão precisar voltar, ela está no commit anterior a este. */
 
 /* Rodapé institucional: a linha de assinatura e o ©, sem inventar link para
    página que não existe. Política de Privacidade e Termos ficam de fora até

@@ -13,9 +13,10 @@ import Link from "next/link";
 import "../v5.css";
 import "../variacoes.css";
 import "./institucional.css";
+import "./centro.css";
 import { Casca, Heroi } from "../casca";
 import { FundoFecho } from "../fundos";
-import { AsciiEstado } from "./art";
+import { Centro } from "./centro";
 import { Rodape } from "../rodape";
 import {
   IcoInovacao,
@@ -80,26 +81,40 @@ export default function Institucional() {
         </header>
       </Heroi>
 
+      {/* A SEÇÃO DA MARCA.
+
+          O credo era um parágrafo de citação aqui, e os três passos ("A ideia",
+          "A personalização", "O produto") eram uma seção `#produto` de três
+          cartões parados, algumas telas abaixo. Os dois viraram uma coisa só:
+          o texto rola normalmente à esquerda e o desenho acompanha à direita,
+          grudado — ver o cabeçalho de `centro.tsx`.
+
+          O que a fusão conserta: o credo afirmava que o cliente está no centro
+          da criação, e a página provava o contrário na linha seguinte — três
+          cartões da esquerda para a direita são a forma de uma esteira, que é o
+          oposto de "no centro". Agora ele está, literalmente, no meio do
+          desenho, e o percurso acontece em volta.
+
+          SEM `.breu` AQUI. Ele existe para entregar uma cena de preto puro
+          sangrada na tela inteira sem desenhar moldura em volta, e essa cena
+          não existe mais: o desenho vive dentro da coluna da página, no fundo
+          da página, como qualquer outra seção. */}
       <section className="hold sec" id="marca">
         {/* O apoio listava três desejos e depois explicava a IA em abstrato —
-            190 caracteres para dizer o que a frase abaixo diz em 67. O credo,
-            logo em seguida, é quem carrega o peso desta seção. */}
+            190 caracteres para dizer o que a frase abaixo diz em 67. */}
         <div className="sec-cab">
           <h2>
             O mercado mudou. <mark>A marca acompanhou.</mark>
           </h2>
           <p>Exclusivo, personalizado e na hora: é o que a IA passou a permitir.</p>
         </div>
-        {/* O credo fica fora do cabeçalho: é a frase de propósito da marca, não
-            linha de apoio da manchete. Tem fio próprio, corpo médio e medida
-            mais estreita — se entrasse no `.sec-cab`, herdaria a medida larga do
-            apoio e deixaria de ser citação. */}
-        <p className="creed">
-          Uma marca que coloca o cliente no centro da criação e usa tecnologia
-          para transformar cada momento em um produto que carrega uma história.
-        </p>
+
+        <Centro />
       </section>
 
+      {/* A seção anterior termina nomeando os três pilares nos vértices do
+          hexágono; esta é onde cada um deles é explicado. O desenho nomeia, a
+          seção detalha — nenhuma das duas repete a outra. */}
       <section className="hold sec" id="pilares">
         <div className="sec-cab">
           <h2>
@@ -141,54 +156,16 @@ export default function Institucional() {
         </div>
       </section>
 
-      <section className="hold sec" id="produto">
-        <div className="sec-cab">
-          <h2>
-            Da ideia ao produto, <mark>em 3 passos.</mark>
-          </h2>
-          <p>Tudo acontece no ponto, na frente do cliente, sem encomenda.</p>
-        </div>
-        <div className="steps">
-          <div className="step">
-            <figure>
-              <AsciiEstado estado={0} />
-            </figure>
-            <div className="txt">
-              <span className="mono num">01</span>
-              <h3>A ideia</h3>
-              <p>
-                No totem, o cliente escolhe ou gera a arte com Inteligência
-                Artificial.
-              </p>
-            </div>
-          </div>
-          <div className="step">
-            <figure>
-              <AsciiEstado estado={1} />
-            </figure>
-            <div className="txt">
-              <span className="mono num">02</span>
-              <h3>A personalização</h3>
-              <p>
-                O produto é personalizado na hora, com qualidade padronizada.
-              </p>
-            </div>
-          </div>
-          <div className="step">
-            <figure>
-              <AsciiEstado estado={2} />
-            </figure>
-            <div className="txt">
-              <span className="mono num">03</span>
-              <h3>O produto</h3>
-              <p>
-                O cliente sai com um produto exclusivo que carrega um
-                significado.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* A seção "Da ideia ao produto, em 3 passos" SAIU daqui.
+
+          Ela era, cartão por cartão, o que a cena da marca agora mostra
+          acontecendo: mesmos três nomes, mesmos três textos e as mesmas três
+          chapas de `art.tsx` — que continuam na página, ao fundo da cena,
+          trocando de estado junto com os passos.
+
+          Repetir em texto parado o que a cena provou em movimento não reforça:
+          enfraquece. Quem viu lê como "então aquilo não bastou", e quem não viu
+          não ganha nada, porque o cartão é mais pobre que a cena. */}
 
       <section className="hold sec" id="ia">
         <div className="sec-cab">
@@ -283,7 +260,7 @@ export default function Institucional() {
           assinatura="Transformando ideias em produtos personalizados com Inteligência Artificial."
           links={[
             { href: "#marca", rotulo: "Quem somos" },
-            { href: "#produto", rotulo: "O produto" },
+            { href: "#pilares", rotulo: "Os pilares" },
             { href: "#onde", rotulo: "Onde atuamos" },
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/", rotulo: "Seja um franqueado" },
