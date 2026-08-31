@@ -53,18 +53,19 @@
   background: var(--bg);
   color: var(--fg);
   font-family: var(--f-txt), system-ui, sans-serif;
-  /* Bricolage Grotesque: largura e terminais irregulares de propósito.
-     Geist saiu por estar na lista de faces saturadas do detector.
+  /* Switzer (Fontshare), variável 100–900, e só ela — ver `casca.tsx`. Antes
+     eram três famílias; agora a hierarquia inteira sai de peso, corpo e
+     espacejamento de uma face só. Geist saiu antes disso por estar na lista de
+     faces saturadas do detector.
 
      0.96875rem e não 15.5px: em px o corpo do texto ignora o tamanho de fonte
      que a pessoa configurou no navegador, enquanto todo o resto da página —
      que é escrito em rem — cresce junto com ele. O valor é o mesmo 15,5px na
      configuração padrão; a diferença é que agora ele escala.
 
-     `font-optical-sizing`: a Bricolage tem eixo óptico (opsz 12–96) e o
-     `casca.tsx` carrega ele. Com isto o desenho da letra muda com o corpo —
-     hastes mais finas e contraforma mais aberta na manchete, o oposto no
-     texto miúdo. É o que a Apple faz nativamente com a San Francisco. */
+     `font-optical-sizing: auto` fica declarado mas sem efeito: a Switzer não
+     tem eixo óptico. É o padrão da propriedade, não custa nada, e volta a
+     valer sozinho no dia em que entrar uma face que tenha `opsz`. */
   font-size: 0.96875rem;
   font-optical-sizing: auto;
   line-height: 1.62;
@@ -156,7 +157,8 @@
 }
 
 .mono {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   /* 12px, não 10px: piso de legibilidade para texto funcional, e o cenário
      aqui é celular à noite. O tracking também baixou, porque 0.18em em caixa
      alta destrói o reconhecimento de palavra. */
@@ -304,7 +306,7 @@
 }
 
 .hero h1 {
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: clamp(2.6rem, 7.4vw, 5.6rem);
   font-weight: 600;
   line-height: 0.96;
@@ -550,7 +552,7 @@
 
 .pilares h3 {
   margin: 0.9rem 0 0.4rem;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: clamp(1.375rem, 2.6vw, 1.875rem);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -625,7 +627,8 @@
   gap: 0.4rem;
   padding-block: 0.34rem;
   text-decoration: none;
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   color: var(--fg-2);
@@ -717,7 +720,8 @@
   background: #1b2027;
   border: 1px dashed #39424c;
   color: #7c8794;
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -775,7 +779,8 @@
 
 .sist-k {
   grid-row: span 3;
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.16em;
   color: var(--fg-hot);
@@ -785,7 +790,8 @@
 /* O lado é a informação que faz a seção fazer sentido: metade das estações é
    o cliente, metade é a operação, e é o mesmo circuito. */
 .sist-lado {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.625rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -932,7 +938,8 @@
 
 .steps-k {
   grid-row: span 2;
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.18em;
   color: var(--fg-hot);
@@ -1079,7 +1086,7 @@
 }
 
 .sec-cab > h2 {
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: clamp(1.5rem, 5.2vw, 3.5rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -1622,7 +1629,7 @@
 
 .form-fr-head h3 {
   margin: 0 0 0.4rem;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: clamp(1.25rem, 2.4vw, 1.625rem);
   font-weight: 600;
   letter-spacing: -0.015em;
@@ -1668,7 +1675,8 @@
 /* Rótulo visível e acima do campo. Placeholder como rótulo some no momento em
    que a pessoa digita, e aí ela não sabe mais o que aquele campo era. */
 .campo > span {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   /* mesmo piso de 11px do resto do texto funcional — e num rótulo de campo
      ele importa mais, porque é o que diz o que digitar */
   font-size: 0.6875rem;
@@ -2434,7 +2442,8 @@
   position: absolute;
   top: 0.7rem;
   left: calc(clamp(0.85rem, 1.6vw, 1.35rem) + 0.7rem);
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2692,7 +2701,7 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -2705,7 +2714,7 @@
 }
 
 .h2h-tag--nos {
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -2911,7 +2920,7 @@
 .num-conta {
   display: block;
   margin-top: 0.35rem;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   /* A escala é o argumento: este número precisa ser lido antes de qualquer
      outra coisa da seção. */
   font-size: clamp(3.25rem, 8vw, 5.5rem);
@@ -3008,7 +3017,7 @@
 .num-parcela-val {
   grid-column: 2;
   grid-row: 1;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -3045,7 +3054,8 @@
   padding: 0.2rem 0.6rem;
   border: 1px dashed color-mix(in srgb, var(--fg) 26%, transparent);
   border-radius: 999px;
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -3288,7 +3298,7 @@
 
 .num-grade .num-val {
   margin: 0.55rem 0 0;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   /* Um degrau acima do que era (1,375rem de teto): estes quatro vinham do
      mesmo corpo do texto de apoio e sumiam ao lado do quadro do
      investimento. */
@@ -3455,7 +3465,8 @@
 }
 
 .orb-lista .orb-rotulo {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
