@@ -292,6 +292,7 @@ export function Centro() {
              legíveis. O LAYOUT É O MESMO NOS DOIS CASOS. */
           no.classList.add("ctr-vivo");
 
+          const cena = um<HTMLElement>(".ctr-cena");
           const aura = um<HTMLElement>(".ctr-aura");
           const guia = um<HTMLElement>(".ctr-guia");
           const onda = um<HTMLElement>(".ctr-onda");
@@ -470,7 +471,14 @@ export function Centro() {
              O QUE FICA NO MEIO É O PAR: o cliente e a coroa da IA em volta
              dele, os dois um degrau menores para caber dentro da esfera. Eles
              são o assunto da seção inteira, e a peça que sai é consequência —
-             não substituição. */
+             não substituição.
+
+             A CENA SOBE 10%. É a única batida em que ela sai do meio da tela,
+             e o motivo é o texto: a cartela de fechamento fica EMBAIXO, e uma
+             esfera de 62svh centrada não deixa faixa livre nenhuma sob ela.
+             Sem a subida o parágrafo entra por dentro da esfera e uma faca em
+             primeiro plano corta a linha no meio. A câmera dá o passo, o texto
+             ganha o rodapé. */
           batida("produto", 3);
           tl.fromTo(
             onda,
@@ -511,6 +519,11 @@ export function Centro() {
               aura,
               { opacity: 0.58, duration: 1, ease: E_LUZ },
               "produto+=0.4"
+            )
+            .to(
+              cena,
+              { yPercent: -10, duration: 1.6, ease: E_MOLA },
+              "produto+=0.15"
             );
 
           /* A última fatia precisa existir inteira na linha do tempo, senão a
