@@ -9,9 +9,9 @@
    substitui esse cliente: ela o ACOMPANHA — recebe a ideia dele, otimiza,
    projeta, e é isso que faz a personalização acontecer na hora.
 
-   Por isso o cliente nunca sai do meio da cena. Nenhuma batida o apaga,
-   nenhuma o troca por outra coisa. O que muda em volta dele é quem chegou
-   para ajudar:
+   Por isso o cliente fica no meio da cena ENQUANTO A CRIAÇÃO ACONTECE.
+   Nenhuma batida da criação o apaga, nenhuma o troca por outra coisa. O que
+   muda em volta dele é quem chegou para ajudar:
 
    1 · O CLIENTE NO CENTRO — a órbita se insinua e ele aparece no meio dela.
    2 · A IDEIA É DELE — um balão sobe do cliente. O pedido existe antes de
@@ -21,14 +21,21 @@
        traço atrás de si. A marca acende no alto dessa coroa quando ela fecha.
        Ninguém foi substituído — alguém foi REVESTIDO.
    4 · O PRODUTO — uma onda parte do centro, a órbita externa se rompe e a
-       coroa explode em peças, que abrem numa esfera em volta do par cliente +
-       IA e ficam girando.
+       coroa explode em peças, que abrem numa esfera girando. Aqui a criação já
+       terminou: o cliente sai do meio levando o que pediu, e a MARCA desce do
+       alto da coroa para o centro da esfera. Quem assina o que nasceu é a
+       grava.ai.
 
    A VERSÃO ANTERIOR DIZIA O CONTRÁRIO, e por isso mudou: lá a marca CRESCIA
-   NO LUGAR do cliente e ele apagava. Desenhar substituição numa seção cujo
-   texto afirma "o cliente no centro da criação" é a página se contradizer no
-   meio da própria frase — o mesmo defeito que fez os três passos saírem de
-   uma fileira de cartões, que é a forma de uma esteira.
+   NO LUGAR do cliente DURANTE A PROJEÇÃO — a IA apagando quem pediu. Desenhar
+   substituição numa seção cujo texto afirma "o cliente no centro da criação" é
+   a página se contradizer no meio da própria frase, o mesmo defeito que fez os
+   três passos saírem de uma fileira de cartões, que é a forma de uma esteira.
+
+   A TROCA DE CENTRO DA QUARTA BATIDA NÃO É ESSA SUBSTITUIÇÃO. Ela acontece
+   DEPOIS de o produto existir: o cliente não é apagado no meio do próprio
+   pedido, ele sai com ele na mão. O assunto do último quadro é o catálogo que
+   nasceu, e catálogo quem assina é a marca.
 
    ───────────────────────────────────────────────────────────────────────────
    O TEXTO ANDA EM VOLTA DA CENA, e não numa coluna fixa
@@ -165,15 +172,32 @@ const VOLTA = 46;
 
    Um bloco de texto e uma batida da cena, com o mesmo nome. `lugar` é o canto
    da tela em que aquele bloco aparece — ver `[data-lugar]` no `centro.css`.
+   O último não tem um canto: ele é `flancos`, e ABRE EM DOIS — rótulo e título
+   de um lado da esfera, o parágrafo do outro. É a batida em que a cena está no
+   tamanho máximo e não sobra canto vazio nenhum, e é também a única em que o
+   texto PODE cercar o desenho: o assunto dele deixou de estar num ponto da cena
+   e passou a ser a cena inteira.
+
+   A LINHA QUE OS QUATRO ESCREVEM JUNTOS, e é ela que decide cada palavra:
+   a marca tem o cliente no centro; a ideia é dele; a IA é a aliada; e são as
+   duas juntas que concebem um produto único — a ideia dele, materializada, com
+   significado. "Juntas" é a palavra-chave do fecho: o produto não sai da
+   máquina nem sai do cliente sozinho, sai do par.
 
    Nenhum texto aqui é fato novo. O credo é o da seção `#marca`; "participa da
    criação em vez de escolher de um catálogo" e "carrega um significado" são do
    antigo `#produto`; "projeta a arte em segundos" e "na hora, e não por
    encomenda" recompõem o que `#ia` e o antigo passo 02 já afirmavam. A seção
-   reorganiza o que a página diz — não acrescenta afirmação. */
+   reorganiza o que a página diz — não acrescenta afirmação.
+
+   TERCEIRA PESSOA, e não "a sua ideia": nesta página o "você" é o CANDIDATO A
+   FRANQUEADO — é com ele que o herói e o fecho falam ("leve a GRAVA.AI para a
+   sua região"). Quem descreve a ideia no totem é o consumidor da loja dele.
+   Trocar de interlocutor no meio da página faria o franqueado ler a seção como
+   se ele fosse o cliente do quiosque. */
 type Topico = {
   id: string;
-  lugar: "topo" | "esq" | "dir" | "baixo";
+  lugar: "topo" | "esq" | "dir" | "flancos";
   rotulo: string;
   titulo: string;
   texto: React.ReactNode;
@@ -200,7 +224,7 @@ const TOPICOS: Topico[] = [
     titulo: "A ideia é dele",
     texto: (
       <>
-        No totem, o cliente descreve o que quer. Ele{" "}
+        No totem, o cliente descreve o que quer. A ideia é dele — ele{" "}
         <mark>participa da criação</mark> em vez de escolher de um catálogo.
       </>
     ),
@@ -209,24 +233,24 @@ const TOPICOS: Topico[] = [
     id: "ia",
     lugar: "dir",
     rotulo: "Passo 02",
-    titulo: "A IA projeta em volta",
+    titulo: "A IA entra como aliada",
     texto: (
       <>
-        A Inteligência Artificial recebe a ideia, otimiza e{" "}
-        <mark>projeta a arte em segundos</mark>. É o que faz a personalização
-        acontecer na hora, e não por encomenda.
+        A Inteligência Artificial recebe essa ideia, otimiza e{" "}
+        <mark>projeta a arte em segundos</mark>. Ela não cria no lugar de
+        ninguém: acompanha quem pediu.
       </>
     ),
   },
   {
     id: "produto",
-    lugar: "baixo",
+    lugar: "flancos",
     rotulo: "Passo 03",
-    titulo: "O produto",
+    titulo: "Juntas, concebem",
     texto: (
       <>
-        O cliente sai com um produto exclusivo que{" "}
-        <mark>carrega um significado</mark> — e não com mais um item de
+        Do par nasce um produto único: a ideia do cliente{" "}
+        <mark>materializada e com significado</mark> — e não mais um item de
         prateleira.
       </>
     ),
@@ -468,17 +492,36 @@ export function Centro() {
              desenhada por trás da esfera daria à cena um segundo círculo
              competindo com o volume que acabou de nascer.
 
-             O QUE FICA NO MEIO É O PAR: o cliente e a coroa da IA em volta
-             dele, os dois um degrau menores para caber dentro da esfera. Eles
-             são o assunto da seção inteira, e a peça que sai é consequência —
-             não substituição.
+             O CENTRO TROCA DE DONO, e é a única batida em que isso pode
+             acontecer: a criação acabou. O cliente sai do meio levando o que
+             pediu — encolhe e apaga, sem ser empurrado por nada — e a MARCA
+             desce do alto da coroa para o lugar dele, maior, no eixo da esfera.
 
-             A CENA SOBE 10%. É a única batida em que ela sai do meio da tela,
-             e o motivo é o texto: a cartela de fechamento fica EMBAIXO, e uma
-             esfera de 62svh centrada não deixa faixa livre nenhuma sob ela.
-             Sem a subida o parágrafo entra por dentro da esfera e uma faca em
-             primeiro plano corta a linha no meio. A câmera dá o passo, o texto
-             ganha o rodapé. */
+             A descida é de 15% da altura da cena, que é quadrada: exatamente o
+             `--coroa-r: 15cqw` que põe o selo no alto da coroa. A medida é lida
+             do elemento a cada `refresh` (`invalidateOnRefresh`), e não escrita
+             em pixels — em pixels o selo pararia fora do centro em qualquer
+             tela que não fosse aquela em que foi medido.
+
+             O selo desce ENQUANTO o cliente apaga, e não depois: em sequência
+             lê como reposição de peça, junto lê como passagem de bastão.
+
+             A CENA SÓ SAI DO MEIO QUANDO O TEXTO FECHA EM COLUNA. Ela subia
+             10% aqui sempre, e o motivo era o texto: a cartela de fechamento
+             ficava EMBAIXO, e uma esfera de 62svh centrada não deixa faixa
+             livre nenhuma sob ela — sem a subida o parágrafo entra por dentro
+             da esfera e uma faca em primeiro plano corta a linha no meio.
+
+             Com os DOIS FLANCOS a cena não tem o que desviar: o texto ocupa as
+             faixas laterais que a esfera nunca ocupou, e ela fica no eixo,
+             entre as duas metades da fala. Abaixo de 1180px, porém, os flancos
+             fecham em coluna (ver `centro.css`) e o problema antigo volta
+             inteiro — então a subida volta com ele.
+
+             A CONDIÇÃO É LIDA A CADA MEDIÇÃO, e não uma vez na montagem: o
+             valor é uma função e o gatilho tem `invalidateOnRefresh`, então
+             quem redimensiona a janela por cima do limite recebe o layout
+             certo sem recarregar a página. */
           batida("produto", 3);
           tl.fromTo(
             onda,
@@ -511,8 +554,23 @@ export function Centro() {
               "produto+=0.2"
             )
             .to(
-              [eu, selo],
-              { scale: 0.86, duration: 1.2, ease: E_MOLA },
+              eu,
+              { autoAlpha: 0, scale: 0.62, duration: 0.9, ease: E_UI },
+              "produto+=0.3"
+            )
+            /* A descida e o crescimento vão no SELO, nunca no marco: o marco
+               centra com `translate: -50% -50%` na propriedade própria, e o
+               GSAP zera `translate` ao assumir um alvo — animado ali, o selo
+               desceria e ao mesmo tempo escorregaria meia peça para a direita
+               e para baixo. Ver o comentário do `.ctr-marco` no CSS. */
+            .to(
+              selo,
+              {
+                y: () => cena.getBoundingClientRect().height * 0.15,
+                scale: 1.9,
+                duration: 1.4,
+                ease: E_MOLA,
+              },
               "produto+=0.3"
             )
             .to(
@@ -522,7 +580,12 @@ export function Centro() {
             )
             .to(
               cena,
-              { yPercent: -10, duration: 1.6, ease: E_MOLA },
+              {
+                yPercent: () =>
+                  window.matchMedia("(max-width: 1180px)").matches ? -10 : 0,
+                duration: 1.6,
+                ease: E_MOLA,
+              },
               "produto+=0.15"
             );
 
@@ -690,7 +753,8 @@ export function Centro() {
                 </svg>
               </div>
 
-              {/* O CLIENTE, no meio, e ele fica aqui do começo ao fim. */}
+              {/* O CLIENTE, no meio durante as três batidas da criação. Na
+                  quarta ele sai com o produto e o meio passa para a marca. */}
               <div className="ctr-marco" style={{ left: "50%", top: "50%" }}>
                 <div className="ctr-eu">
                   <span className="ctr-eu-glifo">
@@ -715,10 +779,14 @@ export function Centro() {
                 </span>
               </div>
 
-              {/* O SELO DA MARCA no alto da coroa: ela assina o que a IA acabou
-                  de projetar. Pequeno de propósito — o meio da cena é do
-                  cliente, e uma marca do tamanho do assunto passa a ser o
-                  assunto. */}
+              {/* O SELO DA MARCA. Nasce PEQUENO no alto da coroa, onde ela
+                  assina o que a IA acabou de projetar sem tomar o meio da cena
+                  — enquanto se cria, o meio é do cliente.
+
+                  Na quarta batida ele desce para o centro da esfera e cresce:
+                  o produto já existe, e o que fica no eixo do catálogo é a
+                  marca. `top: 35%` é a posição de partida, 15% acima do centro
+                  — a mesma medida que a descida desfaz. */}
               <div className="ctr-marco" style={{ left: "50%", top: "35%" }}>
                 <span className="ctr-selo">
                   <Marca />
@@ -753,15 +821,39 @@ export function Centro() {
           é um EIXO com quatro valores, não quatro adjetivos independentes: um
           bloco tem exatamente um lugar. */}
       <ol className="ctr-passos">
-        {TOPICOS.map((t) => (
-          <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
-            <div className="ctr-bloco">
-              <span className="ctr-rot mono">{t.rotulo}</span>
-              <h3 className="ctr-tit">{t.titulo}</h3>
-              <p className="ctr-txt">{t.texto}</p>
-            </div>
-          </li>
-        ))}
+        {TOPICOS.map((t) =>
+          t.lugar === "flancos" ? (
+            /* O BLOCO PARTIDO DA ÚLTIMA BATIDA: rótulo e título de um lado da
+               esfera, o parágrafo do outro.
+
+               OS DOIS LADOS MORAM DENTRO DE UM INVÓLUCRO, e é o invólucro que
+               gruda. Dois `.ctr-bloco` grudados como irmãos na mesma altura
+               ficariam certos na tela larga e empilhados um sobre o outro na
+               estreita, onde a grade vira coluna e os dois passam a disputar o
+               mesmo `top`. Um grude só não tem esse problema: o que muda entre
+               largo e estreito é o desenho interno da grade, e não o número de
+               coisas presas na tela. Ver `.ctr-flancos` no `centro.css`. */
+            <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
+              <div className="ctr-flancos">
+                <div className="ctr-bloco">
+                  <span className="ctr-rot mono">{t.rotulo}</span>
+                  <h3 className="ctr-tit">{t.titulo}</h3>
+                </div>
+                <div className="ctr-bloco">
+                  <p className="ctr-txt">{t.texto}</p>
+                </div>
+              </div>
+            </li>
+          ) : (
+            <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
+              <div className="ctr-bloco">
+                <span className="ctr-rot mono">{t.rotulo}</span>
+                <h3 className="ctr-tit">{t.titulo}</h3>
+                <p className="ctr-txt">{t.texto}</p>
+              </div>
+            </li>
+          )
+        )}
       </ol>
     </div>
   );

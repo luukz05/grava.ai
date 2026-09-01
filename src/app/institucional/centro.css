@@ -137,9 +137,10 @@
    desenha: algo dando a volta em quem está no meio. O leitor faz o giro junto
    com o ponto de luz.
 
-   `topo` e `baixo` centram o texto no eixo da cena e viram cartela de cinema —
-   a primeira batida abre a seção e a última fecha. `esq` e `dir` são as duas
-   laterais livres enquanto a esfera ocupa o meio.
+   `topo` centra o texto no eixo da cena e vira cartela de cinema: é a batida
+   que abre a seção. `esq` e `dir` são as duas laterais livres enquanto a esfera
+   ocupa o meio. `flancos` é a última, e usa as DUAS ao mesmo tempo — o texto
+   se parte e cerca a esfera, que aí já é o assunto inteiro.
 
    A ORDEM DOS CANTOS NÃO É ALTERNÂNCIA DECORATIVA. A segunda batida é o balão
    da ideia, que nasce à DIREITA do cliente; o texto dela vai para a esquerda,
@@ -157,8 +158,10 @@
   justify-items: end;
 }
 
-.ctr-passo[data-lugar="baixo"] {
-  justify-items: center;
+/* Estica: quem desenha as colunas aqui é o `.ctr-flancos`, e para isso ele
+   precisa da largura toda. */
+.ctr-passo[data-lugar="flancos"] {
+  justify-items: stretch;
 }
 
 /* ---- O TEXTO GRUDA NO CANTO DELE ----
@@ -191,11 +194,46 @@
   top: 38svh;
 }
 
-/* O de baixo desce quase ao rodapé, e a cena sobe 10% na batida dele — ver o
-   fim da linha do tempo em `centro.tsx`. Os dois números andam juntos: é a
-   soma deles que abre a faixa livre onde a cartela de fechamento cabe. */
-.ctr-passo[data-lugar="baixo"] .ctr-bloco {
-  top: 76svh;
+/* ---- O TEXTO PARTIDO DA ÚLTIMA BATIDA ----
+
+   Uma faixa da largura inteira, grudada na MESMA altura das laterais, com a
+   esfera atravessando o meio dela. A coluna do meio da grade não tem conteúdo:
+   ela é o LUGAR RESERVADO da cena, medido com a mesma conta que dá a largura
+   dela (`min(88%, 62svh)` — ver `.ctr-cena`). É isso que garante que nenhuma
+   das duas metades do texto encoste no volume, em qualquer proporção de tela.
+
+   O GRUDE É DO INVÓLUCRO, e não dos dois blocos. Presos como irmãos no mesmo
+   `top`, eles ficariam certos aqui e empilhados um sobre o outro assim que a
+   grade virasse coluna, na tela estreita — dois grudes na mesma altura são
+   duas coisas paradas no mesmo pixel.
+
+   Os blocos voltam a ser ESTÁTICOS dentro dele pelo mesmo motivo: quem gruda
+   já grudou, e um sticky dentro de outro é um segundo freio no mesmo eixo. */
+.ctr-flancos {
+  position: sticky;
+  top: 38svh;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, min(88%, 62svh)) 1fr;
+  column-gap: clamp(0.75rem, 2.4vw, 2rem);
+  align-items: start;
+}
+
+.ctr-flancos .ctr-bloco {
+  position: static;
+  max-width: 26ch;
+}
+
+.ctr-flancos .ctr-bloco:first-child {
+  grid-column: 1;
+}
+
+/* O segundo encosta na margem DIREITA — a simetria é do par de blocos em
+   volta da esfera, e não de cada bloco em relação à coluna dele. As linhas
+   dentro continuam alinhadas à esquerda: texto corrido alinhado à direita
+   custa leitura, e isso não muda por estar do lado direito da tela. */
+.ctr-flancos .ctr-bloco:last-child {
+  grid-column: 3;
+  justify-self: end;
 }
 
 /* O bloco que não está sendo lido recua. É ESTADO, não animação: muda em
@@ -250,13 +288,12 @@
   background: var(--hair-hot);
 }
 
-/* Os dois blocos centrados ficam com a medida maior e o texto no eixo: eles
-   são cartela, não parágrafo de coluna. Os laterais continuam alinhados à
-   esquerda mesmo quando o bloco está à direita da tela — texto corrido
-   alinhado à direita custa leitura, e o que decide o canto aqui é a posição do
-   BLOCO, não o alinhamento das linhas dentro dele. */
-.ctr-passo[data-lugar="topo"] .ctr-bloco,
-.ctr-passo[data-lugar="baixo"] .ctr-bloco {
+/* O bloco de abertura fica com a medida maior e o texto no eixo: ele é cartela,
+   não parágrafo de coluna. Os laterais continuam alinhados à esquerda mesmo
+   quando o bloco está à direita da tela — texto corrido alinhado à direita
+   custa leitura, e o que decide o canto aqui é a posição do BLOCO, não o
+   alinhamento das linhas dentro dele. */
+.ctr-passo[data-lugar="topo"] .ctr-bloco {
   max-width: 46ch;
   justify-items: center;
   text-align: center;
@@ -484,12 +521,19 @@
     0 0 26px 6px rgba(102, 205, 255, 0.4);
 }
 
-/* O selo da marca no alto da coroa. Pequeno de propósito: o meio da cena é do
-   cliente, e uma marca do tamanho do assunto passa a ser o assunto.
+/* O selo da marca. Pequeno enquanto está no alto da coroa: durante a criação o
+   meio da cena é do cliente, e uma marca do tamanho do assunto passa a ser o
+   assunto. Na última batida ele desce para o centro da esfera e o GSAP o
+   AMPLIA — lá o assunto é o catálogo, e é a marca que assina catálogo.
 
    O `.ctr-marco` dele está em `top: 35%` no `centro.tsx` — 15% acima do
    centro, que na cena QUADRADA é a mesma medida que `--coroa-r: 15cqw`. Mexer
-   no raio é mexer lá. */
+   no raio é mexer lá E na descida da quarta batida, que é a mesma medida ao
+   contrário.
+
+   O TAMANHO SAI DE `clamp()` e o crescimento é ESCALA, não largura: animar a
+   largura de uma caixa em `cqw` faria o navegador refazer layout a cada quadro
+   dentro de um contêiner de consulta. */
 .ctr-selo {
   display: grid;
   place-items: center;
@@ -744,6 +788,13 @@
 
 /* ============ TELA ESTREITA ============
 
+   ANTES DISSO, EM 1180px, A ÚLTIMA BATIDA FECHA OS FLANCOS. A conta é dela e
+   não da tela: a coluna lateral vale `(largura − min(88%, 62svh)) / 2`, e num
+   monitor deitado a esfera come a largura toda muito antes de os cantos
+   deixarem de existir. Espremido, o flanco vira uma coluna de duas palavras ao
+   lado de um volume de meia tela. Fechado, ele volta a ser o que era antes de
+   abrir: uma cartela, agora embaixo, com o título em cima do parágrafo.
+
    Abaixo de 900px os cantos deixam de fazer sentido: não existe lateral livre
    ao lado de uma cena que ocupa quase a largura toda, e um bloco de 34ch
    encostado numa borda vira uma coluna de duas palavras. Os quatro blocos
@@ -752,6 +803,38 @@
    A cena encolhe e RECUA em opacidade. É a única concessão de conteúdo do
    arquivo, e ela existe porque aqui o texto está garantidamente por cima do
    desenho: a leitura ganha, a ilustração cede. */
+/* Os flancos fecham em coluna: os dois pedaços voltam a ser um bloco só,
+   embaixo, e o grude desce quase ao rodapé — é o layout que a batida tinha
+   antes de o texto se partir.
+
+   A ALTURA ANDA JUNTO COM A SUBIDA DA CENA. Abaixo deste limite a linha do
+   tempo volta a levantar a esfera em 10% (ver a quarta batida em
+   `centro.tsx`), e é a soma das duas coisas que abre a faixa livre onde a
+   cartela cabe. Uma sem a outra põe o parágrafo por dentro da esfera. */
+@media (max-width: 1180px) {
+  .ctr-flancos {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    row-gap: 0.55rem;
+    top: 76svh;
+  }
+
+  .ctr-flancos .ctr-bloco:first-child,
+  .ctr-flancos .ctr-bloco:last-child {
+    grid-column: 1;
+    justify-self: center;
+    justify-items: center;
+    max-width: 40ch;
+    text-align: center;
+  }
+
+  /* Um fio só. Empilhados, os dois viram um bloco de texto — e dois traços de
+     cartela dentro do mesmo bloco anunciariam duas cartelas. */
+  .ctr-flancos .ctr-bloco:last-child::before {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .ctr-visual {
     top: calc((100svh - 46svh) / 2);
@@ -769,14 +852,17 @@
   }
 
   /* Uma altura de grude só: sem laterais livres, os quatro blocos param no
-     mesmo lugar e a troca vira corte, não deslocamento. */
-  .ctr-passo .ctr-bloco {
+     mesmo lugar e a troca vira corte, não deslocamento. O da última batida está
+     no invólucro, que é quem gruda ali. */
+  .ctr-passo .ctr-bloco,
+  .ctr-flancos {
     top: 30svh;
   }
 
   .ctr-bloco,
   .ctr-passo[data-lugar="topo"] .ctr-bloco,
-  .ctr-passo[data-lugar="baixo"] .ctr-bloco {
+  .ctr-flancos .ctr-bloco:first-child,
+  .ctr-flancos .ctr-bloco:last-child {
     max-width: 30ch;
     justify-items: center;
     text-align: center;
