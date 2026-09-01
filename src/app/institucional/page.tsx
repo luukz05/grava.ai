@@ -14,9 +14,11 @@ import "../v5.css";
 import "../variacoes.css";
 import "./institucional.css";
 import "./centro.css";
+import "./pilares.css";
 import { Casca, Heroi } from "../casca";
 import { FundoFecho } from "../fundos";
 import { Centro } from "./centro";
+import { Pilares } from "./pilares";
 import { Rodape } from "../rodape";
 import {
   IcoInovacao,
@@ -112,9 +114,17 @@ export default function Institucional() {
         <Centro />
       </section>
 
-      {/* A seção anterior termina nomeando os três pilares nos vértices do
-          hexágono; esta é onde cada um deles é explicado. O desenho nomeia, a
-          seção detalha — nenhuma das duas repete a outra. */}
+      {/* OS TRÊS PILARES.
+
+          O hexágono que abre esta seção é o antigo diagrama da cena da marca —
+          ver o cabeçalho de `pilares.tsx`. Lá ele carregava duas leituras ao
+          mesmo tempo (o processo num anel interno, os pilares nos vértices) e
+          ficava embolado; aqui carrega uma só, que é a desta seção.
+
+          O DESENHO NOMEIA, OS CARTÕES DETALHAM. Três nomes num hexágono dizem
+          que os três sustentam a mesma peça — que é a frase do apoio, e é o que
+          três cartões lado a lado não conseguem dizer. O texto de cada um
+          continua nos cartões, logo abaixo. */}
       <section className="hold sec" id="pilares">
         <div className="sec-cab">
           <h2>
@@ -122,6 +132,9 @@ export default function Institucional() {
           </h2>
           <p>Não são valores de parede: são o que precisa funcionar junto.</p>
         </div>
+
+        <Pilares />
+
         <div className="cells cells--3">
           <div className="cellart">
             <span className="ico">

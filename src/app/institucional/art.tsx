@@ -100,7 +100,7 @@ export function AsciiEstado({ estado }: { estado: Estado }) {
       className="ascii"
     >
       <rect width={w} height={h} fill="#070c11" />
-      <g fontFamily="var(--f-mono), monospace" fontSize="12" textAnchor="middle">
+      <g fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="12" textAnchor="middle">
         {cells}
       </g>
     </svg>

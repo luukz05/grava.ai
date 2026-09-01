@@ -369,7 +369,8 @@
 }
 
 .grav-hud-rotulo {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 0.625rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;

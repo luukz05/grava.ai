@@ -10,39 +10,39 @@
    Aqui a casca é uma só. Cada página entrega o miolo; forma, tipografia,
    navegação e os fixos vêm daqui e mudam nas três de uma vez. */
 
-import { Bricolage_Grotesque, Space_Mono, Rajdhani } from "next/font/google";
+import localFont from "next/font/local";
 import { NavBar, type Pagina } from "./navbar";
 import { Flutuante } from "./flutuante";
 import { FundoTopo } from "./fundos";
 
-/* `axes: ["opsz"]` carrega o eixo óptico da Bricolage (12–96) junto com o peso.
-   Sem ele o navegador recebe um único desenho de letra, congelado no valor
-   padrão do eixo (14), e usa esse mesmo desenho da manchete de 76px ao rótulo
-   de 11px. Com ele, o `font-optical-sizing: auto` do `v5.css` passa a valer: a
-   letra afina e abre a contraforma conforme cresce, engrossa e respira mais
-   quando encolhe. É o mesmo trabalho que a San Francisco faz sozinha nos
-   sistemas da Apple, e é a diferença entre uma tipografia dimensionada e uma
-   escalada. */
-const grotesk = Bricolage_Grotesque({
+/* Uma face só, em todo o site.
+
+   Aqui viviam três: Bricolage Grotesque no texto, Rajdhani na display da marca
+   e Space Mono nos rótulos técnicos. Três famílias numa página de captação são
+   três downloads, três conjuntos de métricas para o navegador reservar espaço
+   e três vozes disputando a mesma tela — e a única que o cliente reconhecia
+   como marca era a display, que aparecia em meia dúzia de manchetes.
+
+   A Switzer cobre os três papéis: grotesca neutra de contraforma aberta, com o
+   eixo de peso inteiro (100–900) num arquivo só. O que era diferença de
+   família passa a ser diferença de peso, corpo e espacejamento — que é como
+   uma tipografia de sistema se organiza.
+
+   Arquivo variável servido do próprio domínio pelo `next/font/local`: sem
+   requisição a terceiro, sem FOUT, e com o `size-adjust` que o Next calcula
+   para a fonte de fallback, que é o que impede o salto de layout na troca.
+
+   O que se perde, dito de frente: a Bricolage tinha eixo óptico (`opsz`
+   12–96) e a Switzer não tem, então o `font-optical-sizing: auto` do `v5.css`
+   virou no-op — o rótulo de 11px e a manchete de 90px passam a usar o mesmo
+   desenho de letra. E os rótulos que eram monoespaçados perdem o alinhamento
+   de coluna; onde há número, o `font-variant-numeric: tabular-nums` que ficou
+   no lugar deles segura o que importa, que é o dígito não dançar durante a
+   contagem. */
+const switzer = localFont({
+  src: "./fontes/Switzer-Variable.woff2",
   variable: "--f-txt",
-  subsets: ["latin"],
-  axes: ["opsz"],
-  display: "swap",
-});
-
-const mono = Space_Mono({
-  variable: "--f-mono",
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-});
-
-/* A display angular do documento do cliente. Estava só na landing, o que
-   deixava a marca com uma voz tipográfica em uma página e outra nas demais. */
-const brand = Rajdhani({
-  variable: "--f-brand",
-  weight: ["500", "600", "700"],
-  subsets: ["latin"],
+  weight: "100 900",
   display: "swap",
 });
 
@@ -68,7 +68,7 @@ export function Casca({
 }) {
   return (
     <div
-      className={`${grotesk.variable} ${mono.variable} ${brand.variable} v5`}
+      className={`${switzer.variable} v5`}
       data-forma="oblongo"
       data-fundo="topo"
       data-leitura={leitura ? "centro" : undefined}

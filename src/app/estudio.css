@@ -168,7 +168,7 @@
   justify-content: center;
   gap: clamp(10px, 1.2vw, 16px);
   margin: 0;
-  font-family: var(--f-brand), var(--f-txt), system-ui, sans-serif;
+  font-family: var(--f-txt), system-ui, sans-serif;
   font-size: clamp(20px, 2.6vw, 34px);
   font-weight: 600;
   letter-spacing: -0.025em;

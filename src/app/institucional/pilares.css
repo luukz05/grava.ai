@@ -1,0 +1,178 @@
+/* O hexágono dos três pilares.
+
+   Boa parte destas regras veio do `centro.css`, junto com o desenho: o
+   traçado, os raios, o marco de centragem e o nó com o nome pendurado para
+   fora. O que ficou para trás foi o que pertencia ao processo — anel, rastro,
+   cabeça da IA e ecos —, porque aquilo agora é uma cena, não um diagrama. */
+
+/* A caixa. Centrada na coluna e MENOR que ela: o desenho é a abertura da
+   seção, e os três cartões que vêm logo abaixo é que carregam o texto. Um
+   hexágono na largura inteira de 90rem viraria o assunto da seção. */
+.pil {
+  margin: clamp(1.5rem, 4vh, 3rem) auto clamp(2rem, 6vh, 3.5rem);
+  width: min(100%, 34rem);
+}
+
+/* Quadrada porque o sistema de coordenadas é: os nós ficam em porcentagem
+   sobre o mesmo `0–100` do `viewBox`. Mudar o tamanho aqui move o desenho
+   inteiro junto, sem recalcular nada. */
+.pil-cena {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  /* As peças são medidas em `cqw` sobre esta caixa, e NÃO em porcentagem.
+     Porcentagem aqui resolve contra o `.pil-marco`, que é `max-content` — o
+     pai depende do filho e o filho do pai, e o navegador sai desse laço
+     dando ao disco uma largura que não é a pedida. O núcleo ficava um quarto
+     de cena fora do centro. */
+  container-type: inline-size;
+}
+
+.pil-aura {
+  position: absolute;
+  inset: -14%;
+  background: radial-gradient(
+    circle at center,
+    rgba(102, 205, 255, 0.18) 0%,
+    rgba(102, 205, 255, 0.06) 32%,
+    rgba(59, 165, 232, 0.03) 52%,
+    transparent 70%
+  );
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.pil-tracado {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* O hexágono é o que sustenta, então aqui ele é o traço PRINCIPAL — não a
+   estrutura apagada que era no diagrama antigo, onde o anel do processo é que
+   carregava a cor. Sem o anel, a hierarquia se inverte junto com o assunto. */
+.pil-hex {
+  fill: none;
+  stroke: rgba(102, 205, 255, 0.5);
+  stroke-width: 0.4;
+  stroke-dasharray: 6;
+  stroke-linejoin: round;
+}
+
+/* Os raios são relação, não conteúdo: ligam cada pilar ao que ele sustenta.
+   Apagados de propósito — competindo com o hexágono, o desenho passaria a ter
+   duas linhas dizendo coisas diferentes com o mesmo peso. */
+.pil-raio {
+  fill: none;
+  stroke: rgba(242, 248, 255, 0.18);
+  stroke-width: 0.2;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+}
+
+/* ---- o marco: quem centra as peças no ponto ----
+
+   O invólucro tem o tamanho do marcador (o ícone, a marca — os nomes saem do
+   fluxo) e recua metade de si nos dois eixos, então o marcador cai exatamente
+   no vértice. O `translate` fica AQUI, num elemento que o GSAP nunca toca: ao
+   assumir um alvo ele zera `translate`, `rotate` e `scale` para não brigar com
+   a matriz que escreve, e a peça perde a centragem no primeiro quadro. */
+.pil-marco {
+  position: absolute;
+  translate: -50% -50%;
+  width: max-content;
+}
+
+/* A marca no meio, em disco. Ela é a empresa: o que os três seguram. */
+.pil-nucleo {
+  display: grid;
+  place-items: center;
+  width: clamp(2.8rem, 12cqw, 4.2rem);
+  aspect-ratio: 1;
+  color: #66cdff;
+  border: 1px solid var(--hair-hot);
+  border-radius: 999px;
+  background: rgba(11, 18, 25, 0.82);
+  box-shadow: 0 0 0 6px rgba(102, 205, 255, 0.06),
+    0 0 34px rgba(102, 205, 255, 0.18);
+}
+
+.pil-nucleo svg {
+  display: block;
+  width: 52%;
+  height: auto;
+}
+
+/* A caixa da peça é a do ÍCONE, e o nome se pendura nela: é o ícone que marca
+   o vértice, então é ele que tem de cair no ponto. Empilhados na mesma caixa
+   centrada, quem caía no vértice era a média dos dois. */
+.pil-peca {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.pil-ico {
+  display: grid;
+  place-items: center;
+  width: clamp(1.9rem, 8cqw, 2.6rem);
+  aspect-ratio: 1;
+  color: var(--fg);
+  border: 1px solid var(--hair-hot);
+  border-radius: 999px;
+  background: rgba(6, 12, 18, 0.9);
+}
+
+.pil-ico svg {
+  width: 58%;
+  height: 58%;
+}
+
+.pil-nome {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: min(9rem, 28cqw);
+  font-size: clamp(0.75rem, 1.6vw, 0.875rem);
+  font-weight: 600;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--fg);
+  text-shadow: 0 1px 10px rgba(5, 9, 13, 0.9);
+}
+
+/* Sempre para FORA: o nome cai na faixa entre o vértice e a borda da caixa,
+   que é vazia por construção, e nunca entre o ícone e o centro — que é onde
+   mora o raio. */
+.pil [data-lado="cima"] > .pil-nome {
+  bottom: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.pil [data-lado="baixo"] > .pil-nome {
+  top: 100%;
+  margin-top: 0.4rem;
+}
+
+/* Sem script a aura sai: parada em força máxima ela vira uma mancha azul atrás
+   de um diagrama estático. O resto do desenho aparece montado. */
+.pil:not(.pil-vivo) .pil-aura {
+  display: none;
+}
+
+/* No celular o hexágono aperta e os nomes de duas palavras encostam nas
+   bordas. A caixa encolhe junto e o nome quebra em duas linhas — o que ele não
+   pode é sair da cena. */
+@media (max-width: 560px) {
+  .pil {
+    width: min(100%, 20rem);
+  }
+
+  .pil-nome {
+    max-width: 6.5rem;
+    font-size: 0.75rem;
+  }
+}

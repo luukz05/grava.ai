@@ -269,7 +269,8 @@
   border-radius: 999px;
   background: rgba(5, 9, 13, 0.66);
   backdrop-filter: blur(6px);
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -302,7 +303,8 @@
 }
 
 .uni-faixa-rotulo {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -313,7 +315,8 @@
    largura variável a faixa inteira se mexeria para os lados sessenta vezes por
    minuto. */
 .uni-relogio {
-  font-family: var(--f-mono), monospace;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--fg-2);

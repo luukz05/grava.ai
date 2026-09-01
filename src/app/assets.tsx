@@ -110,12 +110,12 @@ export function AsciiWaveHeader() {
       className="ascii"
     >
       <rect width={w} height={h} fill="#070c11" />
-      <g fontFamily="var(--f-mono), monospace" fontSize="13" textAnchor="middle">
+      <g fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="13" textAnchor="middle">
         {cells}
       </g>
       {/* Legenda em caixa mista e 12px: é texto funcional, não ornamento.
           Caixa alta numa frase de 42 caracteres derruba a legibilidade. */}
-      <text x="20" y={h - 14} fontFamily="var(--f-mono), monospace" fontSize="12" fill="#7c8fa0" letterSpacing="0.4">
+      <text x="20" y={h - 14} fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="12" fill="#7c8fa0" letterSpacing="0.4">
         Campo ilustrativo · sem valores declarados
       </text>
     </svg>
@@ -233,11 +233,11 @@ export function AsciiTotem() {
       className="ascii"
     >
       <rect width={w} height={h} fill="#070c11" />
-      <g fontFamily="var(--f-mono), monospace" fontSize="12" textAnchor="middle">
+      <g fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="12" textAnchor="middle">
         {body}
         {screen}
       </g>
-      <text x="20" y={h - 12} fontFamily="var(--f-mono), monospace" fontSize="12" fill="#7c8fa0" letterSpacing="0.4">
+      <text x="20" y={h - 12} fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="12" fill="#7c8fa0" letterSpacing="0.4">
         A arte fecha na tela e vira gravação
       </text>
     </svg>
@@ -328,7 +328,7 @@ export function AsciiCircuito() {
       className="ascii circuito"
     >
       <rect width={size} height={size} fill="#070c11" />
-      <g fontFamily="var(--f-mono), monospace" fontSize="13" textAnchor="middle">
+      <g fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="13" textAnchor="middle">
         {ring}
         {spokes}
 
@@ -367,7 +367,7 @@ export function AsciiCircuito() {
         ))}
       </g>
 
-      <text x="14" y={size - 12} fontFamily="var(--f-mono), monospace" fontSize="11" fill="#7c8fa0" letterSpacing="0.4">
+      <text x="14" y={size - 12} fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="11" fill="#7c8fa0" letterSpacing="0.4">
         Cliente à esquerda · operação à direita · a IA no meio
       </text>
     </svg>
@@ -396,7 +396,7 @@ export function AsciiMeter({ f }: { f: number }) {
   });
   return (
     <svg viewBox="0 0 300 40" aria-hidden="true" className="ascii">
-      <g fontFamily="var(--f-mono), monospace" fontSize="15">{cells}</g>
+      <g fontFamily="var(--f-txt), system-ui, sans-serif" fontSize="15">{cells}</g>
     </svg>
   );
 }
