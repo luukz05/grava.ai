@@ -65,7 +65,14 @@ const py = (a: number, r: number) => 50 + r * Math.sin(rad(a));
    compara a marcação do servidor com a do cliente caractere a caractere. */
 const n3 = (v: number) => v.toFixed(3);
 
-/* Os seis vértices do hexágono, a partir do topo. */
+/* Os seis vértices do hexágono, a partir do topo.
+
+   OS MESMOS DE `centro.tsx`. A cena da seção anterior termina transformando o
+   fio da coroa neste hexágono — mesma orientação, mesmos seis pontos —, e é
+   essa rima que emenda as duas seções: o que a IA desenhou em volta de quem
+   pediu é o que os três pilares sustentam. Mudar a lista aqui sem mudar
+   `A_COROA` lá quebra a emenda, e o defeito aparece a uma tela de distância do
+   lugar onde foi causado. */
 const VERTICES = [-90, -30, 30, 90, 150, 210];
 
 const D_HEX =

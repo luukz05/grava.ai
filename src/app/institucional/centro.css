@@ -236,6 +236,18 @@
   justify-self: end;
 }
 
+/* A FAIXA DE PASSAGEM: a quinta fatia, sem texto.
+
+   Ela vale a mesma altura de um bloco porque as fatias da linha do tempo são
+   iguais — quatro blocos e a faixa dividem a rolagem em cinco pedaços do mesmo
+   tamanho, e cinco batidas de mesma duração dividem o tempo do mesmo jeito.
+   Encurtá-la acelera só o morfo do fio, que é o gesto mais longo dos cinco.
+
+   Nada dentro: o que acontece nela é a cena, que está na camada de trás. */
+.ctr-passagem {
+  min-height: 88svh;
+}
+
 /* O bloco que não está sendo lido recua. É ESTADO, não animação: muda em
    `--t-mov` pela curva padrão da página, e não raspado pela rolagem — texto
    piscando junto com o gesto é ruído em cima de leitura.
@@ -483,10 +495,21 @@
   overflow: visible;
 }
 
+/* A ESPESSURA VEM DE UMA VARIÁVEL, e não do valor direto, porque a última
+   batida a ANIMA: o fio cresce 2,2× para virar o hexágono, e a escala
+   engrossaria o traço na mesma proporção — o hexágono dos pilares é fino, e o
+   que chegasse lá seria a mesma forma com o dobro de tinta.
+
+   POR QUE UMA CUSTOM PROPERTY e não `strokeWidth` direto no tween: o GSAP trata
+   `stroke-width` como medida em px e, num SVG cujo `viewBox` é 100 e a caixa
+   tem poucos rem, o valor que ele escreve arredonda para `0px` — o fio some no
+   meio da passagem. A variável é um número puro, e o navegador a resolve nas
+   unidades do `viewBox`. */
 .ctr-coroa-fio {
   fill: none;
   stroke: #66cdff;
-  stroke-width: 0.9;
+  --coroa-w: 0.9;
+  stroke-width: var(--coroa-w);
   stroke-dasharray: 1;
   stroke-linecap: round;
   filter: drop-shadow(0 0 1.6px rgba(102, 205, 255, 0.7));

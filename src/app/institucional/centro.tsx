@@ -25,6 +25,11 @@
        terminou: o cliente sai do meio levando o que pediu, e a MARCA desce do
        alto da coroa para o centro da esfera. Quem assina o que nasceu é a
        grava.ai.
+   5 · A PASSAGEM — a esfera é REPELIDA: as peças continuam o movimento que já
+       traziam, abrem para fora do quadro e se apagam no caminho. Não some o
+       catálogo, some a vitrine dele; o que estava girando em volta da marca
+       segue adiante e libera o meio. Ficam a marca e o fio da coroa, que cresce
+       e ENDIREITA as curvas até virar o hexágono da seção seguinte.
 
    A VERSÃO ANTERIOR DIZIA O CONTRÁRIO, e por isso mudou: lá a marca CRESCIA
    NO LUGAR do cliente DURANTE A PROJEÇÃO — a IA apagando quem pediu. Desenhar
@@ -36,6 +41,24 @@
    DEPOIS de o produto existir: o cliente não é apagado no meio do próprio
    pedido, ele sai com ele na mão. O assunto do último quadro é o catálogo que
    nasceu, e catálogo quem assina é a marca.
+
+   ───────────────────────────────────────────────────────────────────────────
+   A SEÇÃO NÃO ACABA: ELA ENTREGA
+
+   A seção seguinte abre com o HEXÁGONO DOS TRÊS PILARES e a marca no meio dele
+   (ver `pilares.tsx`). Cortar aqui e recomeçar lá daria duas cenas com a mesma
+   marca no meio e nenhuma relação declarada entre elas — a página teria dito
+   duas vezes "a marca está no centro" sem nunca dizer de que centro se trata.
+
+   Então a última batida é uma PASSAGEM: o fio da coroa — o mesmo círculo que a
+   IA desenhou em volta do cliente — cresce e endireita as curvas até virar o
+   hexágono, nos MESMOS SEIS VÉRTICES que `pilares.tsx` usa. O que fecha uma
+   seção é o que abre a próxima, e a forma faz a emenda: o que a IA desenhou em
+   volta de quem pediu é o que os três pilares sustentam.
+
+   O MORFO É GEOMÉTRICO, e não um plugin: um só `<path>` de seis cúbicas, com o
+   comprimento dos punhos de bézier indo de `K·R` (arco) a zero (reta). Ver
+   `dCoroa` logo abaixo.
 
    ───────────────────────────────────────────────────────────────────────────
    O TEXTO ANDA EM VOLTA DA CENA, e não numa coluna fixa
@@ -166,6 +189,66 @@ const ORBES = Array.from({ length: N_ORBES }, (_, i) => {
    sobre o próprio eixo enquanto orbita, e o defeito só aparece depois de um
    minuto de tela. */
 const VOLTA = 46;
+
+/* ───────────────────────────────────────────────────────────────────────────
+   O FIO DA COROA: DE CÍRCULO A HEXÁGONO, SEM PLUGIN
+
+   O fio era um `<circle>`. Virou um `<path>` porque na última batida ele tem
+   de VIRAR O HEXÁGONO da seção dos pilares, e círculo e polígono não são a
+   mesma primitiva — não há como interpolar entre as duas.
+
+   A conta é toda a mesma coisa: um círculo aproximado por SEIS cúbicas tem os
+   pontos de apoio exatamente nos seis vértices do hexágono. O que separa as
+   duas formas é só o comprimento dos punhos de bézier — `K·R` desenha o arco,
+   zero desenha a reta. `t` vai de 1 a 0 e a curva endireita.
+
+   `K = 4/3·tan(π/(2n))` com `n = 6` é o comprimento que faz a cúbica passar
+   pelo arco de 60° com erro invisível. É a mesma constante que os programas de
+   desenho usam para aproximar círculos, com `n = 4` (o famoso 0,5523).
+
+   OS ÂNGULOS SÃO OS DE `pilares.tsx` (−90 no topo, de 60 em 60): é isso que faz
+   o hexágono que nasce aqui ter a mesma orientação do que abre a seção
+   seguinte. Mudar um lado sem mudar o outro quebra a emenda entre as duas
+   seções, e o defeito aparece a uma tela de distância do lugar onde foi
+   causado — anotado aqui e lá.
+
+   O RAIO 34 é o `r` do `<circle>` que estava aqui, e ele não é livre: a caixa
+   do SVG vale `--coroa-r / 0.34` (ver `.ctr-coroa` no CSS) justamente para que
+   34 unidades de `viewBox` valham `--coroa-r` na tela. Os dois números são um
+   só, escrito em dois lugares. */
+const A_COROA = [-90, -30, 30, 90, 150, 210];
+const R_COROA = 34;
+const K_COROA = (4 / 3) * Math.tan(Math.PI / 12);
+
+const rad = (g: number) => (g * Math.PI) / 180;
+/* Três casas: o valor entra num `d` que o React compara caractere a caractere
+   entre o que veio do servidor e o que ele mesmo desenharia. */
+const n3 = (v: number) => v.toFixed(3);
+
+function dCoroa(t: number) {
+  const h = K_COROA * R_COROA * t;
+  const ponto = (g: number) => [
+    50 + R_COROA * Math.cos(rad(g)),
+    50 + R_COROA * Math.sin(rad(g)),
+  ];
+  /* A tangente é a derivada do ponto no ângulo — o sentido em que a curva
+     avança. É ela que garante que o punho saia do vértice acompanhando o arco,
+     e não numa direção qualquer que faria a forma inchar de um lado. */
+  const tang = (g: number) => [-Math.sin(rad(g)) * h, Math.cos(rad(g)) * h];
+
+  const [x0, y0] = ponto(A_COROA[0]);
+  let d = `M${n3(x0)} ${n3(y0)}`;
+  for (let i = 0; i < A_COROA.length; i++) {
+    const a = A_COROA[i];
+    const b = A_COROA[(i + 1) % A_COROA.length];
+    const [px, py] = ponto(a);
+    const [qx, qy] = ponto(b);
+    const [tax, tay] = tang(a);
+    const [tbx, tby] = tang(b);
+    d += ` C${n3(px + tax)} ${n3(py + tay)} ${n3(qx - tbx)} ${n3(qy - tby)} ${n3(qx)} ${n3(qy)}`;
+  }
+  return d + " Z";
+}
 
 /* ───────────────────────────────────────────────────────────────────────────
    OS QUATRO TÓPICOS
@@ -322,12 +405,15 @@ export function Centro() {
           const onda = um<HTMLElement>(".ctr-onda");
           const eu = um<HTMLElement>(".ctr-eu");
           const balao = um<HTMLElement>(".ctr-balao");
-          const coroa = um<SVGCircleElement>(".ctr-coroa-fio");
+          const coroa = um<SVGPathElement>(".ctr-coroa-fio");
+          const coroaCaixa = um<SVGElement>(".ctr-coroa");
           const orbita = um<HTMLElement>(".ctr-orbita");
           const cabeca = um<HTMLElement>(".ctr-cabeca");
           const selo = um<HTMLElement>(".ctr-selo");
           const esfera = um<HTMLElement>(".ctr-esfera");
           const orbes = q(".ctr-orbe-face");
+          /* Estado do morfo do fio: 1 é o círculo, 0 é o hexágono. */
+          const morfo = { t: 1 };
           const blocos = q(".ctr-passo");
 
           /* Estado zero. Tudo que a cena constrói nasce ausente AQUI, e não no
@@ -355,16 +441,34 @@ export function Centro() {
              acender das faces, uma a uma. */
           gsap.set(esfera, { scale: 0.04 });
           gsap.set(orbes, { autoAlpha: 0 });
+          /* O fio nasce redondo, e o `d` do HTML já é esse — o `set` existe
+             para o caso de a linha do tempo ser reconstruída (troca de mídia,
+             `refresh`) com o morfo a meio caminho. */
+          coroa.setAttribute("d", dCoroa(1));
+          gsap.set(coroaCaixa, { scale: 1 });
 
           const tl = gsap.timeline({
             scrollTrigger: {
-              /* O gatilho é a COLUNA DE BLOCOS e não a seção: é a altura dela
-                 que define quanto a cena tem para andar, e é ela que carrega
-                 os quatro blocos de mesma altura mínima.
+              /* O gatilho é a COLUNA EM FLUXO — os quatro blocos MAIS a faixa
+                 de passagem —, e ela existe como elemento só para isto: é a
+                 altura dela que define quanto a cena tem para andar.
+
+                 NÃO É A RAIZ, e a diferença não é de gosto: a raiz carrega
+                 também a camada absoluta da cena, e medi-la aqui dava uma
+                 leitura em que o gatilho nascia já vencido — a cena aparecia no
+                 estado final desde o topo da página, em qualquer posição de
+                 rolagem. Um invólucro que contém só o que está em fluxo mede o
+                 que se quer medir.
+
+                 A FAIXA DE PASSAGEM É A QUINTA FATIA. Ela não tem texto, e é
+                 por isso que precisa existir como altura: sem ela o morfo do
+                 fio aconteceria espremido no fim do último bloco, com o texto
+                 ainda na tela disputando a atenção do gesto que emenda as duas
+                 seções.
 
                  `top center` → `bottom center`: começa quando o primeiro bloco
-                 chega ao meio da tela e acaba quando o último sai dele. */
-              trigger: um<HTMLElement>(".ctr-passos"),
+                 chega ao meio da tela e acaba quando a faixa sai dele. */
+              trigger: um<HTMLElement>(".ctr-coluna"),
               start: "top center",
               end: "bottom center",
               /* Raspagem folgada: o que continua andando depois que a pessoa
@@ -589,11 +693,72 @@ export function Centro() {
               "produto+=0.15"
             );
 
+          /* ── 5 · A PASSAGEM PARA OS PILARES ──
+             A esfera é REPELIDA. Ela não encolhe de volta ao ponto de onde
+             saiu: continua o movimento que já trazia, abre para fora do quadro
+             e apaga no caminho. Encolher desfaria a explosão — diria que o
+             catálogo foi recolhido —, e o que a página precisa dizer aqui é que
+             ele seguiu adiante e liberou o meio.
+
+             As peças apagam ANTES de a caixa terminar de abrir (a última fecha
+             em 13,3 da linha do tempo, contra 13,6 da abertura): peça que ainda
+             está acesa quando cruza a borda da tela é peça CORTADA pelo quadro,
+             e corte é o contrário de afastamento. O `stagger` é curto (0,03)
+             pelo mesmo motivo — com o escalonamento largo, as últimas da fila
+             ainda estavam inteiras quando já tinham saído do quadro.
+
+             O FIO ENTÃO CRESCE E ENDIREITA. São dois tweens sobre a mesma
+             coisa e o par é a frase: a escala leva o círculo de `--coroa-r` ao
+             tamanho do hexágono da seção seguinte, e o morfo tira a curva dos
+             seis arcos. O traço AFINA junto (0.9 → 0.45) porque a escala
+             engrossaria o desenho na mesma proporção, e o hexágono dos pilares
+             é um traço fino — sem isso, o que chega lá é a mesma forma com o
+             dobro do peso de tinta.
+
+             O QUE FICA NA TELA no fim: o hexágono e a marca no meio dele. É,
+             ponto por ponto, a composição com que `pilares.tsx` abre. */
+          batida("pilares", 4);
+          tl.to(esfera, { scale: 2.75, duration: 1.6, ease: E_UI }, "pilares")
+            .to(
+              orbes,
+              { autoAlpha: 0, duration: 0.8, ease: E_LUZ, stagger: 0.03 },
+              "pilares+=0.05"
+            )
+            .to(
+              coroaCaixa,
+              { scale: 2.2, duration: 1.7, ease: E_MOLA },
+              "pilares+=0.35"
+            )
+            .to(
+              coroa,
+              { "--coroa-w": 0.45, duration: 1.7, ease: E_UI },
+              "pilares+=0.35"
+            )
+            /* O morfo anda num objeto e não no elemento: `d` é atributo de
+               caminho, não propriedade animável, e quem escreve o caminho a
+               cada quadro é a mesma função que desenhou o estado inicial no
+               HTML — uma fonte só para as duas formas. */
+            .to(
+              morfo,
+              {
+                t: 0,
+                duration: 1.7,
+                ease: E_UI,
+                onUpdate: () => coroa.setAttribute("d", dCoroa(morfo.t)),
+              },
+              "pilares+=0.35"
+            )
+            .to(
+              aura,
+              { opacity: 0.72, scale: 1.12, duration: 1.4, ease: E_LUZ },
+              "pilares+=0.3"
+            );
+
           /* A última fatia precisa existir inteira na linha do tempo, senão a
-             duração acaba no último tween e a quarta batida consome menos
-             rolagem que as outras três — os blocos são iguais, as fatias
-             também têm que ser. */
-          tl.to({}, { duration: T_BATIDA }, 3 * T_BATIDA);
+             duração acaba no último tween e a batida final consome menos
+             rolagem que as outras — as fatias de texto são iguais, e a da
+             passagem tem a mesma altura delas. */
+          tl.to({}, { duration: T_BATIDA }, 4 * T_BATIDA);
 
           /* ─────────────────────────────────────────────────────────────────
              O BLOCO QUE ESTÁ SENDO LIDO
@@ -735,20 +900,26 @@ export function Centro() {
                 </div>
               </div>
 
-              {/* A COROA DA IA. Um círculo só, desenhado de cima e no sentido
-                  do relógio — daí o `rotate(-90 50 50)`, porque um `<circle>`
-                  de SVG começa às três horas. `pathLength={1}` para o
-                  `stroke-dashoffset` ir de 1 (nada) a 0 (inteiro) sem depender
-                  do comprimento real da circunferência. */}
+              {/* A COROA DA IA. Um traço só, que começa no alto e corre no
+                  sentido do relógio — o caminho parte de −90°, e é isso que o
+                  põe em fase com o ponto de luz que o desenha, pendurado no
+                  topo da órbita.
+
+                  UM `<path>` E NÃO UM `<circle>`: na última batida ele vira o
+                  hexágono dos pilares, e as duas formas precisam ser a mesma
+                  primitiva para haver o que interpolar. `dCoroa(1)` é o
+                  círculo — a mesma função que o morfo usa depois, então o
+                  desenho do servidor e o do primeiro quadro são o mesmo texto.
+
+                  `pathLength={1}` para o `stroke-dashoffset` ir de 1 (nada) a 0
+                  (inteiro) sem depender do comprimento real do caminho — que,
+                  aqui, muda de forma no meio do caminho. */}
               <div className="ctr-marco" style={{ left: "50%", top: "50%" }}>
                 <svg className="ctr-coroa" viewBox="0 0 100 100">
-                  <circle
+                  <path
                     className="ctr-coroa-fio"
-                    cx="50"
-                    cy="50"
-                    r="34"
+                    d={dCoroa(1)}
                     pathLength={1}
-                    transform="rotate(-90 50 50)"
                   />
                 </svg>
               </div>
@@ -820,10 +991,13 @@ export function Centro() {
           `data-lugar` é o canto de cada bloco. É atributo e não classe porque
           é um EIXO com quatro valores, não quatro adjetivos independentes: um
           bloco tem exatamente um lugar. */}
-      <ol className="ctr-passos">
-        {TOPICOS.map((t) =>
-          t.lugar === "flancos" ? (
-            /* O BLOCO PARTIDO DA ÚLTIMA BATIDA: rótulo e título de um lado da
+      {/* A COLUNA EM FLUXO: os blocos e a faixa de passagem. É ela que o
+          gatilho da linha do tempo mede — ver `trigger` acima. */}
+      <div className="ctr-coluna">
+        <ol className="ctr-passos">
+          {TOPICOS.map((t) =>
+            t.lugar === "flancos" ? (
+              /* O BLOCO PARTIDO DA ÚLTIMA BATIDA: rótulo e título de um lado da
                esfera, o parágrafo do outro.
 
                OS DOIS LADOS MORAM DENTRO DE UM INVÓLUCRO, e é o invólucro que
@@ -833,28 +1007,46 @@ export function Centro() {
                mesmo `top`. Um grude só não tem esse problema: o que muda entre
                largo e estreito é o desenho interno da grade, e não o número de
                coisas presas na tela. Ver `.ctr-flancos` no `centro.css`. */
-            <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
-              <div className="ctr-flancos">
+              <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
+                <div className="ctr-flancos">
+                  <div className="ctr-bloco">
+                    <span className="ctr-rot mono">{t.rotulo}</span>
+                    <h3 className="ctr-tit">{t.titulo}</h3>
+                  </div>
+                  <div className="ctr-bloco">
+                    <p className="ctr-txt">{t.texto}</p>
+                  </div>
+                </div>
+              </li>
+            ) : (
+              <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
                 <div className="ctr-bloco">
                   <span className="ctr-rot mono">{t.rotulo}</span>
                   <h3 className="ctr-tit">{t.titulo}</h3>
-                </div>
-                <div className="ctr-bloco">
                   <p className="ctr-txt">{t.texto}</p>
                 </div>
-              </div>
-            </li>
-          ) : (
-            <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
-              <div className="ctr-bloco">
-                <span className="ctr-rot mono">{t.rotulo}</span>
-                <h3 className="ctr-tit">{t.titulo}</h3>
-                <p className="ctr-txt">{t.texto}</p>
-              </div>
-            </li>
-          )
-        )}
-      </ol>
+              </li>
+            )
+          )}
+        </ol>
+
+        {/* ---- A FAIXA DE PASSAGEM ----
+
+          Uma tela de rolagem sem texto nenhum, e ela é a quinta fatia da linha
+          do tempo: é aqui que a esfera abre para fora e o fio da coroa vira o
+          hexágono da seção seguinte.
+
+          POR QUE ALTURA E NÃO SÓ TEMPO: a linha do tempo é raspada pela
+          rolagem, então tempo de animação é altura de página — sem esta faixa,
+          o gesto que emenda as duas seções teria de caber no fim do último
+          bloco, com o texto dele ainda na tela.
+
+          Fora da `<ol>` de propósito: não é um tópico, e um `<li>` vazio é um
+          item de lista sem item. `aria-hidden` porque não há nada aqui para
+          ler — quem usa leitor de tela vai do último tópico direto para a
+          seção dos pilares, que é a leitura certa. */}
+        <div className="ctr-passagem" aria-hidden="true" />
+      </div>
     </div>
   );
 }
