@@ -1663,9 +1663,16 @@
   }
 }
 
-/* `.campo--largo` saiu junto com o campo de pergunta: a grade tem dois campos e
-   nenhum deles atravessa as duas colunas. Voltando a existir campo de largura
-   inteira, a regra é `grid-column: 1 / -1`. */
+/* O E-MAIL ATRAVESSA A GRADE.
+
+   Nome e WhatsApp cabem folgados em meia coluna; um endereço de e-mail não —
+   ele é o campo mais longo do formulário e é o que decide se o envio serviu
+   para alguma coisa, já que é nele que a apresentação chega. Endereço cortado
+   dentro da caixa é endereço que a pessoa não consegue conferir antes de
+   enviar. */
+.campo--largo {
+  grid-column: 1 / -1;
+}
 
 .campo {
   display: grid;
@@ -1768,18 +1775,24 @@
   font-family: var(--f-txt), system-ui, sans-serif;
 }
 
-/* ---------- o botão de envio, em três estados ----------
+/* ---------- o botão de envio ----------
 
    A regra da casa é a da Apple: a resposta ao dedo é imediata e o que se move
    depois tem massa. O `.cta` já traz o aperto em 90ms lineares e a volta na
    mola; o que este bloco acrescenta é o que acontece DEPOIS do clique.
 
-   A CAIXA NÃO MUDA DE TAMANHO em nenhum dos três estados. Os rótulos estão
+   AQUI HAVIA UM TERCEIRO ESTADO, "enviado": o botão virava confirmação, com
+   fundo na cor da marca e o check se desenhando dentro dele. Ele saiu junto
+   com o fluxo antigo. Enquanto o envio abria o WhatsApp, o botão precisava
+   voltar ao repouso — a conversa podia não ter aberto e a pessoa tinha de
+   poder tentar de novo, então a confirmação tinha de caber no próprio botão.
+   Agora o servidor confirma o recebimento e quem confirma é o cartão inteiro
+   (`.form-fr-ok`), que substitui os campos: com o formulário fora da tela, não
+   sobra botão para pintar. O check e a animação dele foram junto para lá.
+
+   A CAIXA NÃO MUDA DE TAMANHO entre "parado" e "enviando". Os rótulos estão
    empilhados na mesma célula de grade, então a largura do botão é a do mais
-   largo dos três e permanece a mesma quando o texto vira "Enviado". Botão que
-   encolhe no meio da confirmação empurra o aviso abaixo dele e desfaz a
-   sensação de conclusão — o layout tremendo no exato momento em que a pessoa
-   procura por certeza. */
+   largo e permanece a mesma quando o texto vira "Enviando…". */
 .form-fr-enviar {
   position: relative;
   overflow: hidden;
@@ -1793,10 +1806,10 @@
   cursor: progress;
   /* Sem `opacity`: o botão desbotado dizia "indisponível", que é o oposto do
      que está acontecendo — ele está justamente trabalhando. Quem diz isso é o
-     rótulo, que muda para "Abrindo a conversa…". */
+     rótulo, que muda para "Enviando…". */
 }
 
-/* Os três rótulos ocupam a MESMA célula. É isto que trava a largura. */
+/* Os rótulos ocupam a MESMA célula. É isto que trava a largura. */
 .form-fr-rotulos {
   display: grid;
   place-items: center;
@@ -1831,32 +1844,100 @@
   pointer-events: none;
 }
 
-/* ---------- o estado enviado ----------
-   O botão vira confirmação: fundo na cor da marca em cheio e o check se
-   desenhando. Aqui a cor NÃO é decoração — é o que separa "a página respondeu"
-   de "o texto mudou".
+/* A FALHA DO ENVIO, colada no botão.
 
-   O SELETOR PRECISA DE DUAS CLASSES, e isto não é preciosismo de
-   especificidade: logo acima, `.cta:hover` e `.cta:focus-visible` pintam o
-   botão de #57b6f0 com peso (0,2,0) — e depois de um clique o botão FICA com o
-   cursor em cima e, no teclado, com o foco. Escrito com uma classe só, a
-   confirmação perdia para o hover e o fundo continuava azul de botão comum,
-   que é exatamente o estado que ela existe para não parecer.
+   Fica logo abaixo dele e acima do aviso porque é ali que o olho está quando o
+   envio não funciona — a pessoa acabou de clicar e está olhando para o botão.
+   No topo do cartão, a mensagem apareceria fora do campo de visão de quem
+   preencheu até o fim.
 
-   `.cta.form-fr-enviar[data-fase]` dá (0,3,0) e ganha das duas sem
-   `!important` — a página inteira não usa nenhum, e não é aqui que começa. */
-.cta.form-fr-enviar[data-fase="enviado"] {
+   Sem fundo vermelho de caixa de alerta: a página inteira se define por borda e
+   cor de texto, e um retângulo de erro dentro de um cartão que não tem nenhum
+   outro retângulo lê como componente de outro site. O que marca é a cor da
+   palavra e o fio à esquerda.
+
+   O #d6604a é o MESMO vermelho do `.campo input:user-invalid` acima. A paleta
+   não tem token de erro, e criar um segundo tom aqui faria o campo inválido e
+   a mensagem que fala dele terem cores diferentes na mesma caixa. */
+.form-fr-erro {
+  margin: 0;
+  padding-left: 0.7rem;
+  border-left: 2px solid #d6604a;
+  color: #d6604a;
+  font-size: 0.875rem;
+  max-width: 44ch;
+}
+
+.form-fr-aviso {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.8125rem;
+  max-width: 44ch;
+}
+
+/* ---------- a confirmação, que SUBSTITUI o formulário ----------
+
+   Ocupa o mesmo cartão: mesma borda, mesmo fundo, mesmo respiro. É de
+   propósito — a caixa não pisca nem muda de tamanho no momento em que a
+   pessoa procura por certeza; o que muda é o conteúdo dela.
+
+   O que está escrito aqui é o que vem depois, e não um "obrigado": a
+   apresentação vai por e-mail, e o WhatsApp é o segundo contato, feito por
+   quem opera a rede. */
+.form-fr-ok {
+  display: grid;
+  justify-items: start;
+  gap: 0.7rem;
+  /* Segura a altura perto da do formulário que saiu. Sem isto, o cartão
+     encolhe para o tamanho de três linhas de texto e a coluna ao lado fica
+     pendurada no vazio. */
+  align-content: center;
+  min-height: 13rem;
+}
+
+/* O selo do check: círculo na cor da marca, e é ele que diz "a página
+   respondeu". Antes esta cor pintava o botão inteiro; num cartão de
+   confirmação, o botão não existe mais e a cor precisa de um lugar próprio. */
+.form-fr-ok-selo {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
   background: var(--fg-hot);
   color: #04131e;
 }
 
+.form-fr-ok h3 {
+  margin: 0;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.form-fr-ok p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  max-width: 42ch;
+}
+
+/* A segunda linha é o próximo passo, não o desfecho — vem um degrau abaixo,
+   separada por um fio, para não disputar com a confirmação. */
+.form-fr-ok-nota {
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--hair);
+  font-size: 0.875rem;
+}
+
 .form-fr-check {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.35rem;
+  height: 1.35rem;
   flex: none;
 }
 
-/* O traço do check é desenhado, não aparecido. `pathLength="1"` no SVG
+/* O traço do check é desenhado, não aparecido. `pathLength="100"` no SVG
    normaliza o comprimento do caminho, então estes dois valores não dependem da
    geometria — é o mesmo recurso do traço dos ícones da página. */
 .form-fr-check path {
@@ -1865,21 +1946,20 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .form-fr-enviar[data-fase="enviado"] .form-fr-check path {
+  /* `both` segura o quadro final. O bloco só existe enquanto a confirmação
+     está na tela, e ela não volta atrás: um envio bem-sucedido tira o
+     formulário de cena de vez. */
+  .form-fr-ok .form-fr-check path {
     animation: checkRisca 420ms var(--e-ui) both;
-    /* `both` segura o quadro final ENQUANTO a regra vale. Ela só vale na fase
-       "enviado", e é o que se quer: ao voltar para "parado" o traço se desfaz
-       junto com o rótulo que o carrega, e o próximo envio desenha de novo em
-       vez de encontrar um check já pronto. */
   }
 
-  /* O pulso do fundo no instante da confirmação. Um só, curto, e é o que dá o
-     "peso" da coisa acontecendo — o equivalente visual do toque háptico que a
-     Apple dispara junto de uma confirmação.
+  /* O pulso no instante da confirmação. Um só, curto, e é o que dá o "peso" da
+     coisa acontecendo — o equivalente visual do toque háptico que a Apple
+     dispara junto de uma confirmação.
 
-     `box-shadow` e não `transform`: o botão não pode crescer, senão a
-     largura que o resto deste bloco trabalha para travar se mexeria. */
-  .form-fr-enviar[data-fase="enviado"] {
+     `box-shadow` e não `transform`: o selo não pode crescer dentro de uma
+     grade que já reservou o espaço dele. */
+  .form-fr-ok-selo {
     animation: enviouPulso 620ms var(--e-ui) both;
   }
 }
@@ -1888,7 +1968,7 @@
    pessoa precisa ver que enviou, e é o traço que diz isso — o que sai é ele se
    formando, não ele existir. */
 @media (prefers-reduced-motion: reduce) {
-  .form-fr-enviar[data-fase="enviado"] .form-fr-check path {
+  .form-fr-ok .form-fr-check path {
     stroke-dashoffset: 0;
   }
 }
@@ -1910,13 +1990,6 @@
   100% {
     box-shadow: 0 0 0 14px color-mix(in srgb, var(--fg-hot) 0%, transparent);
   }
-}
-
-.form-fr-aviso {
-  margin: 0;
-  color: var(--fg-2);
-  font-size: 0.8125rem;
-  max-width: 44ch;
 }
 
 
@@ -2760,57 +2833,6 @@
 }
 
 
-/* O aviso de pop-up bloqueado. Vermelho não existe nesta paleta e inventar um
-   estado de erro colorido para uma página monocromática de marca seria trocar
-   o sistema por um reflexo: o peso vem da tinta cheia e da moldura. */
-.form-fr-resgate {
-  margin: 0.9rem 0 0;
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--fg-hot);
-  border-radius: 12px;
-  font-size: 0.875rem;
-  color: var(--fg);
-}
-
-.form-fr-resgate a {
-  color: var(--fg-hot);
-  font-weight: 700;
-}
-
-/* Confirmação, não aviso — e o desenho precisa dizer qual dos dois é. O aviso
-   de pop-up bloqueado tem moldura inteira em ciano porque exige uma ação; este
-   aqui informa que deu certo, então fica num fio só, à esquerda, no peso de
-   uma nota. Dois retângulos idênticos com textos opostos treinam a pessoa a
-   não ler nenhum dos dois. */
-.form-fr-status {
-  margin: 0.9rem 0 0;
-  padding: 0.15rem 0 0.15rem 0.85rem;
-  border-left: 2px solid var(--fg-hot);
-  font-size: 0.875rem;
-  color: var(--fg);
-  max-width: 46ch;
-}
-
-/* Ela chega depois de um toque, no lugar onde a pessoa está olhando: entra
-   esmaecendo e subindo um passo curto, na mola da página. Sem isso ela
-   simplesmente existe no quadro seguinte, e conteúdo que aparece do nada é
-   lido como pulo de layout, não como resposta. */
-@media (prefers-reduced-motion: no-preference) {
-  .form-fr-status {
-    animation: statusEntra var(--t-mov) var(--e-mola) both;
-  }
-}
-
-@keyframes statusEntra {
-  from {
-    opacity: 0;
-    translate: 0 0.4rem;
-  }
-  to {
-    opacity: 1;
-    translate: none;
-  }
-}
 
 /* ---------- dedo, não cursor ----------
    Não é questão de largura de tela: um notebook com toque tem 1440px e o mesmo
@@ -3606,9 +3628,9 @@
   }
 }
 
-/* No celular a barra fixa já leva o WhatsApp na largura toda, dentro do
-   alcance do polegar. Um terceiro botão para o mesmo destino, em cima dela,
-   seria repetição — sobe só o de voltar ao topo, acima da barra. */
+/* No celular a barra fixa já leva o CTA na largura toda, dentro do alcance do
+   polegar. Um terceiro botão para o mesmo destino, em cima dela, seria
+   repetição — sobe só o de voltar ao topo, acima da barra. */
 @media (max-width: 780px) {
   .flut-falar {
     display: none;

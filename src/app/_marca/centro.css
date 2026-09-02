@@ -264,19 +264,39 @@
   opacity: 1;
 }
 
-/* O FIO SAIU DA MARGEM ESQUERDA E FOI PARA CIMA DO RÓTULO.
+/* O FIO VOLTOU A SER VERTICAL, e agora ele é a única marca do bloco.
 
-   Ele era `border-left`, e isso só funcionava enquanto todo bloco estava à
-   esquerda: no bloco da direita a barra vertical cai do lado errado, e nos
-   centrados ela desalinha o eixo. Um traço curto ACIMA do rótulo funciona nos
-   quatro cantos, e é a marca de cartela que a seção passou a querer.
+   Já foi `border-left` (quebrava: no bloco da direita a barra caía do lado
+   errado) e depois um traço horizontal acima do rótulo. Com os rótulos fora, o
+   traço acima ficou sobrando no ar sobre um título — e o que a seção quer ali é
+   uma marca de margem, do tipo que acompanha o texto do começo ao fim.
 
-   Ele cresce e acende quando o bloco é o de agora — mesmo papel de antes:
-   dizer qual dos quatro é este, sem escrever "3 de 4". */
+   ELE MEDE O PARÁGRAFO, e é por isso que a caixa virou duas colunas: o fio é
+   uma célula da grade — `grid-row: -2 / -1`, a ÚLTIMA linha — e não um
+   pseudo-elemento empilhado antes do conteúdo. A última linha é o parágrafo
+   quando há um, e o próprio título nos blocos que só têm título (os flancos).
+   Assim um parágrafo de duas linhas ganha um fio curto e um de cinco ganha um
+   longo, sem nenhuma altura escrita à mão.
+
+   NÃO É O BLOCO INTEIRO de propósito: subindo até o topo do título, o fio vira
+   moldura e o título passa a parecer uma citação. Rente ao parágrafo, ele é o
+   que se queria — uma marca de margem ao lado do texto corrido.
+
+   DE QUE LADO: o do canto em que o bloco está. À esquerda nos blocos da
+   esquerda, à direita nos da direita — para fora do texto, nunca entre o fio e
+   a borda da tela. Nos CENTRADOS não há lado que não torça o eixo: ali ele
+   fica HORIZONTAL, acima do texto e da largura dele.
+
+   Ele acende quando o bloco é o de agora — mesmo papel de antes, dizer qual
+   dos quatro é este sem escrever "3 de 4". Antes crescia em largura; agora
+   cresce em ALTURA (`scaleY`), que é o eixo que ele tem. */
 .ctr-bloco {
   display: grid;
-  gap: 0.55rem;
+  grid-template-columns: 1px auto;
+  column-gap: clamp(0.75rem, 1.4vw, 1.15rem);
+  row-gap: 0.55rem;
   justify-items: start;
+  align-items: start;
   max-width: 34ch;
   /* A cena passa por trás do texto. A sombra é o que garante a leitura quando
      uma peça clara — a sacola de lona é a pior delas — cruza atrás de uma
@@ -284,20 +304,107 @@
   text-shadow: 0 1px 16px rgba(5, 9, 13, 0.92), 0 0 30px rgba(5, 9, 13, 0.75);
 }
 
+.ctr-bloco > * {
+  grid-column: 2;
+}
+
 .ctr-bloco::before {
   content: "";
-  display: block;
-  width: 2.25rem;
-  height: 1px;
-  margin-bottom: 0.35rem;
+  grid-column: 1;
+  /* A ÚLTIMA linha da grade: o parágrafo onde há um, o título onde ele é o
+     único filho. Contada do fim (`-2 / -1`) para valer nos dois casos sem
+     saber quantas linhas o bloco tem. */
+  grid-row: -2 / -1;
+  align-self: stretch;
+  width: 1px;
   background: var(--hair);
-  transition: width var(--t-mov) var(--e-ui),
+  /* Encolhe pela BASE. Crescer a partir do meio faria o fio brotar do centro
+     do parágrafo, e o que ele marca é o começo do bloco. */
+  transform: scaleY(0.55);
+  transform-origin: top;
+  transition: transform var(--t-mov) var(--e-ui),
     background-color var(--t-mov) var(--e-ui);
 }
 
 .ctr-vivo .e-ativo .ctr-bloco::before {
-  width: 4rem;
+  transform: scaleY(1);
   background: var(--hair-hot);
+}
+
+/* ---- de que lado ----
+
+   O fio troca de coluna junto com o canto do bloco. `dir` é o único que inverte
+   a grade: o conteúdo passa para a primeira coluna e o fio para a segunda, e o
+   traço fica entre o texto e a borda da tela. */
+.ctr-passo[data-lugar="dir"] .ctr-bloco {
+  grid-template-columns: auto 1px;
+}
+
+.ctr-passo[data-lugar="dir"] .ctr-bloco > * {
+  grid-column: 1;
+}
+
+.ctr-passo[data-lugar="dir"] .ctr-bloco::before {
+  grid-column: 2;
+}
+
+/* NOS FLANCOS, UM FIO SÓ — o do lado do título.
+
+   Os dois pedaços são a mesma fala partida em dois, não dois blocos: com um
+   traço em cada lado da esfera, a batida passa a anunciar duas cartelas e o
+   texto da direita lê como um segundo assunto. O fio marca onde a fala começa,
+   e ela começa uma vez.
+
+   O pedaço da direita fica então com uma coluna só, e o conteúdo nela. */
+.ctr-flancos .ctr-bloco:last-child {
+  grid-template-columns: auto;
+}
+
+.ctr-flancos .ctr-bloco:last-child > * {
+  grid-column: 1;
+}
+
+.ctr-flancos .ctr-bloco:last-child::before {
+  display: none;
+}
+
+/* ---- o bloco centrado: o fio deitado ----
+
+   Uma coluna só e o fio HORIZONTAL, acima do texto. É a marca de cartela que a
+   abertura da seção quer, e é a única forma que não torce o eixo de um bloco
+   centrado — encostado num dos lados, ele puxaria a leitura para aquele lado.
+
+   DA LARGURA DO TEXTO, e por isso `justify-self: stretch` e não uma medida:
+   a coluna vale o mais largo entre o título e o parágrafo, que num bloco de
+   texto corrido é o parágrafo. O fio passa a ter a medida da fala em vez de um
+   valor solto — o mesmo que os verticais fazem no outro eixo.
+
+   Ele cresce no eixo que tem: `scaleX`, do meio para fora, porque num bloco
+   centrado crescer por uma das pontas seria um gesto torto. */
+.ctr-passo[data-lugar="topo"] .ctr-bloco {
+  grid-template-columns: auto;
+}
+
+.ctr-passo[data-lugar="topo"] .ctr-bloco > * {
+  grid-column: 1;
+}
+
+.ctr-passo[data-lugar="topo"] .ctr-bloco::before {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+  justify-self: stretch;
+  width: auto;
+  height: 1px;
+  margin-bottom: 0.35rem;
+  transform: scaleX(0.55);
+  transform-origin: center;
+}
+
+/* O estado aceso precisa vir DEPOIS e mais específico: a regra geral acende
+   escrevendo `scaleY(1)`, que num fio deitado o esticaria na espessura. */
+.ctr-vivo .ctr-passo[data-lugar="topo"].e-ativo .ctr-bloco::before {
+  transform: scaleX(1);
 }
 
 /* O bloco de abertura fica com a medida maior e o texto no eixo: ele é cartela,
@@ -309,10 +416,6 @@
   max-width: 46ch;
   justify-items: center;
   text-align: center;
-}
-
-.ctr-rot {
-  color: var(--fg-2);
 }
 
 .ctr-tit {
@@ -851,6 +954,34 @@
     text-align: center;
   }
 
+  /* Centrado, o fio não tem lado: deita acima do texto e passa a valer a
+     largura dele, como no bloco de abertura. */
+  .ctr-flancos .ctr-bloco,
+  .ctr-flancos .ctr-bloco:last-child {
+    grid-template-columns: auto;
+  }
+
+  .ctr-flancos .ctr-bloco > *,
+  .ctr-flancos .ctr-bloco:last-child > * {
+    grid-column: 1;
+  }
+
+  .ctr-flancos .ctr-bloco::before {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+    justify-self: stretch;
+    width: auto;
+    height: 1px;
+    margin-bottom: 0.35rem;
+    transform: scaleX(0.55);
+    transform-origin: center;
+  }
+
+  .ctr-vivo .e-ativo .ctr-flancos .ctr-bloco::before {
+    transform: scaleX(1);
+  }
+
   /* Um fio só. Empilhados, os dois viram um bloco de texto — e dois traços de
      cartela dentro do mesmo bloco anunciariam duas cartelas. */
   .ctr-flancos .ctr-bloco:last-child::before {
@@ -889,5 +1020,34 @@
     max-width: 30ch;
     justify-items: center;
     text-align: center;
+  }
+
+  /* Sem laterais livres não há lado para o fio: os quatro blocos ficam com o
+     traço deitado acima do texto, da largura dele. */
+  .ctr-bloco,
+  .ctr-passo[data-lugar="dir"] .ctr-bloco {
+    grid-template-columns: auto;
+  }
+
+  .ctr-bloco > *,
+  .ctr-passo[data-lugar="dir"] .ctr-bloco > * {
+    grid-column: 1;
+  }
+
+  .ctr-bloco::before,
+  .ctr-passo[data-lugar="dir"] .ctr-bloco::before {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+    justify-self: stretch;
+    width: auto;
+    height: 1px;
+    margin-bottom: 0.35rem;
+    transform: scaleX(0.55);
+    transform-origin: center;
+  }
+
+  .ctr-vivo .e-ativo .ctr-bloco::before {
+    transform: scaleX(1);
   }
 }

@@ -13,7 +13,8 @@ import "./gravidade.css";
    a leitura de layout acontecer sem o ruído dos mocks — voltar é reimportar
    AsciiWaveHeader / AsciiMeter / AsciiTotem / AsciiCircuito no lugar de quem
    herdou o espaço deles. */
-import { Casca, Heroi, WHATSAPP } from "./casca";
+import { Casca, Heroi } from "./casca";
+import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 import { FundoFecho } from "./fundos";
 import { Gravidade } from "./gravidade";
 import { Modelos } from "./modelos";
@@ -46,8 +47,8 @@ export function Landing() {
               cliente, controla o estoque e reporta à matriz.
             </p>
             <div className="row">
-              <a className="cta cta--lg" href={WHATSAPP}>
-                Falar no WhatsApp
+              <a className="cta cta--lg" href={ANCORA_FORM}>
+                {CTA_ROTULO}
               </a>
               <a className="cta cta--lg cta--out" href="#numeros">
                 Ver os números
@@ -248,7 +249,7 @@ export function Landing() {
         <Rodape
           links={[
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
-            { href: "/institucional", rotulo: "A marca" },
+            { href: "/", rotulo: "A marca" },
             { href: "#ia", rotulo: "A IA" },
             { href: "#numeros", rotulo: "Modelos e valores" },
             { href: "/galeria", rotulo: "Galeria" },

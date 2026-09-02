@@ -19,7 +19,7 @@
       fonte. Uma resposta fechada em três frases é recortável; um parágrafo de
       página institucional não é.
    3. É útil de verdade. Toda dúvida respondida aqui é uma que não precisa
-      ocupar a conversa do WhatsApp — e o WhatsApp é a única métrica do site.
+      ocupar o primeiro contato — e o formulário é a única métrica do site.
 
    CORREÇÃO DE 11/08/2026 — O MOTIVO 2 ERA OUTRO E ESTAVA VENCIDO.
 
@@ -51,7 +51,9 @@ import Link from "next/link";
 import "../v5.css";
 import "../variacoes.css";
 import "./perguntas.css";
-import { Casca, Heroi, WHATSAPP } from "../casca";
+import { Casca, Heroi } from "../casca";
+import { FormFranqueado } from "../form-franqueado";
+import { ANCORA_FORM, CTA_ROTULO } from "../lead";
 import { Rodape } from "../rodape";
 import { SITE_URL } from "../site";
 
@@ -143,7 +145,7 @@ const GRUPOS: { titulo: string; perguntas: Pergunta[] }[] = [
     perguntas: [
       {
         q: "Como faço para abrir uma unidade?",
-        a: "A conversa começa no WhatsApp da rede e segue com quem opera a franquia, não com um atendente. A apresentação completa da franquia é enviada por lá.",
+        a: "Você recebe a apresentação demonstrativa da franquia por e-mail assim que preenche o formulário. Em seguida, quem opera a rede chama no seu WhatsApp para seguir a conversa — não é um atendente.",
       },
     ],
   },
@@ -184,10 +186,10 @@ export default function Perguntas() {
               confirmou. O que não estiver aqui, pergunte direto.
             </p>
             <div className="row">
-              <a className="cta cta--lg" href={WHATSAPP}>
-                Falar no WhatsApp
+              <a className="cta cta--lg" href={ANCORA_FORM}>
+                {CTA_ROTULO}
               </a>
-              <Link className="cta cta--lg cta--out" href="/#numeros">
+              <Link className="cta cta--lg cta--out" href="/seja-franqueado#numeros">
                 Ver os números
               </Link>
             </div>
@@ -221,21 +223,21 @@ export default function Perguntas() {
       ))}
 
       <footer className="hold close" id="falar">
-        <div className="sec-cab">
-          <h2>
-            Ficou uma dúvida <mark>que não está aqui?</mark>
-          </h2>
-          <p>Do outro lado responde quem opera a rede, não um atendente.</p>
-        </div>
-        <div className="row" style={{ marginTop: 0 }}>
-          <a className="cta cta--lg" href={WHATSAPP}>
-            Falar no WhatsApp
-          </a>
-        </div>
+        <FormFranqueado>
+          <div className="sec-cab">
+            <h2>
+              Ficou uma dúvida <mark>que não está aqui?</mark>
+            </h2>
+            <p>
+              A apresentação da franquia responde a maioria delas. O que sobrar,
+              quem opera a rede responde no seu WhatsApp — não um atendente.
+            </p>
+          </div>
+        </FormFranqueado>
         <Rodape
           links={[
-            { href: "/", rotulo: "Seja um franqueado" },
-            { href: "/institucional", rotulo: "A marca" },
+            { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
+            { href: "/", rotulo: "A marca" },
             { href: "/galeria", rotulo: "Galeria" },
           ]}
         />

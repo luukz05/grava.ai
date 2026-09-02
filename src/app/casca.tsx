@@ -12,6 +12,7 @@
 
 import localFont from "next/font/local";
 import { NavBar, type Pagina } from "./navbar";
+import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 import { Flutuante } from "./flutuante";
 import { FundoTopo } from "./fundos";
 
@@ -46,9 +47,15 @@ const switzer = localFont({
   display: "swap",
 });
 
-export const WHATSAPP = "https://wa.me/5515996610916";
+/* O link direto do WhatsApp saiu daqui.
 
-/* `leitura` marca as páginas que abrem sem painel ao lado — /institucional e
+   Ele era o destino de todo CTA das quatro rotas e virou o SEGUNDO contato:
+   quem chama no WhatsApp agora é a operação, depois que a apresentação já
+   chegou no e-mail da pessoa. O que os botões apontam está em `./lead`, e o
+   único link direto que sobrou no site é o do rodapé — lá ele é dado de
+   contato da marca, não conversão. */
+
+/* `leitura` marca as páginas que abrem sem painel ao lado — a home e
    /galeria. O herói delas é uma coluna de texto sozinha, e encostada à esquerda
    numa tela larga ela deixa metade do viewport vazio à direita sem nada
    ocupando esse vazio; centrada, não deixa.
@@ -84,10 +91,11 @@ export function Casca({
         {children}
         <Flutuante />
 
-        {/* No celular o CTA principal vira barra fixa, no alcance do polegar. */}
+        {/* No celular o CTA principal vira barra fixa, no alcance do polegar.
+            Ele desce até o formulário do fechamento, na própria página. */}
         <div className="dock">
-          <a className="cta cta--lg" href={WHATSAPP}>
-            Falar no WhatsApp
+          <a className="cta cta--lg" href={ANCORA_FORM}>
+            {CTA_ROTULO}
           </a>
         </div>
       </main>

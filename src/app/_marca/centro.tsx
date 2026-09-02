@@ -253,7 +253,12 @@ function dCoroa(t: number) {
 /* ───────────────────────────────────────────────────────────────────────────
    OS QUATRO TÓPICOS
 
-   Um bloco de texto e uma batida da cena, com o mesmo nome. `lugar` é o canto
+   Um bloco de texto e uma batida da cena, com o mesmo nome. Cada bloco é um
+   título e um parágrafo — SEM RÓTULO. "Passo 01/02/03" numerava ao lado de uma
+   cena que já é sequencial: a mesma informação dita duas vezes, e a segunda em
+   forma de esteira, que é a forma de que esta seção fugiu. Quem marca qual
+   bloco está sendo lido agora é o FIO ao lado do texto, que acende — trabalho
+   que o rótulo fazia com palavras. `lugar` é o canto
    da tela em que aquele bloco aparece — ver `[data-lugar]` no `centro.css`.
    O último não tem um canto: ele é `flancos`, e ABRE EM DOIS — rótulo e título
    de um lado da esfera, o parágrafo do outro. É a batida em que a cena está no
@@ -281,7 +286,6 @@ function dCoroa(t: number) {
 type Topico = {
   id: string;
   lugar: "topo" | "esq" | "dir" | "flancos";
-  rotulo: string;
   titulo: string;
   texto: React.ReactNode;
 };
@@ -290,7 +294,6 @@ const TOPICOS: Topico[] = [
   {
     id: "credo",
     lugar: "topo",
-    rotulo: "A marca",
     titulo: "O cliente no centro",
     texto: (
       <>
@@ -303,7 +306,6 @@ const TOPICOS: Topico[] = [
   {
     id: "ideia",
     lugar: "esq",
-    rotulo: "Passo 01",
     titulo: "A ideia é dele",
     texto: (
       <>
@@ -315,7 +317,6 @@ const TOPICOS: Topico[] = [
   {
     id: "ia",
     lugar: "dir",
-    rotulo: "Passo 02",
     titulo: "A IA entra como aliada",
     texto: (
       <>
@@ -328,7 +329,6 @@ const TOPICOS: Topico[] = [
   {
     id: "produto",
     lugar: "flancos",
-    rotulo: "Passo 03",
     titulo: "Juntas, concebem",
     texto: (
       <>
@@ -1010,7 +1010,6 @@ export function Centro() {
               <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
                 <div className="ctr-flancos">
                   <div className="ctr-bloco">
-                    <span className="ctr-rot mono">{t.rotulo}</span>
                     <h3 className="ctr-tit">{t.titulo}</h3>
                   </div>
                   <div className="ctr-bloco">
@@ -1021,7 +1020,6 @@ export function Centro() {
             ) : (
               <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
                 <div className="ctr-bloco">
-                  <span className="ctr-rot mono">{t.rotulo}</span>
                   <h3 className="ctr-tit">{t.titulo}</h3>
                   <p className="ctr-txt">{t.texto}</p>
                 </div>

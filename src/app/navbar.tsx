@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { IcoWhatsApp } from "./icons";
+import { IcoEnvelope } from "./icons";
+import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 import "./navbar.css";
 
 /* Barra de navegação do site.
@@ -32,8 +33,8 @@ import "./navbar.css";
 export type Pagina = "home" | "franqueado" | "galeria";
 
 const ITENS: Array<{ id: Pagina; rotulo: string; href: string }> = [
-  { id: "home", rotulo: "Home", href: "/institucional" },
-  { id: "franqueado", rotulo: "Franqueado", href: "/" },
+  { id: "home", rotulo: "Home", href: "/" },
+  { id: "franqueado", rotulo: "Franqueado", href: "/seja-franqueado" },
   { id: "galeria", rotulo: "Galeria", href: "/galeria" },
 ];
 
@@ -56,7 +57,7 @@ export function NavBar({ atual }: { atual: Pagina }) {
       <div className="navbar">
         <Link
           className="brand"
-          href="/institucional"
+          href="/"
           aria-label="GRAVA.AI, ir para o início"
         >
           <Image
@@ -84,9 +85,13 @@ export function NavBar({ atual }: { atual: Pagina }) {
         </nav>
 
         <div className="nav-acoes">
-          <a className="cta nav-cta" href="https://wa.me/5515996610916">
-            <IcoWhatsApp className="nav-cta-ico" />
-            <span className="nav-cta-rotulo">Falar no WhatsApp</span>
+          {/* O ícone é envelope, e não mais o do WhatsApp: o botão desce até
+              o formulário, e o que ele pede chega por e-mail. Ele só aparece
+              quando a barra condensa e o rótulo sai — a esfera não pode ficar
+              vazia, que é um alvo sem nome nenhum. Ver `navbar.css`. */}
+          <a className="cta nav-cta" href={ANCORA_FORM}>
+            <IcoEnvelope className="nav-cta-ico" />
+            <span className="nav-cta-rotulo">{CTA_ROTULO}</span>
           </a>
         </div>
       </div>

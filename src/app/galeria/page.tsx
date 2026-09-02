@@ -10,7 +10,8 @@
 import type { Metadata } from "next";
 import "../v5.css";
 import "../variacoes.css";
-import { Casca, Heroi, WHATSAPP } from "../casca";
+import { Casca, Heroi } from "../casca";
+import { FormFranqueado } from "../form-franqueado";
 import { FundoFecho } from "../fundos";
 import { Ph } from "../ph";
 import { Rodape } from "../rodape";
@@ -101,23 +102,28 @@ export default function Galeria() {
       {/* Mesmo fechamento das outras duas rotas: a carta volta ao fundo. */}
       <div className="close-fundo">
         <FundoFecho />
+      {/* O MESMO FORMULÁRIO DAS OUTRAS TRÊS ROTAS, e não uma âncora para a
+          home. Todo CTA do site desce até `#falar`; se o fechamento daqui
+          fosse só um botão para outra página, o CTA da barra do topo levaria
+          para fora da página que estava convencendo. O formulário existe onde
+          a pessoa está. */}
       <footer className="hold close" id="falar">
-        <div className="sec-cab">
-          <h2>
-            Quer ver <mark>de perto?</mark>
-          </h2>
-          <p>A apresentação completa da franquia sai pelo WhatsApp.</p>
-        </div>
-        <div className="row" style={{ marginTop: 0 }}>
-          <a className="cta cta--lg" href={WHATSAPP}>
-            Falar no WhatsApp
-          </a>
-        </div>
+        <FormFranqueado>
+          <div className="sec-cab">
+            <h2>
+              Quer ver <mark>de perto?</mark>
+            </h2>
+            <p>
+              A apresentação demonstrativa da franquia vai para o seu e-mail,
+              com as peças, os números e como a unidade opera.
+            </p>
+          </div>
+        </FormFranqueado>
         <Rodape
           links={[
-            { href: "/", rotulo: "Seja um franqueado" },
+            { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
-            { href: "/institucional", rotulo: "A marca" },
+            { href: "/", rotulo: "A marca" },
           ]}
         />
       </footer>

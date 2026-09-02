@@ -1,111 +1,110 @@
 "use client";
 
-/* Formulário de interesse, no fechamento.
-   Existe para quem não vai tocar no botão do WhatsApp de cara: dá o que
-   preencher e devolve o mesmo destino, agora com contexto.
+/* Formulário de captação, no fechamento das quatro páginas.
 
-   O envio monta a mensagem no WhatsApp com o que foi preenchido em vez de
-   fingir que existe um servidor. Não há backend neste protótipo, e um
-   "recebemos seu contato" que não recebeu nada é a pior coisa que uma landing
-   de captação pode fazer. Quando houver CRM, o `onSubmit` troca de destino e o
-   resto da peça continua igual. */
+   MUDOU O FLUXO, e é ele que explica o resto deste arquivo.
+
+   Antes o envio montava uma mensagem e abria o WhatsApp: o primeiro contato
+   era a conversa, e a apresentação da franquia saía por lá, à mão. O custo
+   disso é que a conversão inteira dependia de a pessoa querer conversar AGORA
+   — e um bloqueador de pop-up ou uma WebView de rede social eram suficientes
+   para derrubá-la no meio.
+
+   Agora o primeiro contato é por e-mail e é rápido: nome, e-mail e WhatsApp,
+   e a apresentação demonstrativa da franquia chega no e-mail. O telefone é
+   pedido aqui mas não é usado aqui — ele é o SEGUNDO contato, feito à mão pelo
+   WhatsApp depois que a apresentação já chegou e a pessoa já sabe do que se
+   trata. Quem chama é a operação, não a landing.
+
+   Consequências diretas no código: sumiu o `window.open`, sumiu o link de
+   resgate para pop-up bloqueado — não há mais janela para bloquear —, e o
+   envio virou o que sempre deveria ter sido, um POST com resposta de verdade
+   em `/api/lead`. Como agora existe uma requisição, existe erro: o quarto
+   estado do botão não é decoração, é a rede falhando. */
 
 import { useEffect, useRef, useState } from "react";
-
-const WHATSAPP = "5515996610916";
+import { usePathname } from "next/navigation";
+import type { RespostaLead } from "./lead";
 
 /* O FORMULÁRIO ABRAÇA O FECHAMENTO INTEIRO, e `children` é a coluna de texto
    que fica ao lado dele — a marca, a manchete e a linha de apoio.
 
    Parece invertido (o texto do rodapé morando dentro de um `<form>`), e é
    deliberado: o `<form>` é quem monta o par de colunas, e assim o par e o
-   envio são a mesma peça. Ele já teve outro motivo — o botão atravessava as
-   duas colunas, e um `<button type="submit">` só envia o formulário em que
-   está dentro. O botão voltou para dentro do cartão, mas a montagem continua
-   aqui: o alinhamento entre marca e primeira linha do formulário depende dela.
+   envio são a mesma peça.
 
    Com o form por fora, a caixa desenhada não é ele: quem tem borda e fundo é
    `.form-fr-cartao`, em volta do cabeçalho, dos campos e do botão. O `<form>`
    é o layout. */
 export function FormFranqueado({ children }: { children?: React.ReactNode }) {
-  /* A conversa que não abriu. Bloqueador de pop-up, WebView de rede social e
-     navegador em modo restrito engolem `window.open` sem erro nenhum: o clique
-     acontece, nada aparece e a pessoa acha que enviou. Como esta é a única
-     conversão da página, o destino vira um link visível em vez de sumir. */
-  const [resgate, setResgate] = useState<string | null>(null);
-  /* E a conversa que abriu. Antes daqui existia um estado `enviando` que ligava
-     e desligava dentro do mesmo `onSubmit` síncrono: o React agrupa as duas
-     escritas, o botão nunca chegava a renderizar desabilitado e o formulário
-     não dava sinal nenhum de que algo tinha acontecido. Quem envia num celular
-     com o WhatsApp abrindo em outro aplicativo volta para uma página idêntica
-     à de antes do clique — e reenvia. Ação que importa termina em confirmação;
-     é a única coisa que este formulário faz, e ele estava terminando em nada. */
-  const [aberto, setAberto] = useState(false);
-
-  /* O estado do BOTÃO, que é diferente do estado do envio.
-
-     São três: parado, enviando e enviado. O `enviando` dura de propósito —
-     240ms — e essa espera é a única coisa artificial nesta peça. A razão: o
-     trabalho real aqui é montar uma string e chamar `window.open`, o que
-     leva menos de um quadro. Sem a pausa, o botão saltaria direto de "Receber
-     material" para o check, e o olho leria isso como glitch, não como
-     resposta. É o mesmo motivo pelo qual um botão de pagamento mostra o
-     spinner por um instante mesmo quando a resposta volta na hora.
-
-     Uma tentativa anterior de estado `enviando` foi removida deste arquivo
-     porque ligava e desligava dentro do mesmo `onSubmit` síncrono — o React
-     agrupava as duas escritas e o botão nunca chegava a renderizar. Aqui ele
-     passa por `setTimeout`, então cada estado tem o próprio quadro. */
+  /* Três estados de envio e um de falha, separados de propósito: `fase` conta
+     o que está acontecendo com o pedido, `erro` conta o que voltou errado. Um
+     envio que falha volta para `parado` COM erro — o botão fica clicável de
+     novo, que é o que a pessoa precisa depois de corrigir o e-mail. */
   const [fase, setFase] = useState<"parado" | "enviando" | "enviado">("parado");
-  const relogios = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
 
-  /* Quem cria timer limpa timer. Sem isto, sair da página entre o clique e o
-     check chama `setState` num componente desmontado. */
-  useEffect(() => {
-    const atuais = relogios;
-    return () => {
-      atuais.current.forEach(clearTimeout);
-      atuais.current = [];
-    };
-  }, []);
+  /* Quem cria requisição cancela requisição. Sem isto, sair da página no meio
+     do POST chama `setState` num componente desmontado. */
+  const abortar = useRef<AbortController | null>(null);
+  useEffect(() => () => abortar.current?.abort(), []);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  /* Qual das quatro páginas converteu. Vai junto no corpo do POST porque as
+     quatro têm o mesmo formulário no fechamento e, sem isto, não há como
+     saber qual delas trouxe o lead. */
+  const rota = usePathname();
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (fase === "enviando") return;
+    if (fase !== "parado") return;
 
     const d = new FormData(e.currentTarget);
-    const linhas = [
-      "Olá! Vim pelo site e quero receber o material da franquia GRAVA.AI.",
-      "",
-      `Nome: ${d.get("nome")}`,
-      `E-mail: ${d.get("email")}`,
-    ];
-
-    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(linhas.join("\n"))}`;
-    let aba: Window | null = null;
-    try {
-      aba = window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      aba = null;
-    }
-    setResgate(aba ? null : url);
-    setAberto(Boolean(aba));
-
-    /* O bloqueio de pop-up é FALHA, e falha não ganha check. O botão volta ao
-       repouso e quem fala é o link de resgate logo abaixo. */
-    if (!aba) {
-      setFase("parado");
-      return;
-    }
-
     setFase("enviando");
-    relogios.current.push(
-      setTimeout(() => setFase("enviado"), 240),
-      /* Volta ao repouso depois de ler. O formulário continua ali e a pessoa
-         pode enviar de novo — um botão que fica travado em "enviado" para
-         sempre é um formulário que perdeu a segunda tentativa. */
-      setTimeout(() => setFase("parado"), 3600),
-    );
+    setErro(null);
+
+    abortar.current?.abort();
+    const ctrl = new AbortController();
+    abortar.current = ctrl;
+
+    try {
+      const r = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: ctrl.signal,
+        body: JSON.stringify({
+          nome: d.get("nome"),
+          email: d.get("email"),
+          telefone: d.get("telefone"),
+          origem: rota,
+        }),
+      });
+
+      /* A rota responde JSON em qualquer desfecho, mas um 500 de infra pode
+         devolver HTML. O `catch` do parse cobre esse caso para o formulário
+         não morrer com "Unexpected token <". */
+      const corpo: RespostaLead = await r.json().catch(() => ({
+        ok: false as const,
+        erro: "Não conseguimos enviar agora. Tente de novo em instantes.",
+      }));
+
+      if (!r.ok || !corpo.ok) {
+        setErro(
+          corpo.ok
+            ? "Não conseguimos enviar agora. Tente de novo em instantes."
+            : corpo.erro,
+        );
+        setFase("parado");
+        return;
+      }
+
+      setFase("enviado");
+    } catch (err) {
+      /* Cancelamento não é falha: o componente saiu de cena e não há mais
+         ninguém para ler o aviso. */
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setErro("Sem conexão com o servidor. Tente de novo em instantes.");
+      setFase("parado");
+    }
   }
 
   return (
@@ -114,139 +113,168 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
         {children}
 
         <div className="form-fr-cartao">
-        <div className="form-fr-head">
-          <h3>Receba o material da franquia</h3>
-          <p>
-            Preencha e a conversa abre no WhatsApp com seus dados já preenchidos.
-            Do outro lado responde quem opera a rede, com a apresentação
-            completa da franquia.
-          </p>
-        </div>
+          {/* O SUCESSO SUBSTITUI O FORMULÁRIO, e não é enfeite.
 
-        {/* DOIS CAMPOS, E SÓ.
+              Enquanto o envio abria o WhatsApp, fazia sentido o botão voltar
+              ao repouso: a conversa podia não ter aberto, e a pessoa tinha de
+              poder tentar de novo. Agora o servidor confirmou o recebimento —
+              deixar os campos preenchidos e o botão vivo do lado de uma
+              confirmação é convidar o mesmo lead a entrar duas vezes.
 
-            Saíram cidade e estado, o seletor de momento e o campo de pergunta.
-            Cada campo a mais é uma chance a mais de a pessoa desistir no meio — e
-            nenhum dos três era necessário AGORA: onde ela quer a unidade e quando
-            pretende começar são exatamente as perguntas que quem atende faz na
-            primeira mensagem, com a conversa já aberta e a pessoa já engajada.
-
-            Pedir antes é cobrar esforço para qualificar um contato que ainda pode
-            nem existir. */}
-        <div className="form-fr-campos">
-          <label className="campo">
-            <span>Nome</span>
-            <input
-              type="text"
-              name="nome"
-              required
-              autoComplete="name"
-              placeholder="Como devemos te chamar"
-            />
-          </label>
-
-          <label className="campo">
-            <span>E-mail</span>
-            <input
-              type="email"
-              name="email"
-              required
-              autoComplete="email"
-              placeholder="vai junto na conversa"
-            />
-          </label>
-        </div>
-        {/* O PÉ FICA DENTRO DO CARTÃO. Ele já foi irmão do `.form-fr-duo`,
-            atravessando as duas colunas; voltou para dentro da caixa porque
-            o botão é o passo seguinte dos campos, e não um rodapé da seção —
-            entre o último campo e a ação não deve haver uma borda no meio.
-
-            Aqui havia um segundo "Falar no WhatsApp" na coluna da esquerda. Dois
-            botões para a mesma conversa, um do lado do outro, é escolha onde não
-            havia escolha — e o da esquerda ainda pulava o formulário, levando a
-            conversa a abrir sem nome nem e-mail. Ficou o que qualifica. */}
-        <div className="form-fr-pe">
-          {/* UM BOTÃO, TRÊS ESTADOS, E A CAIXA NÃO MUDA DE TAMANHO.
-
-              Os três rótulos vivem empilhados no mesmo lugar por grade — todos na
-              célula `1 / 1` —, e a largura do botão é a do mais largo dos três.
-              É o que impede a peça de encolher quando o texto vira "Enviado": um
-              botão que muda de tamanho no meio da confirmação puxa o layout ao
-              redor e desfaz a sensação de que a ação deu certo.
-
-              `aria-live` no invólucro para o leitor de tela acompanhar a troca,
-              e os rótulos inativos ficam `aria-hidden` — senão os três seriam
-              lidos em sequência. */}
-          <button
-            className="cta cta--lg form-fr-enviar"
-            type="submit"
-            data-fase={fase}
-            disabled={fase === "enviando"}
-          >
-            <span className="form-fr-rotulos" aria-live="polite">
-              <span className="form-fr-rotulo" aria-hidden={fase !== "parado"}>
-                Receber material no WhatsApp
+              O que fica no lugar é o que a pessoa precisa saber a seguir: o
+              e-mail está a caminho, e o WhatsApp é o próximo passo, feito por
+              nós. */}
+          {fase === "enviado" ? (
+            <div className="form-fr-ok" role="status">
+              <span className="form-fr-ok-selo" aria-hidden="true">
+                <Check />
               </span>
-              <span className="form-fr-rotulo" aria-hidden={fase !== "enviando"}>
-                Abrindo a conversa…
-              </span>
-              <span className="form-fr-rotulo" aria-hidden={fase !== "enviado"}>
-                {/* O CHECK.
+              <h3>Apresentação a caminho.</h3>
+              <p>
+                Ela chega no e-mail que você deixou, em alguns minutos. Se não
+                aparecer, vale olhar no spam.
+              </p>
+              <p className="form-fr-ok-nota">
+                Depois disso, quem opera a rede chama no seu WhatsApp para
+                seguir a conversa.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="form-fr-head">
+                <h3>Receba a apresentação da franquia</h3>
+                <p>
+                  Preencha e a apresentação demonstrativa vai para o seu e-mail.
+                  Em seguida, quem opera a rede chama no seu WhatsApp.
+                </p>
+              </div>
 
-                    `pathLength={100}` normaliza o comprimento do caminho para
-                    100, e o `stroke-dasharray` do CSS conta na MESMA escala —
-                    então o traço se desenha sem ninguém medir a geometria. É o
-                    mesmo recurso do traço dos ícones da página, e o desenho
-                    acontece no CSS.
+              {/* TRÊS CAMPOS, E SÓ.
 
-                    100 e NÃO 1: o dasharray é resolvido em unidades de usuário,
-                    que o Chrome trata como px. Com `pathLength="1"`, um
-                    dasharray de 1 cobria 1px de um caminho de ~22 e o traço
-                    ficava invisível — o check simplesmente nunca aparecia. */}
-                <svg className="form-fr-check" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    pathLength={100}
-                    d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  Nome e e-mail são o primeiro contato; o WhatsApp é o segundo,
+                  e por isso está aqui mesmo sem ser usado no envio — pedi-lo
+                  depois seria pedir duas vezes.
+
+                  Continuam de fora cidade, estado, momento e pergunta: são
+                  exatamente as perguntas que quem atende faz na conversa, com
+                  a pessoa já engajada. Cobrá-las aqui é qualificar um contato
+                  que ainda pode nem existir. */}
+              <div className="form-fr-campos">
+                <label className="campo">
+                  <span>Nome</span>
+                  <input
+                    type="text"
+                    name="nome"
+                    required
+                    autoComplete="name"
+                    placeholder="Como devemos te chamar"
                   />
-                </svg>
-                Enviado
-              </span>
-            </span>
-          </button>
+                </label>
 
-          <p className="form-fr-aviso">
-            Seus dados vão direto para a conversa. Nada é publicado e não existe
-            cadastro em lista.
-          </p>
+                <label className="campo">
+                  <span>
+                    WhatsApp <em>com DDD</em>
+                  </span>
+                  <input
+                    type="tel"
+                    name="telefone"
+                    required
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="(15) 99999-9999"
+                  />
+                </label>
+
+                {/* O E-MAIL ATRAVESSA AS DUAS COLUNAS porque é ele que recebe
+                    a apresentação: é o campo que decide se o envio serviu para
+                    alguma coisa, e endereço longo cortado em meia coluna é
+                    endereço digitado errado. */}
+                <label className="campo campo--largo">
+                  <span>
+                    E-mail <em>recebe a apresentação</em>
+                  </span>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    autoComplete="email"
+                    placeholder="voce@empresa.com.br"
+                  />
+                </label>
+              </div>
+
+              <div className="form-fr-pe">
+                {/* UM BOTÃO, TRÊS RÓTULOS, E A CAIXA NÃO MUDA DE TAMANHO.
+
+                    Os rótulos vivem empilhados no mesmo lugar por grade —
+                    todos na célula `1 / 1` —, e a largura do botão é a do mais
+                    largo. É o que impede a peça de encolher no meio da
+                    confirmação, puxando o layout ao redor.
+
+                    `aria-live` no invólucro para o leitor de tela acompanhar a
+                    troca, e os rótulos inativos ficam `aria-hidden` — senão os
+                    três seriam lidos em sequência. */}
+                <button
+                  className="cta cta--lg form-fr-enviar"
+                  type="submit"
+                  data-fase={fase}
+                  disabled={fase === "enviando"}
+                >
+                  <span className="form-fr-rotulos" aria-live="polite">
+                    <span className="form-fr-rotulo" aria-hidden={fase !== "parado"}>
+                      Receber apresentação
+                    </span>
+                    <span className="form-fr-rotulo" aria-hidden={fase !== "enviando"}>
+                      Enviando…
+                    </span>
+                  </span>
+                </button>
+
+                {/* O erro mora colado no botão, e não no topo do cartão: é ali
+                    que o olho está quando o envio falha. `role="alert"` porque
+                    interrompe mesmo — a pessoa acha que enviou. */}
+                {erro ? (
+                  <p className="form-fr-erro" role="alert">
+                    {erro}
+                  </p>
+                ) : null}
+
+                <p className="form-fr-aviso">
+                  Seus dados vão para quem opera a rede. Nada é publicado e não
+                  existe cadastro em lista.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
-      </div>
-
-      {/* `role="status"` e não `alert`: é confirmação, não interrupção — o
-          leitor de tela anuncia quando terminar o que está lendo. A frase diz
-          onde a conversa está, porque no celular ela abriu em outro
-          aplicativo e a pessoa continua olhando para esta tela. */}
-      {aberto ? (
-        <p className="form-fr-status" role="status">
-          Pronto — a conversa abriu no WhatsApp com os seus dados. Se ela não
-          apareceu, procure o aplicativo.
-        </p>
-      ) : null}
-
-      {resgate ? (
-        <p className="form-fr-resgate" role="alert">
-          O navegador bloqueou a abertura da conversa.{" "}
-          <a href={resgate} target="_blank" rel="noopener noreferrer">
-            Abrir o WhatsApp com seus dados
-          </a>
-          .
-        </p>
-      ) : null}
     </form>
+  );
+}
+
+/* O CHECK.
+
+   `pathLength={100}` normaliza o comprimento do caminho para 100, e o
+   `stroke-dasharray` do CSS conta na MESMA escala — então o traço se desenha
+   sem ninguém medir a geometria. É o mesmo recurso do traço dos ícones da
+   página, e o desenho acontece no CSS.
+
+   100 e NÃO 1: o dasharray é resolvido em unidades de usuário, que o Chrome
+   trata como px. Com `pathLength="1"`, um dasharray de 1 cobria 1px de um
+   caminho de ~22 e o traço ficava invisível — o check simplesmente nunca
+   aparecia. */
+function Check() {
+  return (
+    <svg className="form-fr-check" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        pathLength={100}
+        d="M4.5 12.5 L9.5 17.5 L19.5 6.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

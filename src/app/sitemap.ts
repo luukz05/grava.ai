@@ -38,20 +38,29 @@ import { SITE_URL } from "./site";
    iniciais vêm do último commit que tocou o arquivo de cada página
    (`git log -1 --format=%cI -- <arquivo>`), conferido em 11/08/2026. */
 const ATUALIZADO_EM = {
-  home: "2026-08-07",
-  perguntas: "2026-08-04",
-  institucional: "2026-08-04",
-  galeria: "2026-08-04",
+  /* `/` passou a servir a página da marca (era `/institucional`) e a landing de
+     captação foi para `/seja-franqueado` — 02/09/2026. Troca de URL é mudança
+     de conteúdo para quem rastreia: as duas rotas mudaram de fato o que
+     respondem.
+
+     `/institucional` NÃO entra na lista abaixo, e é de propósito: ela agora
+     redireciona (ver `next.config.ts`), e URL que redireciona dentro de um
+     sitemap é sinal contraditório — o arquivo declara "esta é a boa" enquanto
+     o servidor responde "não é, vá para outra". */
+  home: "2026-09-02",
+  sejaFranqueado: "2026-09-02",
+  perguntas: "2026-09-02",
+  galeria: "2026-09-02",
 } as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: SITE_URL, lastModified: ATUALIZADO_EM.home },
-    { url: `${SITE_URL}/perguntas`, lastModified: ATUALIZADO_EM.perguntas },
     {
-      url: `${SITE_URL}/institucional`,
-      lastModified: ATUALIZADO_EM.institucional,
+      url: `${SITE_URL}/seja-franqueado`,
+      lastModified: ATUALIZADO_EM.sejaFranqueado,
     },
+    { url: `${SITE_URL}/perguntas`, lastModified: ATUALIZADO_EM.perguntas },
     { url: `${SITE_URL}/galeria`, lastModified: ATUALIZADO_EM.galeria },
   ];
 }

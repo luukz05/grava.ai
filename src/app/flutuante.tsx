@@ -1,9 +1,14 @@
-/* Par flutuante do canto inferior esquerdo: falar com quem opera a rede, e
-   voltar ao começo.
+/* Par flutuante do canto inferior esquerdo: pedir a apresentação, e voltar ao
+   começo.
+
+   O primeiro já foi "Falar com especialista", abrindo o WhatsApp com uma
+   mensagem pronta. Virou âncora para o formulário do fechamento junto com os
+   outros CTAs: o WhatsApp deixou de ser o primeiro contato e passou a ser o
+   segundo, feito pela operação depois do e-mail.
 
    Duas decisões que o resto da página impõe:
 
-   — no celular já existe a barra fixa com "Falar no WhatsApp" ocupando a
+   — no celular já existe a barra fixa com "Receber apresentação" ocupando a
      largura toda, no alcance do polegar. Repetir o mesmo destino num flutuante
      em cima dela seria o terceiro botão idêntico na mesma tela, então abaixo
      de 780px só o de voltar ao topo aparece;
@@ -16,20 +21,15 @@
    que desfazer é ruído. Quem revela é o CSS, por posição de rolagem — sem
    JavaScript, sem ouvinte de scroll, sem estado. */
 
-import { IcoWhatsApp, IcoTopo } from "./icons";
-
-const WHATSAPP =
-  "https://wa.me/5515996610916?text=" +
-  encodeURIComponent(
-    "Olá! Vim pelo site e quero falar com um especialista sobre a franquia GRAVA.AI.",
-  );
+import { IcoEnvelope, IcoTopo } from "./icons";
+import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 
 export function Flutuante() {
   return (
     <div className="flut">
-      <a className="cta flut-falar" href={WHATSAPP}>
-        <IcoWhatsApp />
-        <span>Falar com especialista</span>
+      <a className="cta flut-falar" href={ANCORA_FORM}>
+        <IcoEnvelope />
+        <span>{CTA_ROTULO}</span>
       </a>
 
       {/* O tamanho da seta vem do wrapper, e não de uma regra em `svg`: dentro

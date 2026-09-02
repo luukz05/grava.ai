@@ -117,6 +117,25 @@ export function IcoTicket({ className }: P) {
   );
 }
 
+/* O ícone do CTA. Entra onde o do WhatsApp estava — na esfera em que a barra
+   do topo condensa o botão, e no flutuante — porque o destino do botão mudou:
+   ele não abre conversa nenhuma, ele pede a apresentação que chega por e-mail.
+   Marca de aplicativo em botão que não abre aquele aplicativo é promessa
+   quebrada no primeiro clique.
+
+   Aba do envelope em V e não em linha reta: na caixa de 24 com traço de 1,5, o
+   V é o que se lê como envelope a 20px — que é o tamanho em que ele aparece na
+   esfera condensada, o único lugar onde ele fica sozinho, sem rótulo ao lado
+   para dizer o que é. */
+export function IcoEnvelope({ className }: P) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="5.5" width="18" height="13" rx="2.5" />
+      <path d="M3.75 7.5 12 13.25 20.25 7.5" />
+    </svg>
+  );
+}
+
 /* Canais do rodapé. Desenhados no mesmo traço dos demais em vez de importados
    de uma biblioteca de logos: são dois ícones, e trazer um pacote inteiro para
    dois desenhos quebraria a coerência de traço do resto da página. */

@@ -102,8 +102,8 @@
 
 /* As ações não encolhem. Com o rótulo em `min-width: 0` (ver o bloco do
    condensado), o mínimo automático deste grupo passou a ser zero também — e num
-   flex apertado ele seria o primeiro a ceder, cortando "Falar no WhatsApp" no
-   estado do topo. Quem cede é a cápsula dos links, que tem folga para isso. */
+   flex apertado ele seria o primeiro a ceder, cortando "Receber apresentação"
+   no estado do topo. Quem cede é a cápsula dos links, que tem folga para isso. */
 .nav-acoes {
   flex: none;
 }
@@ -266,7 +266,7 @@
 
      O motivo: este span é filho de um `inline-flex`, e todo item de flex nasce
      com `min-width: auto` — o tamanho mínimo automático, que com `nowrap` é a
-     frase inteira, "Falar no WhatsApp". E `min-width` VENCE `max-width` na
+     frase inteira, "Receber apresentação". E `min-width` VENCE `max-width` na
      resolução do tamanho usado. O `max-width: 0` abaixo estava sendo calculado
      corretamente e descartado em seguida: o rótulo mantinha os ~150px do
      texto, o botão herdava essa largura, e o `overflow: hidden` do pai só
