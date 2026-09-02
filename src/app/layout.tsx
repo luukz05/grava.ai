@@ -7,20 +7,18 @@ import { SITE_URL, SITE_NOME, WHATSAPP_E164, INSTAGRAM } from "./site";
    da marca e a captação em `/seja-franqueado`, cada rota declara os seus — o
    layout ficou só com o que é de todas.
 
-   O que resta é `metadataBase` e o nome do site. O `title.template` existe para
-   as rotas não repetirem "GRAVA.AI" no fim de cada título escrito à mão; as
-   quatro páginas já trazem a marca na frente, então o template só vale para as
-   que vierem depois e esquecerem. */
+   O que resta é `metadataBase`, o nome do site e um título de reserva. Sem
+   `title.template`: as quatro páginas já abrem com "GRAVA.AI —", e um template
+   que acrescentasse a marca no fim daria "GRAVA.AI — … | GRAVA.AI". O que fica
+   é o `default`, que só aparece se alguma rota futura esquecer de declarar o
+   seu — melhor o nome da marca do que o título vazio. */
 export const metadata: Metadata = {
   /* Sem `metadataBase` o Next emite as URLs de Open Graph relativas, e URL
      relativa em meta tag não resolve em lugar nenhum: o card do WhatsApp e do
      Instagram sai quebrado. Também é daqui que as canônicas de cada rota tiram
      o domínio. */
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_NOME,
-    template: `%s`,
-  },
+  title: SITE_NOME,
   /* Não existe `keywords` aqui de propósito. A meta tag de palavras-chave é
      ignorada pelo Google desde 2009 — ele publicou um post só para dizer isso,
      porque a tag é preenchida pelo dono do site e por isso não vale como sinal.

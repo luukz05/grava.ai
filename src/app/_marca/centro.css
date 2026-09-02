@@ -680,44 +680,70 @@
 
 /* ============ O BALÃO DA IDEIA ============
 
-   Forma de FALA e não de etiqueta: disco com o glifo da arte dentro e um bico
-   apontando de volta para o cliente. É o pedido dele, e o pedido precisa dizer
-   de quem é — sem o bico seriam duas bolhas soltas no mesmo quadro.
+   Forma de FALA, e um DESENHO SÓ: bolha e cauda saem do mesmo caminho (ver
+   `dBalao` no `centro.tsx`). Eram duas peças de HTML — disco com borda e um
+   losango encostado por baixo —, e duas peças com o mesmo contorno e o mesmo
+   fundo nunca fecham: a costura aparecia justamente na curva em que elas
+   deviam ler como uma coisa só, e a cauda saía apontando para baixo em vez de
+   apontar para o cliente.
 
-   O preenchimento é OPACO. O bico entra meia diagonal por baixo do disco: com
-   superfície translúcida, a área comum dobra o alfa e desenha a costura entre
-   as duas peças exatamente onde elas deviam ler como uma só. */
+   O preenchimento é OPACO: a órbita pontilhada passa por trás dele, e por
+   dentro de uma bolha translúcida ela vira ruído em cima das reticências.
+
+   O TAMANHO SUBIU UM DEGRAU. O disco ocupa 68% da caixa (raio 34 de 100) e o
+   resto é a cauda; com os `11cqw` de antes o que sobrava para o conteúdo eram
+   17px, e nada legível cabe ali. */
 .ctr-balao {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: clamp(2.1rem, 11cqw, 3.2rem);
+  display: block;
+  width: clamp(2.9rem, 15cqw, 4.4rem);
   aspect-ratio: 1;
-  color: #9ddcff;
-  border: 1px solid rgba(102, 205, 255, 0.42);
-  border-radius: 999px;
-  background: rgb(9, 16, 23);
-  box-shadow: 0 0 26px rgba(102, 205, 255, 0.22);
 }
 
 .ctr-balao svg {
-  width: 52%;
-  height: 52%;
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* O brilho do contorno passa da caixa — sem isto ele é cortado no quadrado
+     do SVG e o balão ganha uma moldura invisível de canto vivo. */
+  overflow: visible;
 }
 
-/* O bico. Losango girado, tirado do fluxo para meia diagonal entrar por baixo
-   do disco — o que sobra fora é o triângulo apontando para o cliente, que está
-   embaixo e à esquerda. */
-.ctr-balao-bico {
-  position: absolute;
-  left: 12%;
-  bottom: -0.2rem;
-  width: 0.62rem;
-  height: 0.62rem;
-  rotate: 45deg;
-  border-left: 1px solid rgba(102, 205, 255, 0.42);
-  border-bottom: 1px solid rgba(102, 205, 255, 0.42);
-  background: rgb(9, 16, 23);
+.ctr-balao-forma {
+  fill: rgb(9, 16, 23);
+  stroke: rgba(102, 205, 255, 0.42);
+  /* 2 unidades de um `viewBox` de 100 numa caixa de ~3rem dão o mesmo fio de
+     1px do resto da cena. */
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 7px rgba(102, 205, 255, 0.22));
+}
+
+/* A LÂMPADA. Traço e mais nada — o preenchimento fica por conta do halo atrás
+   dela. A COR É ESCRITA PELA LINHA DO TEMPO (apagada no início, clara depois de
+   acender), então aqui não há `stroke`: um valor fixo aqui seria o estado que o
+   GSAP tem de sobrescrever no primeiro quadro, e sem script a lâmpada apareceria
+   acesa antes de existir motivo. O `currentColor` é o que ela usa enquanto
+   ninguém escreveu nada. */
+.ctr-balao-luz {
+  fill: none;
+  /* ACESA é o estado escrito aqui, e a linha do tempo é que a APAGA no começo
+     da cena. O contrário — deixar o apagado no CSS — faria a lâmpada nascer
+     fria e nunca acender sem script, que é justamente o caso em que a cena
+     aparece montada no estado final. */
+  stroke: #eaf7ff;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* O halo: a luz derramada. Um disco de brilho, sem contorno, atrás do vidro —
+   o traço sozinho troca de cor, e trocar de cor não é acender. */
+.ctr-balao-halo {
+  fill: rgba(157, 220, 255, 0.16);
+  filter: blur(3px) drop-shadow(0 0 6px rgba(157, 220, 255, 0.55));
+  /* A escala do halo é escrita pelo GSAP; sem a origem no centro do disco ela
+     partiria do canto do `viewBox`. */
+  transform-origin: 50px 38px;
 }
 
 /* ============ A ESFERA DE PRODUTOS ============

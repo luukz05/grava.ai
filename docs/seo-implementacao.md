@@ -254,12 +254,44 @@ caracteres, carga útil nos primeiros 110 (o que sobra no celular).
 
 | Rota | O que mudou |
 |---|---|
-| `/` | Passou a abrir pela **categoria** (`Franquia de personalização com IA`), não pelo produto, e fecha com investimento e payback — na captação, a descrição que já filtra quem não tem o valor economiza conversa no WhatsApp |
-| `/institucional` | Meta e Open Graph diziam **frases diferentes**; unificadas. Faltava `url` no OG |
+| `/seja-franqueado` | Passou a abrir pela **categoria** (`Franquia de personalização com IA`), não pelo produto, e fecha com investimento e payback — na captação, a descrição que já filtra quem não tem o valor economiza o primeiro contato |
+| `/` | Meta e Open Graph diziam **frases diferentes**; unificadas. Faltava `url` no OG |
 | `/galeria` | Tinha 58 caracteres e desperdiçava o espaço — o que não é dito ali o Google preenche com trecho qualquer da página, que ainda é casca. Reescrita, com OG completo |
 | `/perguntas` | Já estava dentro da regra; sem mudança |
 
-### 5.5 Fontes desta rodada
+### 5.5 As rotas trocaram de lugar — 02/09/2026 ✅
+
+`/` servia a landing de captação e `/institucional`, a página da marca. A barra
+do topo já denunciava a inversão: ela chamava `/institucional` de "Home" e a
+raiz de "Franqueado". Quem chega pelo nome da marca — que é como a maior parte
+do tráfego de uma rede nova chega — caía numa proposta de investimento antes de
+saber o que a GRAVA.AI faz.
+
+| Antes | Agora |
+|---|---|
+| `/` — landing de captação | `/` — a marca (era `/institucional`) |
+| `/institucional` — a marca | `/seja-franqueado` — landing de captação |
+
+O que foi junto, e é o que faz a troca não custar o que já está indexado:
+
+- **308 permanente** de `/institucional` para `/` e de `/franqueado` para
+  `/seja-franqueado`, em `next.config.ts`. O permanente é o que transfere
+  autoridade; um 307 pediria ao Google para manter o endereço antigo no índice.
+- **Canônicas** de cada rota reescritas, e `title`/`description` saíram do
+  `layout.tsx` para as páginas — enquanto a landing era a home, o layout
+  carregava a metadata dela.
+- **`sitemap.ts`**: `/seja-franqueado` entra, `/institucional` NÃO — URL que
+  redireciona dentro de um sitemap é sinal contraditório. Datas atualizadas: as
+  duas rotas mudaram o que respondem, e isso é mudança de conteúdo.
+- **Links internos** (barra do topo, rodapés das quatro páginas, botões
+  secundários) apontam para os endereços novos: redirect interno funciona, mas
+  gasta rastreio e dilui o sinal.
+
+**Pendente depois de publicar:** reenviar o sitemap no Search Console e no Bing
+Webmaster Tools, e conferir a Cobertura por ~2 semanas — é onde `/institucional`
+aparece como "Página com redirecionamento", que é o estado esperado.
+
+### 5.6 Fontes desta rodada
 
 - [Google Search Central — Build and Submit a Sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
 - [Google Search Central — Google does not use the keywords meta tag (2009)](https://developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag)
@@ -269,7 +301,7 @@ caracteres, carga útil nos primeiros 110 (o que sobra no celular).
 - [Digital Applied — Sitemap Lastmod: Google Says Drop Inaccurate Dates](https://www.digitalapplied.com/blog/xml-sitemap-lastmod-hygiene-illyes-directive-seo-2026)
 - [Marketing Miner — 5 facts Google confirmed about sitemaps](https://www.marketingminer.com/en/blog/5-interesting-facts-google-has-recently-confirmed-about-sitemaps)
 
-### 5.6 O que continua pendente depois desta rodada
+### 5.7 O que continua pendente depois desta rodada
 
 - 🔴 **O domínio ainda está chutado** (§3.1). Nada disto vale enquanto
   `NEXT_PUBLIC_SITE_URL` não apontar para o domínio real — as canônicas, o

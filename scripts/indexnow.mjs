@@ -29,7 +29,10 @@ const CHAVE = "c85bd0d6319776caf7a25942dca5c9db";
 const SITE =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://gravaai.com.br";
 
-const ROTAS = ["/", "/perguntas", "/institucional", "/galeria"];
+/* `/institucional` saiu daqui: a rota agora redireciona para `/` (as duas
+   trocaram de lugar em 02/09/2026), e avisar o IndexNow de uma URL que
+   redireciona é gastar o ping com o endereço errado. */
+const ROTAS = ["/", "/seja-franqueado", "/perguntas", "/galeria"];
 
 const host = new URL(SITE).host;
 const urlList = ROTAS.map((r) => new URL(r, SITE).href);

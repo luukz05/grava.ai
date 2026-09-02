@@ -100,7 +100,7 @@
 
 import { useEffect, useRef } from "react";
 import Image, { type StaticImageData } from "next/image";
-import { Marca, IcoArte } from "../icons";
+import { Marca } from "../icons";
 import { E_UI, E_LUZ, E_MOLA, E_MOLA_SOLTA } from "./curvas";
 
 /* As fotos são IMPORTADAS e não caminhos de `public/`, pela mesma razão de
@@ -347,6 +347,74 @@ const TOPICOS: Topico[] = [
    tempo extra sairia de sincronia com o texto dela. */
 const T_BATIDA = 3;
 
+/* ───────────────────────────────────────────────────────────────────────────
+   O BALÃO DA IDEIA
+
+   O QUE ESTAVA ERRADO, item por item:
+
+   — O GLIFO ERA ILEGÍVEL. Dentro do disco ia o `IcoArte` — um pincel de quatro
+     traços numa caixa de 24 —, desenhado a uns 17px de lado. Na tela isso não
+     é um pincel, é um rabisco: quatro segmentos finos que o olho lê como
+     sujeira. Ícone de sistema não sobrevive a meio tamanho.
+   — O BICO ERA OUTRA PEÇA. Um losango de `0.62rem` com duas bordas, encostado
+     por baixo do disco a `left: 12%`. Duas peças com o mesmo contorno e o mesmo
+     fundo nunca fecham: a costura aparece na borda arredondada, e o que se via
+     era um apêndice torto colado na bolha.
+   — O BICO APONTAVA PARA BAIXO, e o cliente está embaixo E À ESQUERDA. Balão de
+     fala que não aponta para quem fala é bolha solta no quadro.
+   — E O DESENHO NÃO TINHA ESCALA: `11cqw` de disco não comportam glifo nenhum.
+
+   O QUE ELE É AGORA: um CAMINHO SÓ — a bolha e a cauda no mesmo contorno, sem
+   costura possível — com a cauda apontando na direção exata do cliente (135°
+   no sistema do SVG: para baixo e para a esquerda), e uma LÂMPADA dentro, que
+   ACENDE depois de o balão pousar.
+
+   A lâmpada é o único glifo que já é a palavra: ideia. E acender é o que
+   separa esta batida da anterior — o balão chega apagado (o pedido existe
+   antes de ser dito) e a luz vem um instante depois, com o halo atrás dela. É
+   o mesmo gesto que o resto da cena usa para dizer "isto está acontecendo
+   agora": primeiro o lugar, depois a luz.
+
+   ELE ACENDE EM AZUL, e não em âmbar. Uma lâmpada amarela seria a única cor
+   fora da paleta em toda a página, e num quadro dark+azul ela não lê como
+   "acendeu" — lê como aviso.
+
+   O BALÃO FICA PERTO DO CLIENTE: `64%/36%` contra os `68%/32%` de antes. A
+   posição não é solta — dela sai a direção da cauda: 14 pontos à direita e 14
+   acima do centro é exatamente a diagonal de 135°, então a ponta aponta para o
+   cliente sem que nenhum dos dois números precise ser ajustado à mão. Longe,
+   as duas peças liam como dois assuntos no mesmo quadro.
+
+   A geometria fica em números nomeados porque ela é uma frase: a ABERTURA é o
+   quanto da borda a cauda toma, e a PONTA é o quanto ela avança, contado em
+   raios — mexer num sem o outro é o que dá cauda de agulha ou de leque. */
+const BAL_CX = 50;
+const BAL_CY = 40;
+const BAL_R = 34;
+/* Para onde a cauda aponta. O cliente está no centro da cena e o balão acima e
+   à direita dele, então a direção é a diagonal para baixo e para a esquerda —
+   135° num sistema em que o Y cresce para baixo. */
+const BAL_ANG = 135;
+const BAL_ABERTURA = 27;
+const BAL_PONTA = 1.62;
+
+function dBalao() {
+  const em = (g: number, r: number): [number, number] => [
+    BAL_CX + r * Math.cos(rad(g)),
+    BAL_CY + r * Math.sin(rad(g)),
+  ];
+  const [ax, ay] = em(BAL_ANG - BAL_ABERTURA, BAL_R);
+  const [bx, by] = em(BAL_ANG + BAL_ABERTURA, BAL_R);
+  const [px, py] = em(BAL_ANG, BAL_R * BAL_PONTA);
+  /* Do lado de trás da base até o da frente pelo caminho LONGO da
+     circunferência (`1 1`: arco maior, sentido dos ângulos crescentes), e o
+     fecho é a cauda — dois segmentos até a ponta e de volta. */
+  return (
+    `M${n3(bx)} ${n3(by)} A${BAL_R} ${BAL_R} 0 1 1 ${n3(ax)} ${n3(ay)} ` +
+    `L${n3(px)} ${n3(py)} Z`
+  );
+}
+
 /* O cliente. Traço 1.5 numa caixa de 24, como o resto do sistema de ícones —
    mora aqui e não em `icons.tsx` porque é o único desenho da página que
    representa uma PESSOA, e ele existe para esta cena. */
@@ -405,6 +473,8 @@ export function Centro() {
           const onda = um<HTMLElement>(".ctr-onda");
           const eu = um<HTMLElement>(".ctr-eu");
           const balao = um<HTMLElement>(".ctr-balao");
+          const lampada = um<SVGGElement>(".ctr-balao-luz");
+          const halo = um<SVGCircleElement>(".ctr-balao-halo");
           const coroa = um<SVGPathElement>(".ctr-coroa-fio");
           const coroaCaixa = um<SVGElement>(".ctr-coroa");
           const orbita = um<HTMLElement>(".ctr-orbita");
@@ -424,7 +494,22 @@ export function Centro() {
           gsap.set(onda, { autoAlpha: 0, scale: 0.14 });
           gsap.set(eu, { autoAlpha: 0, scale: 0.55 });
           gsap.set(balao, { autoAlpha: 0, scale: 0.62, x: -12, y: 14 });
-          gsap.set(coroa, { strokeDashoffset: 1 });
+          /* A lâmpada chega APAGADA: traço frio e sem halo. O balão pousa
+             primeiro, a luz vem depois — o pedido existe antes de ser dito. */
+          gsap.set(lampada, { stroke: "rgba(157, 220, 255, 0.34)" });
+          gsap.set(halo, { autoAlpha: 0, scale: 0.55 });
+          /* O FIO NASCE APAGADO, e não só "vazio".
+
+             `strokeDashoffset: 1` esconde o traço inteiro, mas o `stroke-linecap:
+             round` do fio ainda desenha as PONTAS de um traço de comprimento
+             zero — um pontinho azul no alto da coroa, parado ali desde o
+             primeiro quadro da seção. Era o rastro aparecendo antes da bolinha
+             que o desenha, que é a ordem invertida da frase.
+
+             O `autoAlpha` resolve na raiz: não há o que arredondar num traço
+             que não está sendo pintado. Ele acende no MESMO instante em que o
+             ponto de luz começa a volta. */
+          gsap.set(coroa, { strokeDashoffset: 1, autoAlpha: 0 });
           gsap.set(orbita, { rotation: 0 });
           gsap.set(cabeca, { autoAlpha: 0, scale: 0.5 });
           gsap.set(selo, { autoAlpha: 0, scale: 0.4 });
@@ -523,7 +608,29 @@ export function Centro() {
               ease: E_MOLA_SOLTA,
             },
             "ideia+=0.2"
-          );
+          )
+            /* ACENDER É O HALO, não a troca de cor. O traço clareia junto —
+               vidro aceso é mais claro que vidro apagado —, mas quem diz
+               "acendeu" é a luz derramada em volta, e é por isso que os dois
+               correm juntos e não em sequência.
+
+               A mola do halo é a SOLTA, a mesma do balão: a luz de uma lâmpada
+               não sobe em rampa, ela estoura e assenta. */
+            .to(
+              halo,
+              {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.8,
+                ease: E_MOLA_SOLTA,
+              },
+              "ideia+=0.95"
+            )
+            .to(
+              lampada,
+              { stroke: "#eaf7ff", duration: 0.5, ease: E_LUZ },
+              "ideia+=0.95"
+            );
 
           /* ── 3 · A IA PROJETA EM VOLTA ──
              Três gestos, nesta ordem, e a ordem é a frase:
@@ -565,6 +672,9 @@ export function Centro() {
               { rotation: 360, duration: 1.7, ease: E_UI },
               "ia+=0.35"
             )
+            /* O fio acende junto com a partida do ponto — antes disso ele não
+               existe, nem como ponta arredondada. */
+            .set(coroa, { autoAlpha: 1 }, "ia+=0.35")
             .to(
               coroa,
               { strokeDashoffset: 0, duration: 1.7, ease: E_UI },
@@ -969,12 +1079,35 @@ export function Centro() {
                   quem é. Dentro vai o glifo da arte, o mesmo ícone que a seção
                   `#ia` usa para "Na criação": o balão é o pedido, e o pedido
                   nesta rede é uma arte. */}
-              <div className="ctr-marco" style={{ left: "68%", top: "32%" }}>
+              <div className="ctr-marco" style={{ left: "64%", top: "36%" }}>
                 <div className="ctr-balao">
-                  <span className="ctr-balao-ico">
-                    <IcoArte />
-                  </span>
-                  <span className="ctr-balao-bico" />
+                  <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <path className="ctr-balao-forma" d={dBalao()} />
+
+                    {/* O halo fica ATRÁS da lâmpada e é o que dá o "acendeu":
+                        o traço sozinho só troca de cor, e trocar de cor não é
+                        acender — é a luz derramada em volta que diz isso. */}
+                    <circle
+                      className="ctr-balao-halo"
+                      cx="50"
+                      cy="38"
+                      r="17"
+                    />
+
+                    {/* A LÂMPADA, no vocabulário de ícones da página: caixa de
+                        24 e traço de 1.5, aqui posta em escala 1.25 e centrada
+                        no disco. Desenhada em cima do sistema que já existe, e
+                        não à mão em unidades do `viewBox`, para que a espessura
+                        do traço bata com a dos outros ícones da cena. */}
+                    <g
+                      className="ctr-balao-luz"
+                      transform="translate(35 24) scale(1.25)"
+                    >
+                      <path d="M12 3.5a5.5 5.5 0 013.3 9.9c-.55.42-.86 1.06-.86 1.74v.36H9.56v-.36c0-.68-.31-1.32-.86-1.74A5.5 5.5 0 0112 3.5z" />
+                      <path d="M9.9 18.4h4.2" />
+                      <path d="M10.8 20.9h2.4" />
+                    </g>
+                  </svg>
                 </div>
               </div>
             </div>

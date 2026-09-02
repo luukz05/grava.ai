@@ -42,7 +42,7 @@ A regra é uma página, um termo. Duas páginas disputando a mesma busca é
 canibalização: o Google escolhe uma das duas — normalmente a errada — e a outra
 some.
 
-### `/` — a home (a página que paga a conta)
+### `/seja-franqueado` — a landing de captação (a página que paga a conta)
 
 - **Primário:** `franquia de personalização com IA`
 - **Secundários:** `franquia GRAVA.AI` · `franquia com inteligência artificial`
@@ -82,7 +82,7 @@ conseguem recortar e citar.
 Se alguma pergunta nova chegar pelo WhatsApp três vezes, ela vira linha nova
 aqui — e a data em `sitemap.ts` sobe junto.
 
-### `/institucional` — a marca
+### `/` — a home, a marca
 
 - **Primário:** `GRAVA.AI` (busca por nome)
 - **Secundários:** `personalização de produtos com inteligência artificial` ·
@@ -90,6 +90,11 @@ aqui — e a data em `sitemap.ts` sobe junto.
 
 Esta página existe para a busca por marca, não para captar. É ela que o painel
 lateral do Google usa junto com o JSON-LD de `Organization`.
+
+**Ela era `/institucional` até 02/09/2026**, quando a captação estava em `/`.
+A inversão põe a busca por nome — que é como a maior parte do tráfego de uma
+rede nova chega — na raiz do domínio, que é a URL com mais autoridade. O
+endereço antigo redireciona com 308.
 
 ### `/galeria` — o produto
 
