@@ -45,16 +45,16 @@
    ───────────────────────────────────────────────────────────────────────────
    A SEÇÃO NÃO ACABA: ELA ENTREGA
 
-   A seção seguinte abre com o HEXÁGONO DOS TRÊS PILARES e a marca no meio dele
-   (ver `pilares.tsx`). Cortar aqui e recomeçar lá daria duas cenas com a mesma
-   marca no meio e nenhuma relação declarada entre elas — a página teria dito
-   duas vezes "a marca está no centro" sem nunca dizer de que centro se trata.
+   OS TRÊS PILARES ERAM UM DESENHO À PARTE, uma seção abaixo: outro hexágono,
+   noutra caixa, redesenhado do zero meia tela depois de esta cena ter acabado
+   de formar um. Duas peças iguais em sequência, a segunda apagando a primeira.
 
-   Então a última batida é uma PASSAGEM: o fio da coroa — o mesmo círculo que a
-   IA desenhou em volta do cliente — cresce e endireita as curvas até virar o
-   hexágono, nos MESMOS SEIS VÉRTICES que `pilares.tsx` usa. O que fecha uma
-   seção é o que abre a próxima, e a forma faz a emenda: o que a IA desenhou em
-   volta de quem pediu é o que os três pilares sustentam.
+   Então as duas últimas batidas são a EMENDA. Na quinta, o fio da coroa — o
+   mesmo círculo que a IA desenhou em volta do cliente — cresce e endireita as
+   curvas até virar o hexágono. Na sexta, os raios saem do meio e os três
+   pilares pousam nos vértices dele. O que fecha uma seção é o que abre a
+   próxima, e a forma faz a emenda: o que a IA desenhou em volta de quem pediu é
+   o que os três pilares sustentam.
 
    O MORFO É GEOMÉTRICO, e não um plugin: um só `<path>` de seis cúbicas, com o
    comprimento dos punhos de bézier indo de `K·R` (arco) a zero (reta). Ver
@@ -100,7 +100,12 @@
 
 import { useEffect, useRef } from "react";
 import Image, { type StaticImageData } from "next/image";
-import { Marca } from "../icons";
+import {
+  Marca,
+  IcoInovacao,
+  IcoExperiencia,
+  IcoRentabilidade,
+} from "../icons";
 import { E_UI, E_LUZ, E_MOLA, E_MOLA_SOLTA } from "./curvas";
 
 /* As fotos são IMPORTADAS e não caminhos de `public/`, pela mesma razão de
@@ -206,11 +211,10 @@ const VOLTA = 46;
    pelo arco de 60° com erro invisível. É a mesma constante que os programas de
    desenho usam para aproximar círculos, com `n = 4` (o famoso 0,5523).
 
-   OS ÂNGULOS SÃO OS DE `pilares.tsx` (−90 no topo, de 60 em 60): é isso que faz
-   o hexágono que nasce aqui ter a mesma orientação do que abre a seção
-   seguinte. Mudar um lado sem mudar o outro quebra a emenda entre as duas
-   seções, e o defeito aparece a uma tela de distância do lugar onde foi
-   causado — anotado aqui e lá.
+   OS ÂNGULOS (−90 no topo, de 60 em 60) são também os dos VÉRTICES em que os
+   três pilares se penduram, na batida seguinte: os nós usam três deles,
+   alternados. Uma lista só para as duas coisas — separadas, um ajuste na forma
+   deixaria os nós fora dos cantos.
 
    O RAIO 34 é o `r` do `<circle>` que estava aqui, e ele não é livre: a caixa
    do SVG vale `--coroa-r / 0.34` (ver `.ctr-coroa` no CSS) justamente para que
@@ -219,6 +223,13 @@ const VOLTA = 46;
 const A_COROA = [-90, -30, 30, 90, 150, 210];
 const R_COROA = 34;
 const K_COROA = (4 / 3) * Math.tan(Math.PI / 12);
+
+/* Quanto o fio cresce ao virar hexágono. Ele sai de `--coroa-r` (15cqw, no
+   `centro.css`) e chega a 33cqw — que é o raio em que os três pilares se
+   penduram, logo abaixo. Os dois números são o mesmo número: mexer neste sem
+   mexer lá põe os nós fora dos vértices. */
+const ESCALA_HEX = 2.2;
+const R_HEX_CENA = 15 * ESCALA_HEX;
 
 const rad = (g: number) => (g * Math.PI) / 180;
 /* Três casas: o valor entra num `d` que o React compara caractere a caractere
@@ -285,7 +296,7 @@ function dCoroa(t: number) {
    se ele fosse o cliente do quiosque. */
 type Topico = {
   id: string;
-  lugar: "topo" | "esq" | "dir" | "flancos";
+  lugar: "topo" | "esq" | "dir" | "baixo" | "flancos";
   titulo: string;
   texto: React.ReactNode;
 };
@@ -339,6 +350,75 @@ const TOPICOS: Topico[] = [
     ),
   },
 ];
+
+/* ───────────────────────────────────────────────────────────────────────────
+   OS TRÊS PILARES, NO HEXÁGONO QUE A CENA ACABOU DE FORMAR
+
+   Eles tinham desenho próprio (`pilares.tsx`, agora removido): um segundo
+   hexágono, numa caixa de 34rem, redesenhado do zero uma seção abaixo. Duas
+   peças iguais em sequência, e a segunda apagando a primeira — o leitor via a
+   cena entregar um hexágono e, meia tela depois, outro hexágono nascer
+   sozinho. A rima virava repetição.
+
+   Agora é UM SÓ. O fio que a IA desenhou em volta do cliente vira o hexágono
+   na quinta batida e recebe os pilares na sexta, sem corte: os raios saem do
+   meio, onde a marca está, e os nós pousam nos vértices. A frase que a página
+   diz em duas seções passa a ser uma frase só — o que a marca faz, e o que a
+   sustenta.
+
+   TRÊS VÉRTICES ALTERNADOS, e não três seguidos: alternados, os pilares formam
+   um triângulo equilátero dentro do hexágono e a carga fica distribuída, que é
+   o desenho de algo sustentado. Em três vizinhos ficariam todos de um lado e o
+   polígono pareceria prestes a tombar.
+
+   O NOME E O TEXTO NÃO MORAM NO DESENHO. Cada pilar tem uma batida sua, com o
+   nome e a explicação num bloco de texto ao lado da cena — os mesmos que
+   estavam nos três cartões da seção que existia abaixo. No vértice fica só o
+   ÍCONE: escrito nos dois lugares, o nome apareceria duas vezes no mesmo
+   quadro, e o que liga o texto ao vértice é o nó ACENDER quando chega a vez
+   dele. É a mesma gramática das quatro primeiras batidas — um bloco de texto,
+   um gesto na cena.
+
+   `lugar` é o canto em que o bloco daquele pilar aparece, e ele fica DO LADO do
+   vértice, não em cima dele: o nó de baixo (90°) tem o texto embaixo, na faixa
+   livre entre a ponta do hexágono e o rodapé da tela. O texto do pilar de baixo
+   já esteve no alto — do outro lado da cena — e a distância desfazia a ligação:
+   o leitor via um nó acender num canto e uma frase acender no oposto, sem nada
+   dizendo que eram a mesma coisa. */
+const PILARES = [
+  {
+    id: "inovacao",
+    nome: "Inovação no processo",
+    ang: 210,
+    lugar: "esq" as const,
+    Ico: IcoInovacao,
+    texto:
+      "A personalização deixa de ser encomenda e vira criação na hora, conduzida por Inteligência Artificial.",
+  },
+  {
+    id: "experiencia",
+    nome: "Experiência imersiva",
+    ang: -30,
+    lugar: "dir" as const,
+    Ico: IcoExperiencia,
+    texto:
+      "O cliente participa da criação em vez de escolher de um catálogo. A experiência é parte do produto.",
+  },
+  {
+    id: "rentabilidade",
+    nome: "Rentabilidade real",
+    ang: 90,
+    lugar: "baixo" as const,
+    Ico: IcoRentabilidade,
+    texto:
+      "Uma operação que se sustenta para quem opera a franquia, não só uma ideia bonita de tecnologia.",
+  },
+];
+
+const emCena = (ang: number) => ({
+  left: `${n3(50 + R_HEX_CENA * Math.cos(rad(ang)))}%`,
+  top: `${n3(50 + R_HEX_CENA * Math.sin(rad(ang)))}%`,
+});
 
 /* Quanto tempo de linha do tempo cabe em cada batida. Todas iguais, e é isso
    que as amarra aos blocos: quatro blocos de mesma altura mínima dividem a
@@ -482,6 +562,8 @@ export function Centro() {
           const selo = um<HTMLElement>(".ctr-selo");
           const esfera = um<HTMLElement>(".ctr-esfera");
           const orbes = q(".ctr-orbe-face");
+          const raios = q(".ctr-raio");
+          const pilares = q(".ctr-pilar");
           /* Estado do morfo do fio: 1 é o círculo, 0 é o hexágono. */
           const morfo = { t: 1 };
           const blocos = q(".ctr-passo");
@@ -531,6 +613,11 @@ export function Centro() {
              `refresh`) com o morfo a meio caminho. */
           coroa.setAttribute("d", dCoroa(1));
           gsap.set(coroaCaixa, { scale: 1 });
+          /* Os pilares não existem até a última batida: os raios com o traço
+             recolhido (`pathLength={1}`, então 1 é "nada desenhado") e os nós
+             ausentes. */
+          gsap.set(raios, { strokeDashoffset: 1 });
+          gsap.set(pilares, { autoAlpha: 0, scale: 0.72 });
 
           const tl = gsap.timeline({
             scrollTrigger: {
@@ -825,24 +912,24 @@ export function Centro() {
              é um traço fino — sem isso, o que chega lá é a mesma forma com o
              dobro do peso de tinta.
 
-             O QUE FICA NA TELA no fim: o hexágono e a marca no meio dele. É,
-             ponto por ponto, a composição com que `pilares.tsx` abre. */
-          batida("pilares", 4);
-          tl.to(esfera, { scale: 2.75, duration: 1.6, ease: E_UI }, "pilares")
+             O QUE FICA NA TELA no fim: o hexágono e a marca no meio dele —
+             pronto para receber os três pilares, que é a batida seguinte. */
+          batida("passagem", 4);
+          tl.to(esfera, { scale: 2.75, duration: 1.6, ease: E_UI }, "passagem")
             .to(
               orbes,
               { autoAlpha: 0, duration: 0.8, ease: E_LUZ, stagger: 0.03 },
-              "pilares+=0.05"
+              "passagem+=0.05"
             )
             .to(
               coroaCaixa,
-              { scale: 2.2, duration: 1.7, ease: E_MOLA },
-              "pilares+=0.35"
+              { scale: ESCALA_HEX, duration: 1.7, ease: E_MOLA },
+              "passagem+=0.35"
             )
             .to(
               coroa,
               { "--coroa-w": 0.45, duration: 1.7, ease: E_UI },
-              "pilares+=0.35"
+              "passagem+=0.35"
             )
             /* O morfo anda num objeto e não no elemento: `d` é atributo de
                caminho, não propriedade animável, e quem escreve o caminho a
@@ -856,19 +943,103 @@ export function Centro() {
                 ease: E_UI,
                 onUpdate: () => coroa.setAttribute("d", dCoroa(morfo.t)),
               },
-              "pilares+=0.35"
+              "passagem+=0.35"
             )
             .to(
               aura,
               { opacity: 0.72, scale: 1.12, duration: 1.4, ease: E_LUZ },
+              "passagem+=0.3"
+            );
+
+          /* ── 6 · OS TRÊS PILARES ──
+             O hexágono já está formado e a marca já está no meio dele. O que
+             falta é dizer o que o segura — e a ordem importa: PRIMEIRO OS
+             RAIOS, depois os nós.
+
+             Se os nós chegassem antes, seriam três ícones soltos que ganharam
+             linha depois. Com o raio primeiro, cada pilar chega já ligado ao
+             centro: a ligação é o que os torna pilares, e é ela que a seção
+             afirma no texto ("é o que precisa funcionar junto").
+
+             O raio corre do CENTRO para fora, e o nó pousa na ponta dele — daí
+             o `stagger` nos dois com o mesmo intervalo e um atraso de meia
+             corrida entre as duas listas: cada nó entra logo depois de o seu
+             raio chegar, e não depois de os três chegarem. */
+          batida("pilares", 5);
+          tl.to(
+            raios,
+            {
+              strokeDashoffset: 0,
+              duration: 0.9,
+              ease: E_UI,
+              stagger: 0.18,
+            },
+            "pilares+=0.1"
+          )
+            .to(
+              pilares,
+              {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.8,
+                ease: E_MOLA_SOLTA,
+                stagger: 0.18,
+              },
+              "pilares+=0.55"
+            )
+            /* A aura fecha um degrau acima: o quadro final tem mais desenho no
+               meio do que qualquer outro, e sem isso o hexágono com três nós
+               fica boiando num fundo que foi calibrado para uma marca só. */
+            .to(
+              aura,
+              { opacity: 0.66, duration: 1.2, ease: E_LUZ },
               "pilares+=0.3"
             );
 
+          /* ── 7, 8 e 9 · UM PILAR DE CADA VEZ ──
+             A estrutura está montada; agora cada um tem a sua batida, com o
+             nome e a explicação passando ao lado. O nó da vez CRESCE e acende
+             a borda, e os outros dois recuam.
+
+             O recuo é o que faz o destaque existir: três nós no mesmo peso com
+             um texto ao lado seria o leitor procurando de qual deles o texto
+             fala. Recuar não é apagar — eles continuam ali, segurando o
+             polígono, que é a frase da parte inteira.
+
+             UM LAÇO E NÃO TRÊS BLOCOS ESCRITOS À MÃO: os três gestos são o
+             mesmo gesto, e a lista de pilares já é a fonte da ordem. */
+          PILARES.forEach((_, i) => {
+            const nome = `pilar${i}`;
+            batida(nome, 6 + i);
+            const alvo = pilares[i];
+            const outros = pilares.filter((_, j) => j !== i);
+            tl.to(
+              alvo,
+              {
+                scale: 1.16,
+                opacity: 1,
+                borderColor: "#66cdff",
+                duration: 0.8,
+                ease: E_MOLA,
+              },
+              nome
+            ).to(
+              outros,
+              {
+                scale: 1,
+                opacity: 0.4,
+                borderColor: "rgba(102, 205, 255, 0.22)",
+                duration: 0.8,
+                ease: E_UI,
+              },
+              nome
+            );
+          });
+
           /* A última fatia precisa existir inteira na linha do tempo, senão a
              duração acaba no último tween e a batida final consome menos
-             rolagem que as outras — as fatias de texto são iguais, e a da
-             passagem tem a mesma altura delas. */
-          tl.to({}, { duration: T_BATIDA }, 4 * T_BATIDA);
+             rolagem que as outras — todas as fatias têm a mesma altura. */
+          tl.to({}, { duration: T_BATIDA }, 8 * T_BATIDA);
 
           /* ─────────────────────────────────────────────────────────────────
              O BLOCO QUE ESTÁ SENDO LIDO
@@ -1074,6 +1245,40 @@ export function Centro() {
                 </span>
               </div>
 
+              {/* OS RAIOS DOS PILARES. Saem do centro — onde a marca está — e
+                  vão até os vértices do hexágono. Desenhados ANTES dos nós na
+                  marcação porque são o chão deles: o nó passa por cima da ponta
+                  do raio, e não o contrário.
+
+                  Apagados de propósito: são relação, não conteúdo. Com o peso
+                  do hexágono, o desenho passaria a ter duas linhas dizendo
+                  coisas diferentes com a mesma força. */}
+              <svg className="ctr-raios" viewBox="0 0 100 100" aria-hidden="true">
+                {PILARES.map((p) => (
+                  <line
+                    className="ctr-raio"
+                    key={p.id}
+                    x1="50"
+                    y1="50"
+                    x2={n3(50 + R_HEX_CENA * Math.cos(rad(p.ang)))}
+                    y2={n3(50 + R_HEX_CENA * Math.sin(rad(p.ang)))}
+                    pathLength={1}
+                  />
+                ))}
+              </svg>
+
+              {/* OS TRÊS PILARES, nos vértices — só o ícone. O nome e a
+                  explicação estão no bloco de texto da batida de cada um, ao
+                  lado da cena; escritos também aqui, apareceriam duas vezes no
+                  mesmo quadro. */}
+              {PILARES.map(({ id, ang, Ico }) => (
+                <div className="ctr-marco" key={id} style={emCena(ang)}>
+                  <span className="ctr-pilar" data-pilar={id}>
+                    <Ico />
+                  </span>
+                </div>
+              ))}
+
               {/* O BALÃO DA IDEIA. Acima e à direita do cliente, com o bico
                   apontando de volta para ele — é fala, e fala precisa dizer de
                   quem é. Dentro vai o glifo da arte, o mesmo ícone que a seção
@@ -1177,6 +1382,47 @@ export function Centro() {
           ler — quem usa leitor de tela vai do último tópico direto para a
           seção dos pilares, que é a leitura certa. */}
         <div className="ctr-passagem" aria-hidden="true" />
+
+      {/* ---- OS PILARES, TEXTO E CENA NA MESMA COLUNA ----
+
+          Quatro fatias: o cabeçalho da parte (onde a estrutura se monta) e uma
+          por pilar. Isto era uma seção separada, com um hexágono próprio, um
+          `<h2>` e três cartões lado a lado. Virou a continuação da mesma cena:
+          o polígono já está desenhado, os raios saem do meio, e cada pilar
+          acende no vértice enquanto o texto dele passa ao lado.
+
+          Três cartões lado a lado dizem "são três itens de uma lista". Três nós
+          num hexágono que a cena acabou de formar dizem que os três seguram a
+          mesma peça — que é o que o apoio afirma e o que a seção antiga nunca
+          conseguia mostrar.
+
+          `id="pilares"` fica aqui: é para cá que o menu aponta, e o começo da
+          parte é o cabeçalho, não o primeiro pilar. */}
+        <div className="ctr-pilares-texto" id="pilares">
+          <div className="ctr-passo" data-lugar="topo">
+            <div className="ctr-bloco">
+              <h2 className="ctr-tit">
+                Três pilares <mark>sustentam a empresa.</mark>
+              </h2>
+              <p className="ctr-txt">
+                Não são valores de parede: são o que precisa funcionar junto.
+              </p>
+            </div>
+          </div>
+
+          {/* Uma lista de verdade: os três são itens de igual peso, e isso
+              precisa existir na marcação e não só na tipografia. */}
+          <ul className="ctr-pilares-lista">
+            {PILARES.map((p) => (
+              <li className="ctr-passo" key={p.id} data-lugar={p.lugar}>
+                <div className="ctr-bloco">
+                  <h3 className="ctr-tit">{p.nome}</h3>
+                  <p className="ctr-txt">{p.texto}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

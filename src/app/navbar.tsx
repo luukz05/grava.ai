@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { IcoEnvelope } from "./icons";
-import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 import "./navbar.css";
 
 /* Barra de navegação do site.
@@ -38,7 +37,15 @@ const ITENS: Array<{ id: Pagina; rotulo: string; href: string }> = [
   { id: "galeria", rotulo: "Galeria", href: "/galeria" },
 ];
 
-export function NavBar({ atual }: { atual: Pagina }) {
+/* `cta` vem da casca: na home ele atravessa para `/seja-franqueado` e nas
+   outras desce até o formulário do fechamento. Ver `destinoCta` em `./lead`. */
+export function NavBar({
+  atual,
+  cta,
+}: {
+  atual: Pagina;
+  cta: { href: string; rotulo: string };
+}) {
   /* No topo não existe barra em volta: a marca, a cápsula das pílulas e as ações
      ficam soltas sobre a página, e a única superfície desenhada é a cápsula dos
      links. É só ao rolar que uma superfície aparece em volta das três.
@@ -85,13 +92,13 @@ export function NavBar({ atual }: { atual: Pagina }) {
         </nav>
 
         <div className="nav-acoes">
-          {/* O ícone é envelope, e não mais o do WhatsApp: o botão desce até
-              o formulário, e o que ele pede chega por e-mail. Ele só aparece
+          {/* O ícone é envelope, e não mais o do WhatsApp: o botão leva ao
+              formulário, e o que ele pede chega por e-mail. Ele só aparece
               quando a barra condensa e o rótulo sai — a esfera não pode ficar
               vazia, que é um alvo sem nome nenhum. Ver `navbar.css`. */}
-          <a className="cta nav-cta" href={ANCORA_FORM}>
+          <a className="cta nav-cta" href={cta.href}>
             <IcoEnvelope className="nav-cta-ico" />
-            <span className="nav-cta-rotulo">{CTA_ROTULO}</span>
+            <span className="nav-cta-rotulo">{cta.rotulo}</span>
           </a>
         </div>
       </div>

@@ -22,14 +22,20 @@
    JavaScript, sem ouvinte de scroll, sem estado. */
 
 import { IcoEnvelope, IcoTopo } from "./icons";
-import { ANCORA_FORM, CTA_ROTULO } from "./lead";
 
-export function Flutuante() {
+/* O destino vem da casca, e não de uma constante daqui: na home ele atravessa
+   para `/seja-franqueado` e nas outras desce até o formulário do fechamento.
+   Ver `destinoCta` em `./lead`. */
+export function Flutuante({
+  cta,
+}: {
+  cta: { href: string; rotulo: string };
+}) {
   return (
     <div className="flut">
-      <a className="cta flut-falar" href={ANCORA_FORM}>
+      <a className="cta flut-falar" href={cta.href}>
         <IcoEnvelope />
-        <span>{CTA_ROTULO}</span>
+        <span>{cta.rotulo}</span>
       </a>
 
       {/* O tamanho da seta vem do wrapper, e não de uma regra em `svg`: dentro

@@ -12,8 +12,10 @@
    e os quatro blocos ficam todos legíveis — a mesma informação sem a
    encenação.
 
-   O DIAGRAMA HEXAGONAL SAIU DAQUI. Ele foi inteiro para `pilares.css`, junto
-   com o assunto dele. */
+   O DIAGRAMA HEXAGONAL JÁ SAIU DAQUI E VOLTOU. Ele foi para `pilares.css`
+   quando virou seção própria, e voltou quando as duas viraram uma cena só: o
+   hexágono agora nasce do fio da coroa, no fim desta cena, e recebe os três
+   pilares na batida seguinte. */
 
 /* ============ O PALCO ============
 
@@ -158,6 +160,10 @@
   justify-items: end;
 }
 
+.ctr-passo[data-lugar="baixo"] {
+  justify-items: center;
+}
+
 /* Estica: quem desenha as colunas aqui é o `.ctr-flancos`, e para isso ele
    precisa da largura toda. */
 .ctr-passo[data-lugar="flancos"] {
@@ -192,6 +198,13 @@
 .ctr-passo[data-lugar="esq"] .ctr-bloco,
 .ctr-passo[data-lugar="dir"] .ctr-bloco {
   top: 38svh;
+}
+
+/* O de baixo gruda quase no rodapé: na batida dele o que está no meio da tela é
+   o hexágono, cuja ponta inferior cai por volta de 71svh. Mais alto, o texto
+   entra por dentro do polígono; mais baixo, ele sai da tela. */
+.ctr-passo[data-lugar="baixo"] .ctr-bloco {
+  top: 75svh;
 }
 
 /* ---- O TEXTO PARTIDO DA ÚLTIMA BATIDA ----
@@ -248,6 +261,21 @@
   min-height: 88svh;
 }
 
+/* A COLUNA DOS PILARES. Mesma gramática da lista de tópicos: blocos por cima
+   da cena, um por fatia, com o canto de cada um em `[data-lugar]`. Ela é uma
+   irmã da `<ol>` e não parte dela porque os quatro primeiros são as batidas da
+   criação e estes são os pilares — duas listas, um percurso só. */
+.ctr-pilares-texto {
+  position: relative;
+  z-index: 1;
+}
+
+.ctr-pilares-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* O bloco que não está sendo lido recua. É ESTADO, não animação: muda em
    `--t-mov` pela curva padrão da página, e não raspado pela rolagem — texto
    piscando junto com o gesto é ruído em cima de leitura.
@@ -256,8 +284,16 @@
    legíveis o tempo todo. Um texto apagado que nunca acende é um texto perdido,
    e essa é a única coisa desta seção que não pode falhar. */
 .ctr-vivo .ctr-passo {
-  opacity: 0.14;
-  transition: opacity var(--t-mov) var(--e-ui);
+  /* ZERO, e não os 0.14 de antes. Com um resto de opacidade o bloco continuava
+     legível enquanto subia, e o que se via era um texto ATRAVESSANDO a cena por
+     cima do desenho — dois assuntos no mesmo quadro, e o de baixo é o que
+     importa. Chegando na vez ele acende; passada a vez, apaga onde está.
+
+     A transição é CURTA (180ms) pelo mesmo motivo: no tempo padrão da página o
+     apagar ainda dura enquanto o bloco anda meia tela, que é a distância em que
+     ele volta a atravessar o desenho. */
+  opacity: 0;
+  transition: opacity 180ms var(--e-ui);
 }
 
 .ctr-vivo .ctr-passo.e-ativo {
@@ -300,7 +336,7 @@
   max-width: 34ch;
   /* A cena passa por trás do texto. A sombra é o que garante a leitura quando
      uma peça clara — a sacola de lona é a pior delas — cruza atrás de uma
-     linha. Mesma receita dos rótulos sobre arte do `pilares.css`. */
+     linha. Mesma receita dos nomes dos pilares, mais abaixo. */
   text-shadow: 0 1px 16px rgba(5, 9, 13, 0.92), 0 0 30px rgba(5, 9, 13, 0.75);
 }
 
@@ -381,15 +417,18 @@
 
    Ele cresce no eixo que tem: `scaleX`, do meio para fora, porque num bloco
    centrado crescer por uma das pontas seria um gesto torto. */
-.ctr-passo[data-lugar="topo"] .ctr-bloco {
+.ctr-passo[data-lugar="topo"] .ctr-bloco,
+.ctr-passo[data-lugar="baixo"] .ctr-bloco {
   grid-template-columns: auto;
 }
 
-.ctr-passo[data-lugar="topo"] .ctr-bloco > * {
+.ctr-passo[data-lugar="topo"] .ctr-bloco > *,
+.ctr-passo[data-lugar="baixo"] .ctr-bloco > * {
   grid-column: 1;
 }
 
-.ctr-passo[data-lugar="topo"] .ctr-bloco::before {
+.ctr-passo[data-lugar="topo"] .ctr-bloco::before,
+.ctr-passo[data-lugar="baixo"] .ctr-bloco::before {
   grid-row: 1;
   grid-column: 1;
   align-self: center;
@@ -403,7 +442,8 @@
 
 /* O estado aceso precisa vir DEPOIS e mais específico: a regra geral acende
    escrevendo `scaleY(1)`, que num fio deitado o esticaria na espessura. */
-.ctr-vivo .ctr-passo[data-lugar="topo"].e-ativo .ctr-bloco::before {
+.ctr-vivo .ctr-passo[data-lugar="topo"].e-ativo .ctr-bloco::before,
+.ctr-vivo .ctr-passo[data-lugar="baixo"].e-ativo .ctr-bloco::before {
   transform: scaleX(1);
 }
 
@@ -412,10 +452,19 @@
    quando o bloco está à direita da tela — texto corrido alinhado à direita
    custa leitura, e o que decide o canto aqui é a posição do BLOCO, não o
    alinhamento das linhas dentro dele. */
-.ctr-passo[data-lugar="topo"] .ctr-bloco {
+.ctr-passo[data-lugar="topo"] .ctr-bloco,
+.ctr-passo[data-lugar="baixo"] .ctr-bloco {
   max-width: 46ch;
   justify-items: center;
   text-align: center;
+}
+
+/* O cabeçalho dos pilares ganha mais medida que o de abertura: são 33
+   caracteres de título, e em 46ch eles quebram em duas linhas de 3rem bem no
+   alto da cena. Com a faixa maior a frase cabe deitada, e a altura que ela
+   deixa de ocupar é a que o hexágono precisa. */
+.ctr-pilares-texto .ctr-passo[data-lugar="topo"] .ctr-bloco {
+  max-width: 60ch;
 }
 
 .ctr-tit {
@@ -446,6 +495,19 @@
   background: none;
   color: var(--fg);
   font-weight: 600;
+}
+
+/* O REALCE DO TÍTULO. Sem esta regra o `<mark>` cai no estilo do navegador —
+   fundo AMARELO, a única cor fora da paleta em toda a página.
+
+   EM LINHA, e não `display: block` como no `.sec-cab` do `v5.css`. Lá o bloco
+   força a quebra e o cabeçalho vira duas linhas empilhadas; aqui o título mora
+   por cima de uma cena que ocupa o meio da tela, e cada linha a mais o empurra
+   para dentro do desenho. Deitado, ele ocupa a faixa livre do alto — que é
+   larga — em vez da altura, que é o que falta. */
+.ctr-tit mark {
+  background: none;
+  color: var(--fg-hot);
 }
 
 /* ============ A CENA ============ */
@@ -746,6 +808,55 @@
   transform-origin: 50px 38px;
 }
 
+/* ============ OS TRÊS PILARES ============
+
+   Vieram do `pilares.css`, que deixou de existir junto com o segundo hexágono
+   que ele desenhava (o componente `Pilares` foi removido). O que muda de lá para cá é só a caixa: as medidas eram
+   `cqw` sobre uma caixa de 34rem e agora são `cqw` sobre a cena, que é maior —
+   os ícones encolheram em proporção para não competirem com a marca no meio.
+
+   Os RAIOS são relação, não conteúdo: ligam cada pilar ao que ele sustenta.
+   Apagados de propósito — no mesmo peso do hexágono, o desenho passaria a ter
+   duas linhas dizendo coisas diferentes com a mesma força. */
+.ctr-raios {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ctr-raio {
+  fill: none;
+  stroke: rgba(242, 248, 255, 0.18);
+  stroke-width: 0.2;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+}
+
+/* O NÓ: um disco com o ícone, e nada mais. O nome está no bloco de texto da
+   batida dele.
+
+   A COR DA BORDA É ESCRITA PELA LINHA DO TEMPO — acesa no pilar da vez, recuada
+   nos outros dois. O valor daqui é o de repouso, que é também o que aparece
+   quando os três já passaram. */
+.ctr-pilar {
+  display: grid;
+  place-items: center;
+  width: clamp(1.7rem, 6.5cqw, 2.4rem);
+  aspect-ratio: 1;
+  color: var(--fg);
+  border: 1px solid var(--hair-hot);
+  border-radius: 999px;
+  background: rgba(6, 12, 18, 0.9);
+  box-shadow: 0 0 22px rgba(102, 205, 255, 0.12);
+}
+
+.ctr-pilar svg {
+  width: 58%;
+  height: 58%;
+}
+
 /* ============ A ESFERA DE PRODUTOS ============
 
    Quatro caixas encaixadas, e cada uma existe por um motivo:
@@ -929,6 +1040,20 @@
 .ctr:not(.ctr-vivo) .ctr-balao,
 .ctr:not(.ctr-vivo) .ctr-cabeca,
 .ctr:not(.ctr-vivo) .ctr-guia {
+  display: none;
+}
+
+/* OS PILARES TAMBÉM SAEM SEM SCRIPT, e é o único ponto em que o estado parado
+   não é o quadro final: eles se penduram nos vértices do hexágono, e o
+   hexágono só existe depois do morfo — sem script o fio continua sendo o
+   círculo pequeno da coroa, e os três nós ficariam boiando ao redor dele, a
+   duas vezes o raio de distância, ligados por raios que não chegam a lugar
+   nenhum.
+
+   Nada se perde: os três pilares estão nomeados e explicados nos cartões da
+   seção seguinte, que é onde o texto deles sempre esteve. */
+.ctr:not(.ctr-vivo) .ctr-raios,
+.ctr:not(.ctr-vivo) .ctr-pilar {
   display: none;
 }
 

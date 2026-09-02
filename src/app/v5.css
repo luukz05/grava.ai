@@ -964,6 +964,72 @@
   border-bottom: 1px solid var(--hair);
 }
 
+/* ---------- o pontilhado do miolo ----------
+
+   As seções que não têm arte própria são chapa lisa de `--bg` — e num quadro
+   escuro sem nada dentro o olho não tem como medir a profundidade: uma cena
+   grudada no meio de um fundo chapado parece recortada e colada, não posta
+   dentro de um lugar. O pontilhado dá esse lugar. É a mesma função que a carta
+   topográfica cumpre no herói, um degrau abaixo de intensidade — ali é a
+   assinatura da marca, aqui é só chão.
+
+   TUDO EM CSS: um `radial-gradient` de um ponto repetido pelo `background-size`,
+   sem SVG, sem componente e sem um nó a mais no DOM por seção. A versão em SVG
+   com `<pattern>` desenha o mesmo e cobra um elemento, um `useId` e um
+   `re-render` por seção onde ela entra.
+
+   A MÁSCARA É QUASE PLANA, e não um foco no meio. Ela já foi um clarão central
+   (opaco em 26%, sumindo em 76%) e o efeito era o contrário do que se quer
+   aqui: um holofote pontilhado atrás da cena, com o olho lendo a mancha antes
+   de ler o que está em cima dela. Chão não tem centro.
+
+   Então o degradê é raso — 100% no meio, 82% na maior parte do caminho, 70%
+   perto da borda — e só a borda EXTREMA cai a zero. O centro fica um fio mais
+   aceso que o resto, o suficiente para o quadro não ser uma malha uniforme de
+   ponta a ponta, e o pontilhado ainda não encosta na borda da seção vizinha:
+   duas faixas coladas leriam como uma grade só, atravessando o corte entre
+   elas.
+
+   `isolation: isolate` e `z-index: -1`: a camada fica atrás do conteúdo da
+   seção, e não atrás da PÁGINA. Sem o isolamento ela some sob o fundo do
+   documento no primeiro contexto de empilhamento que aparecer pela frente. */
+.pontos {
+  position: relative;
+  isolation: isolate;
+}
+
+.pontos::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(242, 248, 255, 0.075) 1px,
+    transparent 0
+  );
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(
+    125% 88% at 50% 50%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.82) 38%,
+    rgba(0, 0, 0, 0.68) 72%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    125% 88% at 50% 50%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.82) 38%,
+    rgba(0, 0, 0, 0.68) 72%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Sem movimento reduzido para tratar: o pontilhado é estático de propósito.
+   Ponto que pisca atrás de texto é ruído, e o que ele precisa fazer aqui é
+   ficar parado sendo chão. */
+
 /* ---------- a página apaga para entrar na cena ----------
 
    A cena do percurso é uma chapa de #000 sangrada na tela inteira. A página em

@@ -28,24 +28,14 @@ import "./v5.css";
 import "./variacoes.css";
 import "./_marca/marca.css";
 import "./_marca/centro.css";
-import "./_marca/pilares.css";
 import { Casca, Heroi } from "./casca";
-import { FormFranqueado } from "./form-franqueado";
 import { FundoFecho } from "./fundos";
+import { ROTA_FRANQUEADO } from "./lead";
 import { Centro } from "./_marca/centro";
-import { Pilares } from "./_marca/pilares";
 import { Rodape } from "./rodape";
-import {
-  IcoInovacao,
-  IcoExperiencia,
-  IcoRentabilidade,
-  IcoArte,
-  IcoTempo,
-  IcoJornada,
-  IcoShopping,
-  IcoMercado,
-  IcoAeroporto,
-} from "./icons";
+/* Os ícones dos três pilares saíram junto com os cartões: eles agora são os
+   nós do hexágono, dentro da cena (ver `_marca/centro.tsx`). */
+import { IcoArte, IcoTempo, IcoJornada } from "./icons";
 
 /* Uma frase só, usada na meta e no Open Graph. Antes eram duas frases
    diferentes para a mesma página: o card do WhatsApp dizia uma coisa e o
@@ -119,7 +109,7 @@ export default function Home() {
           sangrada na tela inteira sem desenhar moldura em volta, e essa cena
           não existe mais: o desenho vive dentro da coluna da página, no fundo
           da página, como qualquer outra seção. */}
-      <section className="hold sec" id="marca">
+      <section className="hold sec pontos" id="marca">
         {/* O apoio listava três desejos e depois explicava a IA em abstrato —
             190 caracteres para dizer o que a frase abaixo diz em 67. */}
         <div className="sec-cab">
@@ -132,60 +122,17 @@ export default function Home() {
         <Centro />
       </section>
 
-      {/* OS TRÊS PILARES.
+      {/* A SEÇÃO DOS TRÊS PILARES SAIU DAQUI, inteira.
 
-          O hexágono que abre esta seção é o antigo diagrama da cena da marca —
-          ver o cabeçalho de `pilares.tsx`. Lá ele carregava duas leituras ao
-          mesmo tempo (o processo num anel interno, os pilares nos vértices) e
-          ficava embolado; aqui carrega uma só, que é a desta seção.
+          Ela era um `<h2>`, um hexágono próprio e três cartões lado a lado —
+          e o hexágono era o segundo da página, redesenhado do zero meia tela
+          depois de a cena da marca ter acabado de formar um.
 
-          O DESENHO NOMEIA, OS CARTÕES DETALHAM. Três nomes num hexágono dizem
-          que os três sustentam a mesma peça — que é a frase do apoio, e é o que
-          três cartões lado a lado não conseguem dizer. O texto de cada um
-          continua nos cartões, logo abaixo. */}
-      <section className="hold sec" id="pilares">
-        <div className="sec-cab">
-          <h2>
-            Três pilares <mark>sustentam a empresa.</mark>
-          </h2>
-          <p>Não são valores de parede: são o que precisa funcionar junto.</p>
-        </div>
-
-        <Pilares />
-
-        <div className="cells cells--3">
-          <div className="cellart">
-            <span className="ico">
-              <IcoInovacao />
-            </span>
-            <h3>Inovação no processo</h3>
-            <p>
-              A personalização deixa de ser encomenda e vira criação na hora,
-              conduzida por Inteligência Artificial.
-            </p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoExperiencia />
-            </span>
-            <h3>Experiência imersiva</h3>
-            <p>
-              O cliente participa da criação em vez de escolher de um catálogo.
-              A experiência é parte do produto.
-            </p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoRentabilidade />
-            </span>
-            <h3>Rentabilidade real</h3>
-            <p>
-              Uma operação que se sustenta para quem opera a franquia, não só
-              uma ideia bonita de tecnologia.
-            </p>
-          </div>
-        </div>
-      </section>
+          Agora é a continuação da mesma cena grudada (ver `centro.tsx`): o
+          polígono que o fio da coroa formou recebe os três pilares nos
+          vértices, e o cabeçalho e o texto de cada um passam ao lado enquanto
+          o nó da vez acende. Nada do texto se perdeu — as três explicações que
+          estavam nos cartões são os blocos das três últimas batidas. */}
 
       {/* A seção "Da ideia ao produto, em 3 passos" SAIU daqui.
 
@@ -198,7 +145,7 @@ export default function Home() {
           enfraquece. Quem viu lê como "então aquilo não bastou", e quem não viu
           não ganha nada, porque o cartão é mais pobre que a cena. */}
 
-      <section className="hold sec" id="ia">
+      <section className="hold sec pontos" id="ia">
         <div className="sec-cab">
           <h2>
             Movidos por <mark>Inteligência Artificial.</mark>
@@ -233,37 +180,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="hold sec" id="onde">
-        <div className="sec-cab">
-          <h2>
-            Onde a GRAVA.AI <mark>pode estar?</mark>
-          </h2>
-          <p>Ocupa pouca área e vive do fluxo que o ponto já tem.</p>
-        </div>
-        <div className="cells cells--3">
-          <div className="cellart">
-            <span className="ico">
-              <IcoShopping />
-            </span>
-            <h3>Shopping center</h3>
-            <p>No corredor de maior circulação.</p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoMercado />
-            </span>
-            <h3>Supermercado</h3>
-            <p>Grande porte, perto das frentes de caixa.</p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoAeroporto />
-            </span>
-            <h3>Aeroporto</h3>
-            <p>Área de espera, onde o tempo sobra.</p>
-          </div>
-        </div>
-      </section>
+      {/* AQUI FICAVA `#onde` — "Onde a GRAVA.AI pode estar?", com os três
+          cartões de shopping, supermercado e aeroporto. Saiu a pedido.
+
+          O que ela dizia é argumento de FRANQUIA, não de marca: onde o totem
+          cabe e de que fluxo ele vive são a pergunta de quem está avaliando um
+          ponto, e essa pessoa está em `/seja-franqueado`. Numa página que existe
+          para a busca pelo nome da marca, os três cartões respondiam a uma
+          pergunta que o leitor ainda não tinha feito. */}
 
       {/* O fechamento leva a mesma carta do herói, mais ao fundo e sem os
           gestos de abertura — ver `FundoFecho` em `fundos.tsx`. A
@@ -272,32 +196,39 @@ export default function Home() {
           carrega o `.hold` e pararia a carta na coluna de texto. */}
       <div className="close-fundo">
         <FundoFecho />
+      {/* O FECHAMENTO DA HOME NÃO CAPTA — ELE ENCAMINHA.
+
+          Aqui ficava o mesmo `FormFranqueado` das outras rotas. Saiu a pedido,
+          e a razão é a mesma que tirou `#onde` acima: esta página existe para a
+          busca pelo nome da marca, e pedir nome, e-mail e WhatsApp a quem
+          chegou para saber o que a GRAVA.AI faz é cobrar dado antes de haver
+          intenção. O formulário continua inteiro em `/seja-franqueado`,
+          `/galeria` e `/perguntas` — onde quem lê já está avaliando a franquia.
+
+          Um CTA só, e cheio. O par "principal + secundário" morreu junto com o
+          formulário: sem uma segunda ação para disputar, um botão `cta--out`
+          sozinho seria um botão apagado sem nada ao lado para justificar o
+          contraste menor. */}
       <footer className="hold close" id="falar">
-        <FormFranqueado>
-          <div className="sec-cab">
-            <h2>
-              Leve a GRAVA.AI <mark>para a sua região.</mark>
-            </h2>
-            <p>
-              A apresentação demonstrativa da franquia vai para o seu e-mail. A
-              conversa vem depois, no seu WhatsApp, com quem opera a rede.
-            </p>
-            {/* O secundário fica na coluna de texto, e não ao lado do botão de
-                envio: são ações de peso diferente — uma manda a apresentação,
-                a outra troca de página. */}
-            <div className="row" style={{ marginTop: 0 }}>
-              <Link className="cta cta--out" href="/seja-franqueado">
-                Seja um franqueado
-              </Link>
-            </div>
-          </div>
-        </FormFranqueado>
+        <div className="sec-cab">
+          <h2>
+            Leve a GRAVA.AI <mark>para a sua região.</mark>
+          </h2>
+          <p>
+            A franquia tem página própria: modelos, investimento, o que a rede
+            entrega e como pedir a apresentação.
+          </p>
+        </div>
+        <div className="row" style={{ marginTop: 0 }}>
+          <Link className="cta cta--lg" href={ROTA_FRANQUEADO}>
+            Seja um franqueado
+          </Link>
+        </div>
         <Rodape
           assinatura="Transformando ideias em produtos personalizados com Inteligência Artificial."
           links={[
             { href: "#marca", rotulo: "Quem somos" },
             { href: "#pilares", rotulo: "Os pilares" },
-            { href: "#onde", rotulo: "Onde atuamos" },
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
           ]}

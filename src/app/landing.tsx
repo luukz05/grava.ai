@@ -82,7 +82,7 @@ export function Landing() {
 
             Os links para a história e a galeria não se perderam: os dois já
             estão no rodapé, e o segundo também no menu. */}
-        <section className="hold sec" id="esperar">
+        <section className="hold sec pontos" id="esperar">
           <div className="sec-cab">
             <h2>
               Onde a rede <mark>já está.</mark>
@@ -133,7 +133,7 @@ export function Landing() {
             até o preto dela ao longo do cabeçalho, e devolve a cor depois. Ver
             `.breu` no `v5.css`. */}
         <div className="breu">
-          <section className="hold sec" id="ia">
+          <section className="hold sec pontos" id="ia">
             <div className="sec-cab">
               <h2>
                 Do totem <mark>ao produto final.</mark>
@@ -181,7 +181,7 @@ export function Landing() {
             manchete daqui, sem gastar altura para isso. Ver `.breu` no
             `v5.css`. */}
         <div className="breu-saida">
-          <section className="hold sec" id="numeros">
+          <section className="hold sec pontos" id="numeros">
             <div className="sec-cab">
               <h2>
                 Três modelos <mark>de unidade.</mark>

@@ -12,7 +12,7 @@
 
 import localFont from "next/font/local";
 import { NavBar, type Pagina } from "./navbar";
-import { ANCORA_FORM, CTA_ROTULO } from "./lead";
+import { destinoCta } from "./lead";
 import { Flutuante } from "./flutuante";
 import { FundoTopo } from "./fundos";
 
@@ -73,6 +73,14 @@ export function Casca({
   leitura?: boolean;
   children: React.ReactNode;
 }) {
+  /* O DESTINO DOS FIXOS DEPENDE DA ROTA, e a casca é quem sabe qual é.
+
+     Em três das quatro páginas o CTA desce até o formulário do fechamento. Na
+     home não existe formulário — ela encaminha para `/seja-franqueado` —, e
+     apontar os fixos para `#falar` ali levaria a pessoa até um fechamento sem
+     nada para preencher. Ver `destinoCta` em `./lead`. */
+  const cta = destinoCta(atual === "home");
+
   return (
     <div
       className={`${switzer.variable} v5`}
@@ -87,15 +95,16 @@ export function Casca({
             dobra — o herói passou a fazer sozinho: a carta viva se mexe, e uma
             textura estática atrás de nove telas de texto ao lado dela lia como
             segunda tentativa do mesmo assunto. O componente está no histórico. */}
-        <NavBar atual={atual} />
+        <NavBar atual={atual} cta={cta} />
         {children}
-        <Flutuante />
+        <Flutuante cta={cta} />
 
         {/* No celular o CTA principal vira barra fixa, no alcance do polegar.
-            Ele desce até o formulário do fechamento, na própria página. */}
+            Ele desce até o formulário do fechamento — ou, na home, atravessa
+            para a página de franqueado. */}
         <div className="dock">
-          <a className="cta cta--lg" href={ANCORA_FORM}>
-            {CTA_ROTULO}
+          <a className="cta cta--lg" href={cta.href}>
+            {cta.rotulo}
           </a>
         </div>
       </main>
