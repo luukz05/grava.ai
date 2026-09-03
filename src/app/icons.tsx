@@ -188,65 +188,95 @@ export function IcoNao({ className }: P) {
 }
 
 /* ---------- institucional ----------
-   Mesmo traço, mesma caixa, mesmo vocabulário hexagonal. Os seis abaixo
-   nasceram para a página da marca: pilares, tecnologia e jornada. */
 
+   OS SEIS DOS VÉRTICES, REDESENHADOS. Eles vivem nos nós do hexágono da cena
+   (`_marca/centro.tsx`), a uns 22px de lado, e nenhum deles sobrevivia a esse
+   tamanho: "inovação" era um hexágono com dois traços cruzados dentro,
+   "experiência" um retângulo com ondas ao lado, "arte" um pincel de quatro
+   segmentos, "jornada" um caminho sinuoso com duas setas. Metáforas que só se
+   leem no tamanho em que foram desenhadas — e nenhuma delas era desenhada em
+   22px.
+
+   A REGRA QUE PASSOU A VALER: forma CANÔNICA, a mesma que qualquer pessoa já
+   viu mil vezes (chip, olho, gráfico subindo, faísca, raio, headset), e no
+   máximo duas partes por ícone. Ícone pequeno não é ilustração reduzida: é um
+   desenho que precisa ser reconhecido antes de ser lido, e o que faz isso é a
+   silhueta, não o detalhe.
+
+   Nenhuma biblioteca, pelo mesmo motivo de sempre: os outros catorze ícones da
+   página são deste sistema — traço 1,5, caixa 24, terminais arredondados —, e
+   um conjunto importado ao lado deles seria um segundo vocabulário na mesma
+   tela. O que mudou aqui foi a ESCOLHA das formas, não o sistema. */
+
+/* Inovação no processo: um chip. Hardware é o que a rede tem de diferente na
+   operação, e a silhueta de quadrado com pinos é das mais reconhecíveis que
+   existem em tamanho pequeno. */
 export function IcoInovacao({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <path d="M12 3l7.5 4.5v9L12 21l-7.5-4.5v-9z" />
-      <path d="M12 8.5v7M9 10.25l6 3.5M15 10.25l-6 3.5" />
+      <rect x="7" y="7" width="10" height="10" rx="1.4" />
+      <path d="M10 3.6v3.4M14 3.6v3.4M10 17v3.4M14 17v3.4" />
+      <path d="M3.6 10h3.4M3.6 14h3.4M17 10h3.4M17 14h3.4" />
     </svg>
   );
 }
 
+/* Experiência imersiva: um olho. A experiência acontece na frente do totem, e
+   olho é a forma mais legível que existe para "ver de perto". */
 export function IcoExperiencia({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <rect x="4" y="4" width="10" height="13" rx="0.5" />
-      <path d="M7 8h4" />
-      <path d="M14.5 12.5a4.5 4.5 0 013 3M14.5 9a8 8 0 016.5 6.5" />
-      <path d="M7 21h10" />
+      <path d="M2.6 12S6.2 5.8 12 5.8 21.4 12 21.4 12 17.8 18.2 12 18.2 2.6 12 2.6 12z" />
+      <circle cx="12" cy="12" r="2.7" />
     </svg>
   );
 }
 
+/* Rentabilidade real: a linha que sobe com a seta. É o único dos seis que já
+   funcionava, e continua igual em espírito — só com menos traços. */
 export function IcoRentabilidade({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <path d="M4 20v-5M9.3 20v-8M14.6 20v-4M20 20V7" />
-      <path d="M3 20h18" />
-      <path d="M17 4h4v4" />
+      <path d="M3.5 16.5l5-5 3.5 3.5L20.5 7" />
+      <path d="M15 7h5.5v5.5" />
     </svg>
   );
 }
 
+/* Na criação: a faísca dupla. Virou o símbolo universal de "isto foi gerado por
+   Inteligência Artificial" — a página inteira ganha com usar o desenho que a
+   pessoa já aprendeu em outro lugar, em vez de um pincel que ninguém lê. */
 export function IcoArte({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <path d="M4 20l6.5-6.5" />
-      <path d="M10.5 13.5l3-3 3.5 3.5-3 3z" />
-      <path d="M13.5 10.5l3-3 3.5 3.5-3 3" />
-      <path d="M4 20h3.5" />
+      <path d="M10.5 3l1.7 4.6 4.6 1.7-4.6 1.7-1.7 4.6-1.7-4.6L4.2 9.3l4.6-1.7z" />
+      <path d="M17.8 14.4l.8 2.3 2.3.8-2.3.8-.8 2.3-.8-2.3-2.3-.8 2.3-.8z" />
     </svg>
   );
 }
 
+/* Na produção: o raio. O que a batida afirma é o TEMPO — do conceito ao produto
+   gravado em minutos —, e raio é a forma de "na hora" que não precisa de
+   legenda. O relógio dentro de um hexágono que estava aqui virava, em 22px, um
+   hexágono com sujeira dentro. */
 export function IcoTempo({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <path d="M12 3.5l7 4v9l-7 4-7-4v-9z" />
-      <path d="M12 8v4.3l3 1.8" />
+      <path d="M13.2 2.5L4.8 13.4h5.6l-.6 8.1 8.4-10.9h-5.6z" />
     </svg>
   );
 }
 
+/* No atendimento: o headset. Atendimento tem um desenho canônico e é este; o
+   balão de fala, que seria a outra opção, já é o balão da ideia na mesma cena —
+   duas coisas diferentes com a mesma forma, a uma tela de distância. */
 export function IcoJornada({ className }: P) {
   return (
     <svg {...base} className={className}>
-      <path d="M4 17h3.5a4 4 0 004-4v-2a4 4 0 014-4H20" />
-      <path d="M3 17h2M18.5 5.5L20 7l-1.5 1.5" />
-      <path d="M4.5 15.5L3 17l1.5 1.5" />
+      <path d="M4.5 15v-3a7.5 7.5 0 0115 0v3" />
+      <rect x="2.6" y="13.8" width="4.2" height="6.2" rx="1.6" />
+      <rect x="17.2" y="13.8" width="4.2" height="6.2" rx="1.6" />
+      <path d="M19.5 20a2.6 2.6 0 01-2.6 2.6h-2.4" />
     </svg>
   );
 }
