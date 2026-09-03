@@ -33,9 +33,8 @@ import { FundoFecho } from "./fundos";
 import { ROTA_FRANQUEADO } from "./lead";
 import { Centro } from "./_marca/centro";
 import { Rodape } from "./rodape";
-/* Os ícones dos três pilares saíram junto com os cartões: eles agora são os
-   nós do hexágono, dentro da cena (ver `_marca/centro.tsx`). */
-import { IcoArte, IcoTempo, IcoJornada } from "./icons";
+/* Os ícones dos pilares e os da IA saíram junto com os cartões: os seis são
+   agora os nós do hexágono, dentro da cena (ver `_marca/centro.tsx`). */
 
 /* Uma frase só, usada na meta e no Open Graph. Antes eram duas frases
    diferentes para a mesma página: o card do WhatsApp dizia uma coisa e o
@@ -145,40 +144,20 @@ export default function Home() {
           enfraquece. Quem viu lê como "então aquilo não bastou", e quem não viu
           não ganha nada, porque o cartão é mais pobre que a cena. */}
 
-      <section className="hold sec pontos" id="ia">
-        <div className="sec-cab">
-          <h2>
-            Movidos por <mark>Inteligência Artificial.</mark>
-          </h2>
-          <p>Da criação da arte ao atendimento, tudo passa por ela.</p>
-        </div>
-        <div className="cells cells--3">
-          <div className="cellart">
-            <span className="ico">
-              <IcoArte />
-            </span>
-            <h3>Na criação</h3>
-            <p>
-              O cliente gera a arte ideal em segundos, com Inteligência
-              Artificial.
-            </p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoTempo />
-            </span>
-            <h3>Na produção</h3>
-            <p>Do conceito ao produto gravado, em poucos minutos.</p>
-          </div>
-          <div className="cellart">
-            <span className="ico">
-              <IcoJornada />
-            </span>
-            <h3>No atendimento</h3>
-            <p>A IA conduz o cliente do primeiro toque até a retirada.</p>
-          </div>
-        </div>
-      </section>
+      {/* A SEÇÃO "MOVIDOS POR INTELIGÊNCIA ARTIFICIAL" TAMBÉM SAIU DAQUI.
+
+          Ela era um `<h2>` e três cartões — criação, produção, atendimento —
+          logo depois dos três pilares, que já eram outros três cartões. Duas
+          listas de três em fila, e nenhuma das duas dizia por que eram três.
+
+          O hexágono da cena tinha SEIS cantos e os pilares ocupavam três,
+          alternados. Os outros três eram exatamente esta lista: agora cada
+          papel da IA é um vértice, a marca abre até ocupar o polígono e a
+          figura fecha com as duas listas intercaladas — que é a relação que os
+          seis cartões em fila nunca chegaram a desenhar.
+
+          Todo o texto continua na página, nos blocos das quatro últimas
+          batidas da cena (ver `_marca/centro.tsx`). */}
 
       {/* AQUI FICAVA `#onde` — "Onde a GRAVA.AI pode estar?", com os três
           cartões de shopping, supermercado e aeroporto. Saiu a pedido.
@@ -229,6 +208,7 @@ export default function Home() {
           links={[
             { href: "#marca", rotulo: "Quem somos" },
             { href: "#pilares", rotulo: "Os pilares" },
+            { href: "#ia", rotulo: "A IA" },
             { href: "/perguntas", rotulo: "Perguntas frequentes" },
             { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
           ]}

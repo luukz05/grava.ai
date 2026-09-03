@@ -105,6 +105,9 @@ import {
   IcoInovacao,
   IcoExperiencia,
   IcoRentabilidade,
+  IcoArte,
+  IcoTempo,
+  IcoJornada,
 } from "../icons";
 import { E_UI, E_LUZ, E_MOLA, E_MOLA_SOLTA } from "./curvas";
 
@@ -420,6 +423,60 @@ const emCena = (ang: number) => ({
   top: `${n3(50 + R_HEX_CENA * Math.sin(rad(ang)))}%`,
 });
 
+/* ───────────────────────────────────────────────────────────────────────────
+   A IA, NOS TRÊS VÉRTICES QUE SOBRARAM
+
+   O hexágono tem seis cantos e os pilares ocupam três, alternados. Os outros
+   três estavam vazios — e a seção seguinte da página era exatamente outra lista
+   de três, sobre a IA, em outros três cartões. O polígono já era a resposta:
+   um vértice para cada, e as duas listas passam a ser as duas metades da mesma
+   figura, intercaladas.
+
+   É a mesma emenda que trouxe os pilares para cá, um degrau adiante: em vez de
+   três seções em fila — a marca, os pilares, a IA —, uma cena só que vai
+   ganhando peça e nunca recomeça.
+
+   ÂNGULOS: −90 (topo), 30 e 150. São os complementares dos pilares (210, −30,
+   90) na mesma lista de seis, então nenhum dos dois grupos precisa saber do
+   outro para não colidir — a geometria já garante.
+
+   E É AQUI QUE A MARCA CRESCE. Com os seis cantos ocupados, o meio deixa de ser
+   um ponto e passa a ser a área que os seis seguram: a marca abre até ocupar o
+   hexágono, atrás dos nós, e o que a cena diz no último quadro é que tudo
+   aquilo é uma coisa só. */
+const IA = [
+  {
+    id: "criacao",
+    nome: "Na criação",
+    ang: -90,
+    lugar: "topo" as const,
+    Ico: IcoArte,
+    texto:
+      "O cliente gera a arte ideal em segundos, com Inteligência Artificial.",
+  },
+  {
+    id: "producao",
+    nome: "Na produção",
+    ang: 30,
+    lugar: "dir" as const,
+    Ico: IcoTempo,
+    texto: "Do conceito ao produto gravado, em poucos minutos.",
+  },
+  {
+    id: "atendimento",
+    nome: "No atendimento",
+    ang: 150,
+    lugar: "esq" as const,
+    Ico: IcoJornada,
+    texto: "A IA conduz o cliente do primeiro toque até a retirada.",
+  },
+];
+
+/* Quanto do DIÂMETRO do hexágono a marca ocupa quando abre. Menos de 1 porque
+   ela precisa terminar dentro do polígono, e não encostada nele: marca colada
+   na linha vira selo carimbado por cima do desenho. */
+const MARCA_NO_HEX = 0.78;
+
 /* Quanto tempo de linha do tempo cabe em cada batida. Todas iguais, e é isso
    que as amarra aos blocos: quatro blocos de mesma altura mínima dividem a
    rolagem em quatro fatias iguais, e quatro batidas de mesma duração dividem a
@@ -563,7 +620,8 @@ export function Centro() {
           const esfera = um<HTMLElement>(".ctr-esfera");
           const orbes = q(".ctr-orbe-face");
           const raios = q(".ctr-raio");
-          const pilares = q(".ctr-pilar");
+          const pilares = q('.ctr-pilar[data-fam="pilar"]');
+          const nosIa = q('.ctr-pilar[data-fam="ia"]');
           /* Estado do morfo do fio: 1 é o círculo, 0 é o hexágono. */
           const morfo = { t: 1 };
           const blocos = q(".ctr-passo");
@@ -617,7 +675,7 @@ export function Centro() {
              recolhido (`pathLength={1}`, então 1 é "nada desenhado") e os nós
              ausentes. */
           gsap.set(raios, { strokeDashoffset: 1 });
-          gsap.set(pilares, { autoAlpha: 0, scale: 0.72 });
+          gsap.set([...pilares, ...nosIa], { autoAlpha: 0, scale: 0.72 });
 
           const tl = gsap.timeline({
             scrollTrigger: {
@@ -1036,10 +1094,113 @@ export function Centro() {
             );
           });
 
+          /* ── 10 · O HEXÁGONO FECHA: A MARCA ABRE E A IA OCUPA O RESTO ──
+             Três coisas ao mesmo tempo, e juntas são a frase: os três cantos
+             que faltavam recebem os nós da IA, a MARCA cresce até ocupar o
+             hexágono, e os pilares voltam ao repouso — nenhum deles está em
+             destaque agora, porque o assunto passou a ser o conjunto.
+
+             A MARCA VIRA FUNDO, e não peça: ela abre atrás dos nós, em opacidade
+             baixa. Cheia, um hexágono azul de meia cena vira uma chapa e engole
+             os seis pontos que acabaram de ser plantados — e o que a batida diz
+             é que eles estão DENTRO dela, não em cima.
+
+             A escala é MEDIDA, não escrita: o alvo é a altura do glifo chegar a
+             `MARCA_NO_HEX` do diâmetro do polígono, e a conta usa o tamanho real
+             da cena a cada `refresh`. Um número fixo aqui só valeria para a
+             tela em que ele foi calibrado — o selo nasce de um `clamp()`, e o
+             clamp muda de perna conforme a cena.
+
+             A chapa do selo (o disco escuro e o anel) some junto: escalada doze
+             vezes, uma borda de 1px vira uma moldura de 12. */
+          batida("motor", 9);
+          tl.to(
+            selo,
+            {
+              scale: () => {
+                const glifo = selo.querySelector("svg");
+                const alto = glifo?.getBoundingClientRect().height ?? 1;
+                const cheio = cena.getBoundingClientRect().height;
+                /* `alto` já vem com a escala atual aplicada (1.9, da quarta
+                   batida), então a razão é sobre a caixa como ela está — e o
+                   valor devolvido é a escala ABSOLUTA que o tween vai escrever,
+                   não um acréscimo. */
+                const atual = gsap.getProperty(selo, "scale") as number;
+                const alvo = cheio * ((2 * R_HEX_CENA) / 100) * MARCA_NO_HEX;
+                return (alvo / alto) * atual;
+              },
+              opacity: 0.38,
+              backgroundColor: "rgba(7, 13, 19, 0)",
+              boxShadow:
+                "0 0 0 1px rgba(102, 205, 255, 0), 0 0 24px rgba(102, 205, 255, 0)",
+              duration: 1.5,
+              ease: E_MOLA,
+            },
+            "motor+=0.15"
+          )
+            /* Os raios saem de cena: eles ligavam três nós a um ponto no meio,
+               e o meio virou uma área. Linha por baixo de uma marca chapada é
+               linha que não se vê e ainda suja a borda dela. */
+            .to(
+              raios,
+              { autoAlpha: 0, duration: 0.7, ease: E_UI },
+              "motor+=0.15"
+            )
+            .to(
+              pilares,
+              { opacity: 0.62, scale: 1, duration: 0.8, ease: E_UI },
+              "motor+=0.2"
+            )
+            .to(
+              nosIa,
+              {
+                autoAlpha: 1,
+                scale: 1,
+                opacity: 0.62,
+                duration: 0.8,
+                ease: E_MOLA_SOLTA,
+                stagger: 0.16,
+              },
+              "motor+=0.45"
+            );
+
+          /* ── 11, 12 e 13 · UM PAPEL DA IA DE CADA VEZ ──
+             Mesma gramática das batidas dos pilares: o nó da vez cresce e
+             acende, os outros recuam. Só que aqui os que recuam são os CINCO
+             restantes — os dois irmãos da IA e os três pilares —, porque a
+             figura já está inteira e o que muda é para onde se olha. */
+          IA.forEach((_, i) => {
+            const nome = `motor${i}`;
+            batida(nome, 10 + i);
+            const alvo = nosIa[i];
+            const resto = [...nosIa.filter((_, j) => j !== i), ...pilares];
+            tl.to(
+              alvo,
+              {
+                scale: 1.16,
+                opacity: 1,
+                borderColor: "#66cdff",
+                duration: 0.8,
+                ease: E_MOLA,
+              },
+              nome
+            ).to(
+              resto,
+              {
+                scale: 1,
+                opacity: 0.42,
+                borderColor: "rgba(102, 205, 255, 0.22)",
+                duration: 0.8,
+                ease: E_UI,
+              },
+              nome
+            );
+          });
+
           /* A última fatia precisa existir inteira na linha do tempo, senão a
              duração acaba no último tween e a batida final consome menos
              rolagem que as outras — todas as fatias têm a mesma altura. */
-          tl.to({}, { duration: T_BATIDA }, 8 * T_BATIDA);
+          tl.to({}, { duration: T_BATIDA }, 12 * T_BATIDA);
 
           /* ─────────────────────────────────────────────────────────────────
              O BLOCO QUE ESTÁ SENDO LIDO
@@ -1273,7 +1434,19 @@ export function Centro() {
                   mesmo quadro. */}
               {PILARES.map(({ id, ang, Ico }) => (
                 <div className="ctr-marco" key={id} style={emCena(ang)}>
-                  <span className="ctr-pilar" data-pilar={id}>
+                  <span className="ctr-pilar" data-fam="pilar" data-no={id}>
+                    <Ico />
+                  </span>
+                </div>
+              ))}
+
+              {/* OS TRÊS PAPÉIS DA IA, nos vértices que sobraram. Mesma peça
+                  dos pilares — o hexágono não tem dois tipos de canto —, e o
+                  que separa as duas listas é só `data-fam`, que a linha do
+                  tempo usa para acender uma de cada vez. */}
+              {IA.map(({ id, ang, Ico }) => (
+                <div className="ctr-marco" key={id} style={emCena(ang)}>
+                  <span className="ctr-pilar" data-fam="ia" data-no={id}>
                     <Ico />
                   </span>
                 </div>
@@ -1414,6 +1587,42 @@ export function Centro() {
               precisa existir na marcação e não só na tipografia. */}
           <ul className="ctr-pilares-lista">
             {PILARES.map((p) => (
+              <li className="ctr-passo" key={p.id} data-lugar={p.lugar}>
+                <div className="ctr-bloco">
+                  <h3 className="ctr-tit">{p.nome}</h3>
+                  <p className="ctr-txt">{p.texto}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ---- A IA, NA MESMA COLUNA ----
+
+            Quatro fatias, como as dos pilares: o cabeçalho da parte — onde a
+            marca abre e os três nós ocupam os cantos que faltavam — e uma por
+            papel. Era a seção `#ia` da página, com `<h2>` e três cartões.
+
+            Ela fecha a cena: a partir daqui não há mais canto vazio no
+            hexágono nem seção nova para abrir. */}
+        <div className="ctr-pilares-texto" id="ia">
+          {/* O cabeçalho desta parte vai no ALTO, e não embaixo como o dos
+              pilares: é na batida dele que a marca abre até 78% do diâmetro do
+              hexágono, e a borda de baixo dela chega perto do rodapé da tela —
+              onde o bloco de baixo gruda. */}
+          <div className="ctr-passo" data-lugar="topo">
+            <div className="ctr-bloco">
+              <h2 className="ctr-tit">
+                Movidos por <mark>Inteligência Artificial.</mark>
+              </h2>
+              <p className="ctr-txt">
+                Da criação da arte ao atendimento, tudo passa por ela.
+              </p>
+            </div>
+          </div>
+
+          <ul className="ctr-pilares-lista">
+            {IA.map((p) => (
               <li className="ctr-passo" key={p.id} data-lugar={p.lugar}>
                 <div className="ctr-bloco">
                   <h3 className="ctr-tit">{p.nome}</h3>
