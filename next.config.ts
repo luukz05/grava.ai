@@ -18,13 +18,24 @@ const nextConfig: NextConfig = {
      custo de um redirect é zero e o de um link morto não é.
 
      `/franqueado` não existiu como rota, mas é o que alguém digita ou escreve
-     à mão ao lembrar do nome do item na barra do topo. */
+     à mão ao lembrar do nome do item na barra do topo.
+
+     `/perguntas` EXISTIU E FOI EXTINTA: o FAQ virou seção da landing, com as
+     doze perguntas e o dado estruturado. O destino leva à âncora `#duvidas`
+     porque a seção fica no meio de uma página longa — sem ela, quem clica num
+     link antigo cai no topo da landing e tem que procurar o que já tinha
+     achado. */
   async redirects() {
     return [
       { source: "/institucional", destination: "/", permanent: true },
       {
         source: "/franqueado",
         destination: "/seja-franqueado",
+        permanent: true,
+      },
+      {
+        source: "/perguntas",
+        destination: "/seja-franqueado#duvidas",
         permanent: true,
       },
     ];

@@ -136,6 +136,37 @@ export function IcoEnvelope({ className }: P) {
   );
 }
 
+/* O par do menu do celular. Os dois desenhos ocupam a MESMA caixa de 24 e
+   compartilham o eixo vertical de 12: o botão troca um pelo outro no lugar, e
+   qualquer diferença de altura entre eles apareceria como um salto.
+
+   Três traços e não dois: dois lêem como "igual", que é um sinal de matemática.
+   As pontas ficam a 4,5 e 19,5 — 1,5 a mais de folga que o padrão da caixa —,
+   porque o botão é pequeno (42px) e traço encostando na borda do viewBox fica
+   grudado na quina do círculo.
+
+   O X é o mesmo gesto girado: duas diagonais de canto a canto do mesmo
+   retângulo que os traços do menu ocupam, então a área de tinta é parecida e o
+   peso visual não muda na troca. */
+export function IcoMenu({ className }: P) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4.5 7.5h15" />
+      <path d="M4.5 12h15" />
+      <path d="M4.5 16.5h15" />
+    </svg>
+  );
+}
+
+export function IcoFechar({ className }: P) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M6.5 6.5l11 11" />
+      <path d="M17.5 6.5l-11 11" />
+    </svg>
+  );
+}
+
 /* Canais do rodapé. Desenhados no mesmo traço dos demais em vez de importados
    de uma biblioteca de logos: são dois ícones, e trazer um pacote inteiro para
    dois desenhos quebraria a coerência de traço do resto da página. */

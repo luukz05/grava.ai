@@ -99,14 +99,19 @@ export function Casca({
         {children}
         <Flutuante cta={cta} />
 
-        {/* No celular o CTA principal vira barra fixa, no alcance do polegar.
-            Ele desce até o formulário do fechamento — ou, na home, atravessa
-            para a página de franqueado. */}
-        <div className="dock">
-          <a className="cta cta--lg" href={cta.href}>
-            {cta.rotulo}
-          </a>
-        </div>
+        {/* A `.dock` SAIU — a barra fixa que colava o CTA de largura total no pé
+            da tela abaixo de 780px.
+
+            Ela custava uma faixa permanente de ~70px do viewport do celular, e
+            era o terceiro lugar em que o mesmo botão aparecia: a barra do topo
+            é `sticky` e já carrega o CTA na primeira linha de toda rota, no
+            campo de visão o tempo inteiro. Duas barras coladas nas duas quinas
+            da tela não dobram a conversão; elas espremem o conteúdo por onde a
+            pessoa está lendo.
+
+            O CTA do celular é o da barra do topo, e a navegação entre rotas —
+            que abaixo de 820px não existia, porque as pílulas somem — passou a
+            ser o menu ao lado dele. Ver `MenuMobile` em `menu-mobile.tsx`. */}
       </main>
     </div>
   );

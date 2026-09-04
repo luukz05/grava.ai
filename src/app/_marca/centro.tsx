@@ -56,6 +56,23 @@
    próxima, e a forma faz a emenda: o que a IA desenhou em volta de quem pediu é
    o que os três pilares sustentam.
 
+   ───────────────────────────────────────────────────────────────────────────
+   SETE FATIAS, E NÃO TREZE
+
+   A seção pedia ONZE TELAS de rolagem. Quatro eram a narrativa acima, uma a
+   passagem — e as OUTRAS OITO eram os pilares e os papéis da IA, cada grupo
+   com um cabeçalho e um item por tela. Nessas oito a cena não mudava de
+   assunto: o mesmo hexágono parado, um nó crescendo e os outros recuando, oito
+   telas para seis frases curtas. Informação boa cobrando pedágio.
+
+   As oito viraram DUAS CONSTELAÇÕES. A diferença é a relação entre texto e
+   desenho: na narrativa o bloco passa POR CIMA da cena, um de cada vez, e por
+   isso cada um precisa da fatia inteira; na constelação os três textos moram EM
+   VOLTA do polígono, cada um do lado do vértice de que fala. O que ligava a
+   frase ao nó era o tempo (o nó acendia na vez dele); passa a ser a POSIÇÃO — e
+   o gesto continua no `stagger`, com cada frase pousando no instante em que o
+   seu vértice acende. Nenhuma palavra saiu; saiu a rolagem morta.
+
    O MORFO É GEOMÉTRICO, e não um plugin: um só `<path>` de seis cúbicas, com o
    comprimento dos punhos de bézier indo de `K·R` (arco) a zero (reta). Ver
    `dCoroa` logo abaixo.
@@ -86,10 +103,12 @@
    tempo é raspada (`scrub`) pela posição da coluna. Descer avança, subir
    desfaz, parar congela.
 
-   As batidas são IGUALMENTE ESPAÇADAS (`i * T_BATIDA`) e os blocos têm a mesma
-   altura mínima. É essa dupla igualdade que faz a explosão acontecer enquanto
-   o texto do produto está na tela — sem um gatilho por bloco para amarrar as
-   duas coisas.
+   CADA BATIDA RECEBE A FRAÇÃO DE TEMPO QUE A FATIA DELA OCUPA. As alturas são
+   lidas do DOM e viram posição e duração na linha do tempo (`emT`/`durT`), o
+   que mantém a amarra antiga — a explosão acontece enquanto o texto do produto
+   está na tela, sem um gatilho por bloco — valendo agora para fatias de
+   tamanhos diferentes, e continuando a valer no celular, onde o CSS empilha a
+   constelação e muda as proporções.
 
    A ESFERA GIRA EM CSS, e não no relógio do GSAP. Três animações de mesma
    duração: uma vira o conjunto, a segunda desvira cada peça para ela continuar
@@ -374,20 +393,22 @@ const TOPICOS: Topico[] = [
    o desenho de algo sustentado. Em três vizinhos ficariam todos de um lado e o
    polígono pareceria prestes a tombar.
 
-   O NOME E O TEXTO NÃO MORAM NO DESENHO. Cada pilar tem uma batida sua, com o
-   nome e a explicação num bloco de texto ao lado da cena — os mesmos que
-   estavam nos três cartões da seção que existia abaixo. No vértice fica só o
-   ÍCONE: escrito nos dois lugares, o nome apareceria duas vezes no mesmo
-   quadro, e o que liga o texto ao vértice é o nó ACENDER quando chega a vez
-   dele. É a mesma gramática das quatro primeiras batidas — um bloco de texto,
-   um gesto na cena.
+   O NOME E O TEXTO NÃO MORAM NO DESENHO. No vértice fica só o ÍCONE: escrito
+   nos dois lugares, o nome apareceria duas vezes no mesmo quadro. A explicação
+   fica num bloco ao lado — o mesmo texto que estava nos três cartões da seção
+   que existia abaixo.
 
-   `lugar` é o canto em que o bloco daquele pilar aparece, e ele fica DO LADO do
-   vértice, não em cima dele: o nó de baixo (90°) tem o texto embaixo, na faixa
-   livre entre a ponta do hexágono e o rodapé da tela. O texto do pilar de baixo
-   já esteve no alto — do outro lado da cena — e a distância desfazia a ligação:
-   o leitor via um nó acender num canto e uma frase acender no oposto, sem nada
-   dizendo que eram a mesma coisa. */
+   OS TRÊS APARECEM JUNTOS, numa fatia só. Cada um já teve a sua batida, e o
+   que ligava a frase ao vértice era o nó acender na vez dele: ligação por
+   TEMPO, que custa uma tela de rolagem por item. Agora a ligação é por LUGAR —
+   o bloco fica do lado do vértice de que fala —, e o gesto continua existindo
+   no `stagger`: o nó acende e a frase dele pousa no mesmo instante.
+
+   `lugar` é a célula da constelação, e ela segue o ângulo do vértice: 210° e
+   −30° são as duas laterais acima do eixo (`esq` e `dir`), 90° é a ponta de
+   baixo (`baixo`, na faixa livre entre o hexágono e o rodapé da tela). Do
+   LADO, e não em cima: o texto do pilar de baixo já esteve no alto — do outro
+   lado da cena — e a distância desfazia a ligação. */
 const PILARES = [
   {
     id: "inovacao",
@@ -477,11 +498,17 @@ const IA = [
    na linha vira selo carimbado por cima do desenho. */
 const MARCA_NO_HEX = 0.78;
 
-/* Quanto tempo de linha do tempo cabe em cada batida. Todas iguais, e é isso
-   que as amarra aos blocos: quatro blocos de mesma altura mínima dividem a
-   rolagem em quatro fatias iguais, e quatro batidas de mesma duração dividem a
-   linha do tempo do mesmo jeito. Uma batida "mais importante" que ganhasse
-   tempo extra sairia de sincronia com o texto dela. */
+/* A UNIDADE DE TEMPO DE UMA BATIDA — hoje só a régua, e não mais a divisão.
+
+   Enquanto todas as fatias tinham a mesma altura, a linha do tempo era
+   `i * T_BATIDA` e pronto. As fatias deixaram de ser iguais: um bloco da
+   narrativa vale 76svh, a passagem 64 e cada constelação uma tela inteira,
+   porque nela três textos entram ao mesmo tempo em volta do hexágono.
+
+   Então quem divide a linha do tempo é a ALTURA REAL de cada fatia, medida do
+   DOM (ver `emT`/`durT` no efeito). Esta constante só decide quanto tempo o
+   percurso inteiro dura — o que importa é a razão entre ele e as durações dos
+   tweens, que continuam escritas em unidades de batida. */
 const T_BATIDA = 3;
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -622,6 +649,13 @@ export function Centro() {
           const raios = q(".ctr-raio");
           const pilares = q('.ctr-pilar[data-fam="pilar"]');
           const nosIa = q('.ctr-pilar[data-fam="ia"]');
+          /* Os textos das constelações. Estão na ordem do DOM, que é a ordem
+             de `PILARES` e de `IA` — é o que permite entrar CADA UM junto do
+             seu nó, no mesmo `stagger`, sem um gatilho por item. */
+          const cabPilares = um<HTMLElement>('.ctr-const[data-fam="pilar"] .ctr-const-cab');
+          const cabIa = um<HTMLElement>('.ctr-const[data-fam="ia"] .ctr-const-cab');
+          const txtPilares = q('.ctr-const[data-fam="pilar"] .ctr-no');
+          const txtIa = q('.ctr-const[data-fam="ia"] .ctr-no');
           /* Estado do morfo do fio: 1 é o círculo, 0 é o hexágono. */
           const morfo = { t: 1 };
           const blocos = q(".ctr-passo");
@@ -676,12 +710,23 @@ export function Centro() {
              ausentes. */
           gsap.set(raios, { strokeDashoffset: 1 });
           gsap.set([...pilares, ...nosIa], { autoAlpha: 0, scale: 0.72 });
+          /* Os textos das constelações nascem ausentes pelo mesmo motivo que a
+             cena: sem script a página os mostra prontos, e escondê-los pelo
+             CSS apagaria justamente o conteúdo que não pode falhar.
+
+             `y` pequeno (14px) e não uma entrada de meia tela: eles não estão
+             viajando, estão POUSANDO no vértice que acabou de acender. */
+          gsap.set([cabPilares, cabIa, ...txtPilares, ...txtIa], {
+            autoAlpha: 0,
+            y: 14,
+          });
 
           const tl = gsap.timeline({
             scrollTrigger: {
-              /* O gatilho é a COLUNA EM FLUXO — os quatro blocos MAIS a faixa
-                 de passagem —, e ela existe como elemento só para isto: é a
-                 altura dela que define quanto a cena tem para andar.
+              /* O gatilho é a COLUNA EM FLUXO — os quatro blocos da narrativa,
+                 a faixa de passagem e as duas constelações —, e ela existe como
+                 elemento só para isto: é a altura dela que define quanto a cena
+                 tem para andar.
 
                  NÃO É A RAIZ, e a diferença não é de gosto: a raiz carrega
                  também a camada absoluta da cena, e medi-la aqui dava uma
@@ -709,8 +754,35 @@ export function Centro() {
             },
           });
 
+          /* ── AS FATIAS SÃO MEDIDAS, E NÃO ESCRITAS ──
+
+             A linha do tempo é raspada pela coluna inteira, então cada batida
+             precisa cair exatamente sobre a fatia de rolagem que lhe pertence.
+             Enquanto TODAS as fatias tinham a mesma altura, `i * T_BATIDA`
+             bastava. Não têm mais: os blocos da narrativa valem uma tela curta
+             e cada CONSTELAÇÃO vale uma tela inteira, porque nela três textos
+             entram ao mesmo tempo em volta do hexágono.
+
+             Então a posição e a duração de cada batida saem da altura REAL da
+             fatia, lida do DOM. É a mesma amarra de antes — fatia e batida
+             ocupando a mesma fração do percurso —, só que agora ela vale para
+             fatias de tamanhos diferentes, e continua valendo no celular, onde
+             o CSS empilha a constelação e muda as proporções. */
+          const fatias = q(".ctr-fatia");
+          const alturas = fatias.map((el) => el.offsetHeight);
+          const somaAlt = alturas.reduce((a, b) => a + b, 0) || 1;
+          const T_TOTAL = fatias.length * T_BATIDA;
+          const emT: number[] = [];
+          const durT: number[] = [];
+          let corrido = 0;
+          for (const alt of alturas) {
+            emT.push((corrido / somaAlt) * T_TOTAL);
+            durT.push((alt / somaAlt) * T_TOTAL);
+            corrido += alt;
+          }
+
           const batida = (nome: string, i: number) =>
-            tl.addLabel(nome, i * T_BATIDA);
+            tl.addLabel(nome, emT[i] ?? i * T_BATIDA);
 
           /* ── 1 · O CLIENTE NO CENTRO ──
              A luz primeiro, o lugar depois, o cliente por último. A aura não
@@ -1009,96 +1081,112 @@ export function Centro() {
               "passagem+=0.3"
             );
 
-          /* ── 6 · OS TRÊS PILARES ──
+          /* ── 6 · A CONSTELAÇÃO DOS PILARES ──
              O hexágono já está formado e a marca já está no meio dele. O que
              falta é dizer o que o segura — e a ordem importa: PRIMEIRO OS
-             RAIOS, depois os nós.
+             RAIOS, depois os nós, e cada texto junto do seu nó.
 
              Se os nós chegassem antes, seriam três ícones soltos que ganharam
              linha depois. Com o raio primeiro, cada pilar chega já ligado ao
              centro: a ligação é o que os torna pilares, e é ela que a seção
              afirma no texto ("é o que precisa funcionar junto").
 
-             O raio corre do CENTRO para fora, e o nó pousa na ponta dele — daí
-             o `stagger` nos dois com o mesmo intervalo e um atraso de meia
-             corrida entre as duas listas: cada nó entra logo depois de o seu
-             raio chegar, e não depois de os três chegarem. */
+             ISTO ERA QUATRO BATIDAS — cabeçalho e um pilar de cada vez, quatro
+             telas de rolagem em que a cena não mudava de assunto: o mesmo
+             hexágono parado enquanto um nó crescia e os outros dois recuavam.
+             Cobrava meia página para dizer três frases curtas, e o leitor
+             pagava esse mesmo pedágio de novo na parte da IA.
+
+             Agora é UMA. Os três textos moram em VOLTA do polígono, cada um do
+             lado do seu vértice — e é isso que dispensa a batida por item: o
+             que ligava o texto ao nó era o nó acender na vez dele, e aqui é a
+             POSIÇÃO que liga. O `stagger` continua: o nó acende e o texto dele
+             pousa no mesmo instante, três vezes, dentro de uma fatia só.
+
+             Os três terminam ACESOS, sem recuo. O recuo existia para dizer de
+             qual nó o texto da vez falava; com os três textos na tela ao mesmo
+             tempo, apagar dois seria apagar dois que estão sendo lidos.
+
+             OS TEMPOS SAEM DA JANELA DE GRUDE, e não do gosto. A moldura da
+             constelação vale uma tela dentro de uma fatia de 160svh: ela
+             assenta depois de 50svh de rolagem (31% da fatia, ou +1,55 desta
+             batida) e solta 110svh adiante (69%, +3,42). Tudo entra DEPOIS de
+             assentar e apaga ANTES de soltar — senão o texto atravessa o
+             hexágono no caminho, que é o defeito que a moldura veio corrigir. */
           batida("pilares", 5);
           tl.to(
-            raios,
-            {
-              strokeDashoffset: 0,
-              duration: 0.9,
-              ease: E_UI,
-              stagger: 0.18,
-            },
-            "pilares+=0.1"
+            cabPilares,
+            { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
+            "pilares+=1.65"
           )
+            .to(
+              raios,
+              {
+                strokeDashoffset: 0,
+                duration: 0.8,
+                ease: E_UI,
+                stagger: 0.2,
+              },
+              "pilares+=1.75"
+            )
             .to(
               pilares,
               {
                 autoAlpha: 1,
                 scale: 1,
-                duration: 0.8,
+                borderColor: "#66cdff",
+                duration: 0.7,
                 ease: E_MOLA_SOLTA,
-                stagger: 0.18,
+                stagger: 0.2,
               },
-              "pilares+=0.55"
+              "pilares+=1.95"
             )
-            /* A aura fecha um degrau acima: o quadro final tem mais desenho no
-               meio do que qualquer outro, e sem isso o hexágono com três nós
-               fica boiando num fundo que foi calibrado para uma marca só. */
+            /* O texto entra COM o nó — mesmo instante, mesmo intervalo. É o
+               par que substitui a batida por item: o olho vê o vértice acender
+               e a frase aparecer do lado dele, e não precisa de mais nada para
+               saber que são a mesma coisa. */
+            .to(
+              txtPilares,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.65,
+                ease: E_UI,
+                stagger: 0.2,
+              },
+              "pilares+=2"
+            )
+            /* A aura fecha um degrau acima: o quadro tem mais desenho no meio
+               do que qualquer outro, e sem isso o hexágono com três nós fica
+               boiando num fundo calibrado para uma marca só. */
             .to(
               aura,
               { opacity: 0.66, duration: 1.2, ease: E_LUZ },
-              "pilares+=0.3"
+              "pilares+=1.7"
+            )
+            /* E APAGA ANTES DE A MOLDURA SOLTAR. Enquanto ela está presa o
+               texto fica parado nas faixas livres; solta, ele sobe — e subir
+               aceso é passar por cima do hexágono, que é justamente o que não
+               pode acontecer. O gesto é curto (0,3) porque não é uma saída para
+               ser vista: é o quadro sendo limpo. */
+            .to(
+              [cabPilares, ...txtPilares],
+              { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
+              "pilares+=3.1"
             );
 
-          /* ── 7, 8 e 9 · UM PILAR DE CADA VEZ ──
-             A estrutura está montada; agora cada um tem a sua batida, com o
-             nome e a explicação passando ao lado. O nó da vez CRESCE e acende
-             a borda, e os outros dois recuam.
-
-             O recuo é o que faz o destaque existir: três nós no mesmo peso com
-             um texto ao lado seria o leitor procurando de qual deles o texto
-             fala. Recuar não é apagar — eles continuam ali, segurando o
-             polígono, que é a frase da parte inteira.
-
-             UM LAÇO E NÃO TRÊS BLOCOS ESCRITOS À MÃO: os três gestos são o
-             mesmo gesto, e a lista de pilares já é a fonte da ordem. */
-          PILARES.forEach((_, i) => {
-            const nome = `pilar${i}`;
-            batida(nome, 6 + i);
-            const alvo = pilares[i];
-            const outros = pilares.filter((_, j) => j !== i);
-            tl.to(
-              alvo,
-              {
-                scale: 1.16,
-                opacity: 1,
-                borderColor: "#66cdff",
-                duration: 0.8,
-                ease: E_MOLA,
-              },
-              nome
-            ).to(
-              outros,
-              {
-                scale: 1,
-                opacity: 0.4,
-                borderColor: "rgba(102, 205, 255, 0.22)",
-                duration: 0.8,
-                ease: E_UI,
-              },
-              nome
-            );
-          });
-
-          /* ── 10 · O HEXÁGONO FECHA: A MARCA ABRE E A IA OCUPA O RESTO ──
-             Três coisas ao mesmo tempo, e juntas são a frase: os três cantos
+          /* ── 7 · O HEXÁGONO FECHA: A MARCA ABRE E A IA OCUPA O RESTO ──
+             Quatro coisas ao mesmo tempo, e juntas são a frase: os três cantos
              que faltavam recebem os nós da IA, a MARCA cresce até ocupar o
-             hexágono, e os pilares voltam ao repouso — nenhum deles está em
-             destaque agora, porque o assunto passou a ser o conjunto.
+             hexágono, os pilares voltam ao repouso e o texto deles sai — o
+             assunto passou a ser o conjunto.
+
+             O TEXTO DOS PILARES JÁ SAIU no fim da batida anterior, antes de a
+             moldura dele soltar — não há três frases velhas atravessando o
+             quadro mais cheio da seção.
+
+             OS TEMPOS SEGUEM A MESMA JANELA de grude da constelação dos
+             pilares: entra depois de +1,55 e apaga antes de +3,42.
 
              A MARCA VIRA FUNDO, e não peça: ela abre atrás dos nós, em opacidade
              baixa. Cheia, um hexágono azul de meia cena vira uma chapa e engole
@@ -1113,94 +1201,91 @@ export function Centro() {
 
              A chapa do selo (o disco escuro e o anel) some junto: escalada doze
              vezes, uma borda de 1px vira uma moldura de 12. */
-          batida("motor", 9);
+          batida("motor", 6);
           tl.to(
-            selo,
-            {
-              scale: () => {
-                const glifo = selo.querySelector("svg");
-                const alto = glifo?.getBoundingClientRect().height ?? 1;
-                const cheio = cena.getBoundingClientRect().height;
-                /* `alto` já vem com a escala atual aplicada (1.9, da quarta
-                   batida), então a razão é sobre a caixa como ela está — e o
-                   valor devolvido é a escala ABSOLUTA que o tween vai escrever,
-                   não um acréscimo. */
-                const atual = gsap.getProperty(selo, "scale") as number;
-                const alvo = cheio * ((2 * R_HEX_CENA) / 100) * MARCA_NO_HEX;
-                return (alvo / alto) * atual;
+              selo,
+              {
+                scale: () => {
+                  const glifo = selo.querySelector("svg");
+                  const alto = glifo?.getBoundingClientRect().height ?? 1;
+                  const cheio = cena.getBoundingClientRect().height;
+                  /* `alto` já vem com a escala atual aplicada (1.9, da quarta
+                     batida), então a razão é sobre a caixa como ela está — e o
+                     valor devolvido é a escala ABSOLUTA que o tween vai
+                     escrever, não um acréscimo. */
+                  const atual = gsap.getProperty(selo, "scale") as number;
+                  const alvo = cheio * ((2 * R_HEX_CENA) / 100) * MARCA_NO_HEX;
+                  return (alvo / alto) * atual;
+                },
+                opacity: 0.38,
+                backgroundColor: "rgba(7, 13, 19, 0)",
+                boxShadow:
+                  "0 0 0 1px rgba(102, 205, 255, 0), 0 0 24px rgba(102, 205, 255, 0)",
+                duration: 1.5,
+                ease: E_MOLA,
               },
-              opacity: 0.38,
-              backgroundColor: "rgba(7, 13, 19, 0)",
-              boxShadow:
-                "0 0 0 1px rgba(102, 205, 255, 0), 0 0 24px rgba(102, 205, 255, 0)",
-              duration: 1.5,
-              ease: E_MOLA,
-            },
-            "motor+=0.15"
-          )
+              "motor+=1.6"
+            )
             /* Os raios saem de cena: eles ligavam três nós a um ponto no meio,
                e o meio virou uma área. Linha por baixo de uma marca chapada é
                linha que não se vê e ainda suja a borda dela. */
             .to(
               raios,
               { autoAlpha: 0, duration: 0.7, ease: E_UI },
-              "motor+=0.15"
+              "motor+=1.6"
             )
             .to(
               pilares,
-              { opacity: 0.62, scale: 1, duration: 0.8, ease: E_UI },
-              "motor+=0.2"
+              {
+                opacity: 0.62,
+                scale: 1,
+                borderColor: "rgba(102, 205, 255, 0.22)",
+                duration: 0.8,
+                ease: E_UI,
+              },
+              "motor+=1.65"
+            )
+            .to(
+              cabIa,
+              { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
+              "motor+=1.7"
             )
             .to(
               nosIa,
               {
                 autoAlpha: 1,
                 scale: 1,
-                opacity: 0.62,
-                duration: 0.8,
-                ease: E_MOLA_SOLTA,
-                stagger: 0.16,
-              },
-              "motor+=0.45"
-            );
-
-          /* ── 11, 12 e 13 · UM PAPEL DA IA DE CADA VEZ ──
-             Mesma gramática das batidas dos pilares: o nó da vez cresce e
-             acende, os outros recuam. Só que aqui os que recuam são os CINCO
-             restantes — os dois irmãos da IA e os três pilares —, porque a
-             figura já está inteira e o que muda é para onde se olha. */
-          IA.forEach((_, i) => {
-            const nome = `motor${i}`;
-            batida(nome, 10 + i);
-            const alvo = nosIa[i];
-            const resto = [...nosIa.filter((_, j) => j !== i), ...pilares];
-            tl.to(
-              alvo,
-              {
-                scale: 1.16,
                 opacity: 1,
                 borderColor: "#66cdff",
                 duration: 0.8,
-                ease: E_MOLA,
+                ease: E_MOLA_SOLTA,
+                stagger: 0.2,
               },
-              nome
-            ).to(
-              resto,
+              "motor+=1.95"
+            )
+            .to(
+              txtIa,
               {
-                scale: 1,
-                opacity: 0.42,
-                borderColor: "rgba(102, 205, 255, 0.22)",
-                duration: 0.8,
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.6,
                 ease: E_UI,
+                stagger: 0.18,
               },
-              nome
+              "motor+=1.95"
+            )
+            /* E o quadro se limpa antes de a moldura soltar, como na batida
+               anterior: o que fica na tela daqui em diante é a cena. */
+            .to(
+              [cabIa, ...txtIa],
+              { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
+              "motor+=3.1"
             );
-          });
 
           /* A última fatia precisa existir inteira na linha do tempo, senão a
              duração acaba no último tween e a batida final consome menos
-             rolagem que as outras — todas as fatias têm a mesma altura. */
-          tl.to({}, { duration: T_BATIDA }, 12 * T_BATIDA);
+             rolagem do que a fatia dela mede. */
+          tl.to({}, { duration: durT[6] ?? T_BATIDA }, emT[6] ?? 6 * T_BATIDA);
 
           /* ─────────────────────────────────────────────────────────────────
              O BLOCO QUE ESTÁ SENDO LIDO
@@ -1518,7 +1603,7 @@ export function Centro() {
                mesmo `top`. Um grude só não tem esse problema: o que muda entre
                largo e estreito é o desenho interno da grade, e não o número de
                coisas presas na tela. Ver `.ctr-flancos` no `centro.css`. */
-              <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
+              <li className="ctr-passo ctr-fatia" key={t.id} data-lugar={t.lugar}>
                 <div className="ctr-flancos">
                   <div className="ctr-bloco">
                     <h3 className="ctr-tit">{t.titulo}</h3>
@@ -1529,7 +1614,7 @@ export function Centro() {
                 </div>
               </li>
             ) : (
-              <li className="ctr-passo" key={t.id} data-lugar={t.lugar}>
+              <li className="ctr-passo ctr-fatia" key={t.id} data-lugar={t.lugar}>
                 <div className="ctr-bloco">
                   <h3 className="ctr-tit">{t.titulo}</h3>
                   <p className="ctr-txt">{t.texto}</p>
@@ -1554,83 +1639,90 @@ export function Centro() {
           item de lista sem item. `aria-hidden` porque não há nada aqui para
           ler — quem usa leitor de tela vai do último tópico direto para a
           seção dos pilares, que é a leitura certa. */}
-        <div className="ctr-passagem" aria-hidden="true" />
+        <div className="ctr-passagem ctr-fatia" aria-hidden="true" />
 
-      {/* ---- OS PILARES, TEXTO E CENA NA MESMA COLUNA ----
+        {/* ---- AS DUAS CONSTELAÇÕES ----
 
-          Quatro fatias: o cabeçalho da parte (onde a estrutura se monta) e uma
-          por pilar. Isto era uma seção separada, com um hexágono próprio, um
-          `<h2>` e três cartões lado a lado. Virou a continuação da mesma cena:
-          o polígono já está desenhado, os raios saem do meio, e cada pilar
-          acende no vértice enquanto o texto dele passa ao lado.
+            OITO FATIAS DE ROLAGEM VIRARAM DUAS. Os pilares e os papéis da IA
+            eram, cada grupo, um cabeçalho e três blocos em fila — oito telas em
+            que a cena não mudava de assunto: o mesmo hexágono parado enquanto
+            um nó crescia e os outros recuavam. Era meia página de rolagem para
+            dizer três frases curtas, duas vezes seguidas.
 
-          Três cartões lado a lado dizem "são três itens de uma lista". Três nós
-          num hexágono que a cena acabou de formar dizem que os três seguram a
-          mesma peça — que é o que o apoio afirma e o que a seção antiga nunca
-          conseguia mostrar.
+            A constelação diz as mesmas três de uma vez. Os textos deixam de
+            passar POR a cena e passam a morar EM VOLTA dela, cada um do lado do
+            vértice de que fala: a grade reserva o meio para o hexágono e
+            distribui os blocos pelas faixas livres, nas mesmas direções em que
+            os nós estão plantados (ver `emCena` e os ângulos em `PILARES`/`IA`).
 
-          `id="pilares"` fica aqui: é para cá que o menu aponta, e o começo da
-          parte é o cabeçalho, não o primeiro pilar. */}
-        <div className="ctr-pilares-texto" id="pilares">
-          <div className="ctr-passo" data-lugar="topo">
-            <div className="ctr-bloco">
-              <h2 className="ctr-tit">
+            É a posição que liga o texto ao nó — trabalho que a batida por item
+            fazia gastando uma tela. O que sobrou de movimento é o que importa:
+            o raio corre, o nó acende e a frase dele pousa ao lado, três vezes,
+            dentro de uma fatia só.
+
+            NENHUMA PALAVRA SE PERDEU: são os mesmos seis nomes e os mesmos seis
+            textos que estavam nos cartões das seções antigas.
+
+            `id` fica no invólucro, que é onde a parte começa — é para cá que o
+            menu e o rodapé apontam. */}
+        <div className="ctr-const ctr-fatia" data-fam="pilar" id="pilares">
+          <div className="ctr-const-grade">
+            {/* O cabeçalho ocupa a faixa livre do ALTO. Os três pilares moram
+                em 210°, −30° e 90° — esquerda-cima, direita-cima e baixo —,
+                então o topo é o único lugar da grade sem vértice para
+                disputar. */}
+            <div className="ctr-const-cab">
+              <h2 className="ctr-tit ctr-tit--cab">
                 Três pilares <mark>sustentam a empresa.</mark>
               </h2>
               <p className="ctr-txt">
                 Não são valores de parede: são o que precisa funcionar junto.
               </p>
             </div>
-          </div>
 
-          {/* Uma lista de verdade: os três são itens de igual peso, e isso
-              precisa existir na marcação e não só na tipografia. */}
-          <ul className="ctr-pilares-lista">
-            {PILARES.map((p) => (
-              <li className="ctr-passo" key={p.id} data-lugar={p.lugar}>
-                <div className="ctr-bloco">
-                  <h3 className="ctr-tit">{p.nome}</h3>
+            {/* Uma lista de verdade: os três são itens de igual peso, e isso
+                precisa existir na marcação e não só na tipografia. */}
+            <ul className="ctr-nos">
+              {PILARES.map((p) => (
+                <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
+                  <h3 className="ctr-no-tit">{p.nome}</h3>
                   <p className="ctr-txt">{p.texto}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* ---- A IA, NA MESMA COLUNA ----
+        {/* A IA fecha a cena: a partir daqui não há canto vazio no hexágono
+            nem seção nova para abrir.
 
-            Quatro fatias, como as dos pilares: o cabeçalho da parte — onde a
-            marca abre e os três nós ocupam os cantos que faltavam — e uma por
-            papel. Era a seção `#ia` da página, com `<h2>` e três cartões.
-
-            Ela fecha a cena: a partir daqui não há mais canto vazio no
-            hexágono nem seção nova para abrir. */}
-        <div className="ctr-pilares-texto" id="ia">
-          {/* O cabeçalho desta parte vai no ALTO, e não embaixo como o dos
-              pilares: é na batida dele que a marca abre até 78% do diâmetro do
-              hexágono, e a borda de baixo dela chega perto do rodapé da tela —
-              onde o bloco de baixo gruda. */}
-          <div className="ctr-passo" data-lugar="topo">
-            <div className="ctr-bloco">
-              <h2 className="ctr-tit">
+            O CABEÇALHO DELA VAI EMBAIXO, e não no alto como o dos pilares. Não
+            é variação: os três papéis da IA ocupam −90°, 30° e 150° — topo,
+            direita-baixo e esquerda-baixo —, e o topo é vértice ocupado. A
+            faixa livre é a de baixo, e a frase ali embaixo lê como o que ela
+            é: a assinatura do quadro completo, com a marca já aberta dentro do
+            polígono. Na ordem do documento ela continua vindo primeiro, que é
+            como o leitor de tela precisa receber. */}
+        <div className="ctr-const ctr-fatia" data-fam="ia" id="ia">
+          <div className="ctr-const-grade">
+            <div className="ctr-const-cab">
+              <h2 className="ctr-tit ctr-tit--cab">
                 Movidos por <mark>Inteligência Artificial.</mark>
               </h2>
               <p className="ctr-txt">
                 Da criação da arte ao atendimento, tudo passa por ela.
               </p>
             </div>
-          </div>
 
-          <ul className="ctr-pilares-lista">
-            {IA.map((p) => (
-              <li className="ctr-passo" key={p.id} data-lugar={p.lugar}>
-                <div className="ctr-bloco">
-                  <h3 className="ctr-tit">{p.nome}</h3>
+            <ul className="ctr-nos">
+              {IA.map((p) => (
+                <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
+                  <h3 className="ctr-no-tit">{p.nome}</h3>
                   <p className="ctr-txt">{p.texto}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

@@ -306,11 +306,366 @@
   }
 }
 
-/* Sem os links visíveis não existe o que recolher: a barra fica com marca e
-   ações, e condensar isso não muda nada além de encolher o botão. */
+/* AQUI O RÓTULO DO CTA FICAVA SEMPRE ABERTO NO CELULAR, e a regra saiu.
+
+   Ela dizia: "sem os links visíveis não existe o que recolher — a barra fica
+   com marca e ações, e condensar isso não muda nada além de encolher o botão".
+   Era verdade enquanto a barra do celular tinha dois elementos. Agora ela tem
+   três, e a rolagem empilha os três à direita (ver o bloco no fim deste
+   arquivo): o CTA precisa fechar em esfera de 42px como fecha no desktop, senão
+   a coluna sai com um oblongo largo no meio de dois círculos.
+
+   Onde `animation-timeline` não existe, `--nav-cond` fica em 0 e o rótulo
+   continua aberto pelo `max-width` do `@supports` — o estado do topo, que é o
+   comportamento correto para degradar. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   O MENU DO CELULAR
+
+   Abaixo de 820px a cápsula de pílulas é `display: none` — ela não cabe ao lado
+   da marca e do botão de conversão. O que sobrava era uma barra sem navegação
+   nenhuma: marca e CTA, e as outras três rotas só nos links do rodapé. Este
+   bloco é o que devolve o roteamento ao dispositivo em que ele mais falta.
+
+   O botão é o par exato do `.nav-cta`: 42×42, o mesmo alvo de dedo, ao lado
+   dele. Dois círculos da mesma medida lêem como um par de controles; um de 42 e
+   outro de 38 lêem como acidente.
+
+   O painel pende do botão pela DIREITA, e não da coluna da página. É o que faz
+   ele continuar preso à barra depois que ela condensa: ali a barra vira um
+   oblongo estreito e centrado, e um painel alinhado à margem da página ficaria
+   flutuando solto, longe do controle que o abriu. */
+
+.nav-menu-caixa {
+  position: relative;
+  display: none;
+  flex: none;
+}
+
+.nav-menu-botao {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 999px;
+  /* Superfície e fio, não o azul: o azul é do botão de conversão ao lado, e
+     dois controles cheios da mesma cor na mesma linha disputam a mesma
+     intenção. Aqui é navegação — ela se apresenta, não se oferece. */
+  background: var(--bg-2);
+  border: 1px solid var(--hair);
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color var(--t-ui) var(--e-ui),
+    border-color var(--t-ui) var(--e-ui);
+}
+
+.nav-menu-botao:active {
+  scale: 0.94;
+}
+
+.nav-menu-botao[aria-expanded="true"] {
+  border-color: var(--hair-hot);
+}
+
+.nav-menu-botao:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: 2px;
+}
+
+/* O ícone vive numa caixa própria: dentro de um botão em grid o SVG não tem
+   tamanho intrínseco para o CSS esticar, e sem medida declarada ele encolhe
+   para o mínimo. Mesma razão do `.flut-seta`. */
+.nav-menu-ico {
+  width: 20px;
+  height: 20px;
+}
+
+/* O PAINEL.
+
+   `visibility` junto de `opacity`, e não só `opacity`: elemento com opacidade
+   zero continua sendo alvo de toque, e o painel fechado cobre um pedaço da
+   página inteira logo abaixo da barra. Quem não usa `visibility` aqui entrega
+   uma faixa de 240px em que nada da página responde ao dedo.
+
+   O `inert` do componente cobre foco e leitor de tela; a `visibility` cobre o
+   toque e a pintura. São camadas diferentes do mesmo "isto não existe agora", e
+   nenhuma das duas substitui a outra. */
+.nav-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 2;
+  width: max-content;
+  min-width: 208px;
+  max-width: calc(100vw - 1.7rem);
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--bg-2) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid var(--hair);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), 0 24px 48px -20px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  visibility: hidden;
+  /* Nasce a partir da quina de cima à direita — a do botão. Painel que cresce
+     do próprio centro não diz de onde veio; este diz. */
+  transform-origin: 100% 0;
+  scale: 0.96;
+  translate: 0 -6px;
+  transition: opacity var(--t-ui) var(--e-ui), scale var(--t-mov) var(--e-mola),
+    translate var(--t-mov) var(--e-mola),
+    visibility 0s linear var(--t-mov);
+}
+
+.nav-menu[data-aberto] {
+  opacity: 1;
+  visibility: visible;
+  scale: 1;
+  translate: none;
+  /* Na abertura a visibilidade tem que valer no primeiro quadro, senão a
+     transição roda com o painel ainda escondido e ele aparece pronto no fim. */
+  transition-delay: 0s;
+}
+
+.nav-menu-item {
+  display: flex;
+  align-items: center;
+  /* 48px de altura: o alvo de toque mínimo confortável, e o que impede a lista
+     de virar quatro linhas de texto empilhadas. */
+  min-height: 48px;
+  padding: 0 1.1rem;
+  border-radius: 14px;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--fg-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--t-ui) var(--e-ui),
+    background-color var(--t-ui) var(--e-ui);
+}
+
+.nav-menu-item:active {
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+.nav-menu-item:focus-visible {
+  outline: 2px solid var(--fg-hot);
+  outline-offset: -2px;
+}
+
+/* A página atual, com a mesma gramática da pílula do desktop: preenchida com a
+   superfície, texto em tinta cheia e peso maior. O azul continua sendo só do
+   botão de conversão. */
+.nav-menu-item[aria-current="page"] {
+  background: var(--bg);
+  color: var(--fg);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+/* Quem pede menos movimento recebe a mesma troca sem o deslocamento: o painel
+   aparece e some por opacidade, no lugar onde já estava. O que ele não perde é
+   o aparecer — é navegação, não enfeite. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu {
+    scale: 1;
+    translate: none;
+    transition: opacity var(--t-ui) var(--e-ui),
+      visibility 0s linear var(--t-ui);
+  }
+}
+
+/* O PONTO DE TROCA, e é o mesmo 820px que esconde as pílulas em `v5.css` e que
+   o componente lê em `matchMedia`. Os três têm que andar juntos: acima disso
+   existem as pílulas e não existe o botão; abaixo, o contrário. Um menu ao lado
+   de uma navegação que já está visível seria a mesma lista duas vezes. */
 @media (max-width: 820px) {
-  .nav-cta-rotulo {
-    max-width: none;
-    opacity: 1;
+  .nav-menu-caixa {
+    display: block;
+  }
+}
+
+/* AQUI HAVIA UM APERTO DE PÍLULA entre 821px e 1000px, de quando `/perguntas`
+   era a quarta rota e as quatro disputavam a linha com a marca e o CTA. A rota
+   saiu (o FAQ virou seção da landing), são três de novo, e três cabem na faixa
+   sem ajuda. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NO CELULAR, A ROLAGEM EMPILHA A BARRA À DIREITA
+
+   Estado do topo: como sempre foi — marca à esquerda, CTA com rótulo e o botão
+   do menu à direita, na largura da coluna.
+
+   Fora do topo: os três viram uma coluna de esferas de 42px encostada na
+   direita, nesta ordem, de cima para baixo — o menu, o CTA (envelope) e a
+   marca. Sem barra em volta: no desktop as peças se recolhem para dentro de um
+   oblongo, e aqui não existe oblongo para recolher; cada esfera carrega a
+   própria superfície.
+
+   A ORDEM SAI DO `column-reverse`, e não de uma reordenação no DOM. O DOM é
+   marca → pílulas → ações, e a ordem de leitura e de tabulação tem que continuar
+   sendo essa: quem chega de teclado ou de leitor de tela encontra a marca
+   primeiro, como em qualquer site. `column-reverse` inverte só a pintura, que é
+   exatamente a diferença entre `order`/`*-reverse` (visual) e mexer no HTML
+   (semântico).
+
+   ───────────────────────────────────────────────────────────────────────────
+   POR QUE `.navbar` VIRA ABSOLUTO AQUI, E ESSA É A PARTE QUE NÃO É ENFEITE
+
+   A coluna tem 142px de altura (três esferas e dois vãos) contra os 58px da
+   linha. Com a barra em fluxo, essa diferença é altura que NASCE no meio da
+   rolagem: a `.navbar-faixa` cresceria 84px e empurraria a página inteira para
+   baixo — deslocamento de layout no exato momento em que a pessoa está lendo, e
+   causado pelo próprio ato de rolar.
+
+   Absoluto dentro da faixa (que é `sticky`, e sticky é elemento posicionado, e
+   por isso serve de âncora sem precisar de `position: relative`), a coluna
+   deixa de ter altura em fluxo. A faixa ganha uma altura fixa igual à da linha
+   do topo, e o espaço reservado no alto da página não muda mais — nem quando a
+   coluna cresce, nem quando ela volta.
+
+   Os 58px são os mesmos que o `.hero` desconta em `v5.css` (`margin-top` e
+   `padding-top` de `calc(var(--nav-gap) + 58px)`). Mudou um, mudam os dois. */
+
+@media (max-width: 820px) {
+  /* A marca vira caixa quadrada do tamanho dos outros dois controles. Vale
+     também no topo, e é de propósito: uma imagem de 32px alinhada com dois
+     alvos de 42px deixa a linha do topo visivelmente desencontrada. Aqui ela
+     passa a ter a mesma caixa que eles desde o primeiro quadro, e o que a
+     rolagem acrescenta é só a superfície. */
+  .brand {
+    display: grid;
+    /* `start` E NÃO `center`, e a diferença é de 7px que se enxergam.
+
+       A marca é o primeiro elemento da linha do topo e o lado esquerdo dela
+       encosta na margem do `.hold` — a mesma margem em que começam o `<h1>` e
+       todo parágrafo da página. Centrar o símbolo dentro de uma caixa de 42px o
+       empurraria para dentro, e a barra passaria a começar num eixo que nenhum
+       outro elemento usa.
+
+       Quem recentra o símbolo quando a caixa vira esfera é o `padding-left`
+       animado, no bloco do `@supports` abaixo. */
+    justify-items: start;
+    align-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 820px) {
+    /* SEM SUPERFÍCIE EM VOLTA, em nenhum momento. As três esferas são as
+       superfícies da barra do celular; um oblongo por trás delas seria caixa
+       dentro de caixa, e no estado empilhado ele nem teria forma — seria um
+       retângulo alto atrás de uma coluna. */
+    .navbar {
+      position: absolute;
+      /* O bloco de posicionamento de um absoluto é a caixa de PADDING do
+         ancestral, então `top: 0` ignoraria o `padding-top` da faixa e a barra
+         subiria colada no alto no estado do topo. Esta conta repete o padding
+         da faixa: mesma expressão, mesmo resultado, e some junto com ele. */
+      top: calc(var(--nav-gap) * (1 - var(--nav-cond)));
+      left: 0;
+      right: 0;
+      /* Encostada na direita quando encolhe. `margin-inline: auto` centraliza,
+         que é o certo no desktop e errado aqui: a coluna é do polegar, e o
+         polegar está do lado. */
+      margin-left: auto;
+      margin-right: 0;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-color: transparent;
+      animation: navEmpilha linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 160px;
+    }
+
+    /* A ALTURA RESERVADA NO ALTO DA PÁGINA, FIXA E IGUAL À DO ESTADO DO TOPO.
+
+       Sem ela a faixa mediria a coluna absoluta como zero e o conteúdo subiria
+       — o mesmo defeito do parágrafo acima, com o sinal trocado.
+
+       `border-box` (o reset é global), então estes `var(--nav-gap) + 58px` já
+       incluem o `padding-top` da faixa: o padding encolhe com a rolagem, a
+       caixa não. São os mesmos 58px que o `.hero` desconta em `v5.css`. */
+    .navbar-faixa {
+      min-height: calc(var(--nav-gap) + 58px);
+    }
+
+    .nav-acoes {
+      animation: navEmpilha linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 160px;
+    }
+
+    /* `flex-direction` e `align-items` não interpolam — são propriedades
+       discretas, e numa animação CSS elas trocam de valor na metade do
+       intervalo. É o que se quer: layout não derrete, ele troca. O que derrete
+       em volta (o vão, a superfície das esferas, o rótulo do CTA fechando) é o
+       que faz a troca aos 80px de rolagem passar como transição e não como
+       salto. */
+    @keyframes navEmpilha {
+      to {
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 8px;
+      }
+    }
+
+    /* A superfície da marca acompanha a rolagem por `--nav-cond`, como todo o
+       resto: no topo ela é só o símbolo solto, e fora dele é a esfera que faz
+       par com o CTA e com o menu.
+
+       `box-shadow: inset` e não `border`: borda de 1px somaria à caixa de 42px
+       e a marca ficaria 2px maior que os dois vizinhos — num trio de círculos
+       encostados isso se vê. */
+    .brand {
+      /* O símbolo sai da margem e vai para o meio da esfera, junto com ela.
+
+         10px é o que sobra de um lado quando o símbolo condensado (26px de
+         altura na proporção 108×128, ou seja ~22px de largura) fica no centro de
+         42px. Com `box-sizing: border-box` o padding come a caixa pela
+         esquerda, e `justify-items: start` empurra o símbolo junto — no fim ele
+         está centrado sem nunca ter deixado de estar alinhado à margem no
+         estado do topo. Mexeu na altura do símbolo, refaz a conta. */
+      padding-left: calc(var(--nav-cond) * 10px);
+      background: color-mix(
+        in srgb,
+        var(--bg-2) calc(var(--nav-cond) * 100%),
+        transparent
+      );
+      box-shadow: inset 0 0 0 1px
+        color-mix(
+          in srgb,
+          var(--fg) calc(var(--nav-cond) * 10%),
+          transparent
+        );
+    }
+
+    /* O PAINEL DO MENU SAI PELO LADO, e não mais para baixo.
+
+       Abaixo do menu passaram a morar o CTA e a marca. Um painel descendo do
+       botão cobriria os dois — e ícone que some debaixo de uma folha lê como
+       defeito, não como camada.
+
+       `top` e `right` são comprimentos e interpolam: o painel migra de "abaixo
+       do botão" para "ao lado dele" ao longo da mesma faixa de rolagem, sem
+       ponto de troca. A origem da escala continua na quina de cima à direita,
+       que é a quina do botão nos dois estados.
+
+       O `max-width` abre espaço para a coluna: são os 42px da esfera mais o
+       respiro dos dois lados. */
+    .nav-menu {
+      top: calc((1 - var(--nav-cond)) * (100% + 10px));
+      right: calc(var(--nav-cond) * (100% + 10px));
+      max-width: calc(100vw - 5rem);
+    }
   }
 }

@@ -19,6 +19,11 @@ import { FundoFecho } from "./fundos";
 import { Gravidade } from "./gravidade";
 import { Modelos } from "./modelos";
 import { MapaUnidades } from "./mapa-unidades";
+/* O acordeão, as doze perguntas e o CSS deles — o CSS é importado dentro do
+   próprio módulo. Ver o cabeçalho de `faq.tsx`, que é onde vive a regra de
+   conteúdo: nenhuma resposta inventa fato, e a franqueadora revisa todas antes
+   de publicar. */
+import { Faq, TODAS } from "./faq";
 /* A cena do totem e o stepper das quatro frentes viraram um percurso só — ver o
    cabeçalho de `percurso.tsx`. `estudio.tsx` e `frentes.tsx` seguem no
    repositório, sem referência, para o caso de a divisão precisar voltar. */
@@ -173,7 +178,7 @@ export function Landing() {
             tabela, que é o único lugar onde ele compara.
 
             A âncora `#numeros` fica com esta seção porque é para cá que apontam
-            o botão do herói, o rodapé, a galeria e a página de perguntas — e é
+            o botão do herói, o rodapé e a galeria — e é
             aqui que os números passaram a morar.
 
             O `.breu-saida` é a outra metade da chegada na cena: o preto do vídeo
@@ -192,6 +197,67 @@ export function Landing() {
             <Modelos />
           </section>
         </div>
+
+        {/* AS PERGUNTAS, AQUI E NÃO NO FIM.
+
+            Este é o ponto da página em que o candidato acabou de ver preço — e
+            preço é o que faz a objeção subir. Um FAQ colado no rodapé chega
+            depois do formulário, ou seja, depois da decisão; aqui ele chega
+            entre o número e o pedido, que é onde a dúvida acontece.
+
+            ELA JÁ FOI UMA ROTA, `/perguntas`, e esta seção mostrava seis das
+            doze com um link para o resto. A rota saiu a pedido e as doze vieram
+            junto — o porquê de trazer todas está no cabeçalho de `faq.tsx`. Em
+            resumo: sem uma segunda página, "não mostrar" virava "apagar do
+            site", e o que sairia incluía a ressalva de que o payback é
+            estimativa e não garantia.
+
+            `/perguntas` redireciona para cá (ver `next.config.ts`): a URL foi
+            publicada, e link morto é pior que redirect. */}
+        <section className="hold sec pontos" id="duvidas">
+          {/* O JSON-LD sai da MESMA lista que a seção renderiza. Se uma resposta
+              mudar, as duas mudam juntas — é a única forma de garantir que o que
+              o buscador lê é o que a página diz, e divergência entre os dois o
+              Google trata como marcação enganosa, não como descuido.
+
+              Ele mudou de rota junto com o conteúdo: enquanto `/perguntas`
+              existia, a marcação era de lá, e uma segunda cópia aqui faria duas
+              páginas do domínio se declararem o FAQ do mesmo assunto. Agora é
+              uma só, e é esta.
+
+              NÃO É PELO RESULTADO RICO. O Google restringiu a caixa expansível
+              de FAQ a sites de governo e saúde em agosto de 2023 e desligou o
+              recurso de vez em 07/05/2026. O que a marcação faz hoje é dizer aos
+              sistemas de resposta — ChatGPT, Perplexity, Copilot e o próprio
+              Google — que aquilo é uma pergunta com resposta fechada e de quem
+              ela é. Morreu o enfeite, não o dado. */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: TODAS.map((p) => ({
+                  "@type": "Question",
+                  name: p.q,
+                  acceptedAnswer: { "@type": "Answer", text: p.a },
+                })),
+              }),
+            }}
+          />
+
+          <div className="sec-cab">
+            <h2>
+              Perguntas de quem está <mark>avaliando a franquia.</mark>
+            </h2>
+            <p>
+              As dúvidas que mais chegam, respondidas com o que a rede já
+              confirmou. O que não estiver aqui, pergunte no formulário abaixo.
+            </p>
+          </div>
+
+          <Faq perguntas={TODAS} />
+        </section>
 
       </div>
 
@@ -248,7 +314,7 @@ export function Landing() {
         </FormFranqueado>
         <Rodape
           links={[
-            { href: "/perguntas", rotulo: "Perguntas frequentes" },
+            { href: "#duvidas", rotulo: "Perguntas frequentes" },
             { href: "/", rotulo: "A marca" },
             { href: "#ia", rotulo: "A IA" },
             { href: "#numeros", rotulo: "Modelos e valores" },

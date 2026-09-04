@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { IcoEnvelope } from "./icons";
+import { MenuMobile } from "./menu-mobile";
+import { ROTAS, type Pagina } from "./rotas";
 import "./navbar.css";
 
 /* Barra de navegação do site.
@@ -29,13 +31,13 @@ import "./navbar.css";
    aparece no lugar. Trocar texto por ícone escondendo o texto de todo mundo
    deixaria o botão sem nome acessível — a bolinha viraria um alvo anônimo. */
 
-export type Pagina = "home" | "franqueado" | "galeria";
+/* A LISTA DE ROTAS E O TIPO `Pagina` MUDARAM PARA `./rotas`.
 
-const ITENS: Array<{ id: Pagina; rotulo: string; href: string }> = [
-  { id: "home", rotulo: "Home", href: "/" },
-  { id: "franqueado", rotulo: "Franqueado", href: "/seja-franqueado" },
-  { id: "galeria", rotulo: "Galeria", href: "/galeria" },
-];
+   O menu do celular precisa dos mesmos quatro itens e é componente de cliente;
+   importá-los daqui fecharia um ciclo entre os dois arquivos, porque este
+   importa aquele. O reexport mantém `import { type Pagina } from "./navbar"`
+   funcionando em quem já escrevia assim. */
+export type { Pagina } from "./rotas";
 
 /* `cta` vem da casca: na home ele atravessa para `/seja-franqueado` e nas
    outras desce até o formulário do fechamento. Ver `destinoCta` em `./lead`. */
@@ -78,7 +80,7 @@ export function NavBar({
         </Link>
 
         <nav className="nav-pilulas" aria-label="Páginas">
-          {ITENS.map((i) =>
+          {ROTAS.map((i) =>
             i.id === atual ? (
               <span key={i.id} className="pilula" aria-current="page">
                 {i.rotulo}
@@ -100,6 +102,12 @@ export function NavBar({
             <IcoEnvelope className="nav-cta-ico" />
             <span className="nav-cta-rotulo">{cta.rotulo}</span>
           </a>
+
+          {/* O menu só existe abaixo de 820px, onde a cápsula de pílulas some.
+              Ele fica DEPOIS do CTA na ordem do DOM de propósito: a ordem visual
+              é a mesma, e o botão de conversão precisa vir antes na tabulação —
+              é a ação da página, não a navegação entre elas. */}
+          <MenuMobile atual={atual} />
         </div>
       </div>
     </div>

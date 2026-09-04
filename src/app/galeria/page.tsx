@@ -122,7 +122,7 @@ export default function Galeria() {
         <Rodape
           links={[
             { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
-            { href: "/perguntas", rotulo: "Perguntas frequentes" },
+            { href: "/seja-franqueado#duvidas", rotulo: "Perguntas frequentes" },
             { href: "/", rotulo: "A marca" },
           ]}
         />

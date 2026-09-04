@@ -47,11 +47,23 @@ const ATUALIZADO_EM = {
      redireciona (ver `next.config.ts`), e URL que redireciona dentro de um
      sitemap é sinal contraditório — o arquivo declara "esta é a boa" enquanto
      o servidor responde "não é, vá para outra". */
+  /* A home e a galeria NÃO mudaram de data: nelas só o destino de um link do
+     rodapé trocou, e troca de link interno não é mudança de conteúdo. Carimbar
+     data nova nas três porque o deploy mexeu nas três é exatamente como o
+     `lastmod` de um site vira decoração. */
   home: "2026-09-02",
-  sejaFranqueado: "2026-09-02",
-  perguntas: "2026-09-02",
+  /* 04/09/2026: o FAQ virou seção desta rota (`#duvidas`), com as doze
+     perguntas e o `FAQPage` em JSON-LD que era de `/perguntas`. É mudança de
+     conteúdo de verdade, das que o `lastmod` existe para declarar. */
+  sejaFranqueado: "2026-09-04",
   galeria: "2026-09-02",
 } as const;
+
+/* `/perguntas` SAIU DA LISTA, junto com a rota. Ela agora redireciona para
+   `/seja-franqueado#duvidas` (ver `next.config.ts`), e URL que redireciona
+   dentro de um sitemap é sinal contraditório — o arquivo declara "esta é a boa"
+   enquanto o servidor responde "não é, vá para outra". Mesma razão que mantém
+   `/institucional` fora daqui. */
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -60,7 +72,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/seja-franqueado`,
       lastModified: ATUALIZADO_EM.sejaFranqueado,
     },
-    { url: `${SITE_URL}/perguntas`, lastModified: ATUALIZADO_EM.perguntas },
     { url: `${SITE_URL}/galeria`, lastModified: ATUALIZADO_EM.galeria },
   ];
 }

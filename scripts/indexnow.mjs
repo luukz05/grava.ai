@@ -31,8 +31,11 @@ const SITE =
 
 /* `/institucional` saiu daqui: a rota agora redireciona para `/` (as duas
    trocaram de lugar em 02/09/2026), e avisar o IndexNow de uma URL que
-   redireciona é gastar o ping com o endereço errado. */
-const ROTAS = ["/", "/seja-franqueado", "/perguntas", "/galeria"];
+   redireciona é gastar o ping com o endereço errado.
+
+   `/perguntas` saiu pelo mesmo motivo, em 04/09/2026: o FAQ virou seção de
+   `/seja-franqueado` e a rota passou a redirecionar para lá. */
+const ROTAS = ["/", "/seja-franqueado", "/galeria"];
 
 const host = new URL(SITE).host;
 const urlList = ROTAS.map((r) => new URL(r, SITE).href);

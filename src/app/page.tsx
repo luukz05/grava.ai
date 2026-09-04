@@ -182,7 +182,7 @@ export default function Home() {
           busca pelo nome da marca, e pedir nome, e-mail e WhatsApp a quem
           chegou para saber o que a GRAVA.AI faz é cobrar dado antes de haver
           intenção. O formulário continua inteiro em `/seja-franqueado`,
-          `/galeria` e `/perguntas` — onde quem lê já está avaliando a franquia.
+          `/galeria` — onde quem lê já está avaliando a franquia.
 
           Um CTA só, e cheio. O par "principal + secundário" morreu junto com o
           formulário: sem uma segunda ação para disputar, um botão `cta--out`
@@ -209,7 +209,7 @@ export default function Home() {
             { href: "#marca", rotulo: "Quem somos" },
             { href: "#pilares", rotulo: "Os pilares" },
             { href: "#ia", rotulo: "A IA" },
-            { href: "/perguntas", rotulo: "Perguntas frequentes" },
+            { href: "/seja-franqueado#duvidas", rotulo: "Perguntas frequentes" },
             { href: "/seja-franqueado", rotulo: "Seja um franqueado" },
           ]}
         />

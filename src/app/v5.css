@@ -961,7 +961,6 @@
 
 .sec {
   padding-block: clamp(2.5rem, 7vw, 4.5rem);
-  border-bottom: 1px solid var(--hair);
 }
 
 /* ---------- o pontilhado do miolo ----------
@@ -978,17 +977,17 @@
    com `<pattern>` desenha o mesmo e cobra um elemento, um `useId` e um
    `re-render` por seção onde ela entra.
 
-   A MÁSCARA É QUASE PLANA, e não um foco no meio. Ela já foi um clarão central
+   A MÁSCARA É PLANA, e não um foco no meio. Ela já foi um clarão central
    (opaco em 26%, sumindo em 76%) e o efeito era o contrário do que se quer
    aqui: um holofote pontilhado atrás da cena, com o olho lendo a mancha antes
-   de ler o que está em cima dela. Chão não tem centro.
+   de ler o que está em cima dela. Chão não tem centro — e um foco preso ao
+   elemento, com a malha ancorada no viewport, seria a única coisa se movendo
+   na rolagem.
 
-   Então o degradê é raso — 100% no meio, 82% na maior parte do caminho, 70%
-   perto da borda — e só a borda EXTREMA cai a zero. O centro fica um fio mais
-   aceso que o resto, o suficiente para o quadro não ser uma malha uniforme de
-   ponta a ponta, e o pontilhado ainda não encosta na borda da seção vizinha:
-   duas faixas coladas leriam como uma grade só, atravessando o corte entre
-   elas.
+   Sobrou um fade vertical só nas pontas: o miolo é opaco de ponta a ponta e
+   apenas os 14% de cima e de baixo caem a zero, para o pontilhado não encostar
+   na borda da seção vizinha — duas faixas coladas leriam como uma grade só,
+   atravessando o corte entre elas.
 
    `isolation: isolate` e `z-index: -1`: a camada fica atrás do conteúdo da
    seção, e não atrás da PÁGINA. Sem o isolamento ela some sob o fundo do
@@ -1005,22 +1004,33 @@
   z-index: -1;
   background-image: radial-gradient(
     circle at 1px 1px,
-    rgba(242, 248, 255, 0.075) 1px,
+    rgba(242, 248, 255, 0.13) 1px,
     transparent 0
   );
   background-size: 26px 26px;
-  -webkit-mask-image: radial-gradient(
-    125% 88% at 50% 50%,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.82) 38%,
-    rgba(0, 0, 0, 0.68) 72%,
+  /* `fixed` ancora a malha no VIEWPORT, não no elemento: ao rolar, o chão fica
+     parado e o conteúdo passa por cima dele. Sem isso cada seção carrega sua
+     própria grade rolando junto — e como cada uma conta o grid a partir do seu
+     próprio topo, os pontos desalinham no corte entre duas seções e o olho lê
+     o deslize como sujeira, não como fundo. */
+  background-attachment: fixed;
+  /* A máscara é VERTICAL e quase plana, não mais um foco radial no meio. Com a
+     malha fixa, aquele foco preso ao elemento seria a única coisa se movendo —
+     exatamente o efeito que se quer eliminar. Aqui só as pontas apagam, para
+     que duas seções coladas não leiam como uma grade única atravessando o
+     corte entre elas. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 1) 14%,
+    rgba(0, 0, 0, 1) 86%,
     transparent 100%
   );
-  mask-image: radial-gradient(
-    125% 88% at 50% 50%,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.82) 38%,
-    rgba(0, 0, 0, 0.68) 72%,
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 1) 14%,
+    rgba(0, 0, 0, 1) 86%,
     transparent 100%
   );
   pointer-events: none;
@@ -1078,13 +1088,6 @@
   background-repeat: no-repeat;
   background-size: 100% clamp(120px, 22vh, 260px);
   background-position: top;
-}
-
-/* O fio de baixo da seção sai. Em preto, uma hairline na largura da coluna logo
-   depois de um vídeo sangrado lê como risco, não como separação — e quem separa
-   aqui é a rampa, que é mais larga e mais clara que qualquer fio. */
-.breu .sec {
-  border-bottom: 0;
 }
 
 /* ---------- cabeçalho de seção ----------
@@ -1559,68 +1562,6 @@
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-  }
-}
-
-.dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 20;
-  display: none;
-  padding: 0.65rem clamp(0.85rem, 4vw, 1.25rem);
-  /* A faixa do indicador de home do iPhone fica por baixo de qualquer coisa
-     colada no rodapé; sem isto o botão encosta nela. */
-  padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
-  /* Token e não valor cru: a barra é a superfície da página vista através de
-     desfoque, e valor fixo aqui descola dela na primeira vez que `--bg` mudar.
-
-     95% de opacidade com 10px de desfoque era desfoque decorativo: a essa
-     densidade nada do conteúdo atravessa, e o que se via era uma tarja opaca
-     pagando o custo de repintar o fundo a cada quadro de rolagem. Ou é
-     material — o conteúdo passa por baixo e se lê que ele continua ali —, ou é
-     tarja sólida e o desfoque sai. Aqui é material: 76%, desfoque de 20px e
-     saturação, que é o que impede a cor por trás de virar cinza ao ser
-     borrada. A superfície é grande, então o desfoque é forte: peça maior lê
-     como material mais espesso. */
-  background: color-mix(in srgb, var(--bg) 76%, transparent);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  /* Fio de luz, não divisória: é a quina do material pegando a claridade da
-     página, do mesmo jeito que a borda superior de uma barra translúcida da
-     Apple. Quem separa a barra do conteúdo é o esmaecido logo abaixo. */
-  border-top: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
-}
-
-/* Onde o conteúdo encontra a barra flutuante, a página desvanece em vez de
-   bater numa linha. Divisória de 1px sobre conteúdo que rola corta a frase no
-   meio; o esmaecido diz a mesma coisa — daqui para baixo é chrome — sem cortar
-   nada. Só existe na faixa em que a barra existe, e só sobre a área que ela
-   cobre. */
-.dock::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: 1.75rem;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--bg) 62%, transparent),
-    transparent
-  );
-}
-
-.dock a {
-  display: block;
-  text-align: center;
-}
-
-@media (max-width: 780px) {
-  .dock {
-    display: block;
   }
 }
 
@@ -3053,7 +2994,7 @@
 
    Não há mais fio fechando o bloco por baixo: os cartões desenham a si mesmos,
    e a régua embaixo do último cartão duplicaria a borda dele. Quem separa esta
-   seção da próxima é o `border-bottom` do `.sec`. */
+   seção da próxima é o respiro do `.sec`. */
 .num-juntos-bloco {
   padding-block: 0 clamp(1.5rem, 4vw, 2.5rem);
 }
@@ -3694,16 +3635,25 @@
   }
 }
 
-/* No celular a barra fixa já leva o CTA na largura toda, dentro do alcance do
-   polegar. Um terceiro botão para o mesmo destino, em cima dela, seria
-   repetição — sobe só o de voltar ao topo, acima da barra. */
+/* No celular sobe só o botão de voltar ao topo.
+
+   A razão mudou de dono. Era "a barra fixa do rodapé já leva o CTA na largura
+   toda" — mas a `.dock` saiu (ver `casca.tsx`), e o argumento continua valendo
+   com outro sujeito: a barra do topo é `sticky` e carrega o mesmo CTA no campo
+   de visão o tempo inteiro. Um segundo botão para o mesmo destino, flutuando
+   sobre o texto numa tela de 390px, é repetição ocupando a largura onde a
+   pessoa está lendo.
+
+   O `bottom` volta ao valor de tela larga: os 4,5rem de folga existiam para o
+   botão não pousar em cima da barra que não existe mais. O que fica é a faixa
+   do indicador de home do iPhone, que continua lá. */
 @media (max-width: 780px) {
   .flut-falar {
     display: none;
   }
 
   .flut {
-    bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(clamp(0.85rem, 2vw, 1.5rem) + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -3740,9 +3690,12 @@
    central é a assinatura de uma ABERTURA, e estender isso a dez seções de
    conteúdo transformaria duas páginas de leitura em duas páginas de convite.
 
-   `.hero--curto` continua logo abaixo e `/perguntas` ainda usa: aquela página
-   é uma lista de perguntas, e ali a abertura curta faz sentido — a primeira
-   pergunta é que precisa aparecer na primeira tela. */
+   `.hero--curto` continua logo abaixo, agora SEM NINGUÉM USANDO. Ele era a
+   abertura de `/perguntas` — naquela página o herói precisava ser baixo para a
+   primeira pergunta caber na primeira tela —, e a rota foi extinta em
+   04/09/2026: o FAQ virou seção da landing. As regras ficam como `orbita.tsx` e
+   `head-to-head.tsx` ficaram, prontas para o dia em que uma rota precisar
+   abrir curta. */
 
 /* O sinal vem do atributo da casca (ver `casca.tsx`) e não de uma classe no
    `<header>`, porque é a página que decide o eixo da própria abertura — o
@@ -4060,17 +4013,13 @@
    superfícies ficam opacas e o desfoque sai, porque desfoque atrás de fundo
    sólido é só custo de repintura sem nada em troca. */
 @media (prefers-reduced-transparency: reduce) {
-  .v5 .dock {
+  /* ERA A `.dock`, a barra fixa do rodapé — ela saiu, e quem herdou a regra é o
+     painel do menu do celular. Mesmo caso: superfície translúcida com desfoque,
+     e sobre ela uma lista de links que precisa ser lida. */
+  .v5 .nav-menu {
     background: var(--bg);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  /* Sem o material, o esmaecido também sai: ele existia para amaciar a quina
-     de uma barra que se via através. Sobre barra sólida, o fio da borda já é
-     a separação. */
-  .v5 .dock::before {
-    display: none;
   }
 
   .v5 .scope,
@@ -4119,7 +4068,7 @@
     border: 1px solid var(--hair);
   }
 
-  .v5 .dock {
+  .v5 .nav-menu {
     background: var(--bg);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;

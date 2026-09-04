@@ -1,6 +1,12 @@
-/* Só o que a página de perguntas tem e as outras não. Fio, tipografia, botões,
-   tema e movimento vêm do `v5.css`: um FAQ que redeclara o sistema deixa de ser
-   a mesma marca. */
+/* O acordeão de perguntas. Fio, tipografia, botões, tema e movimento vêm do
+   `v5.css`: um FAQ que redeclara o sistema deixa de ser a mesma marca.
+
+   ERA `perguntas/perguntas.css`, dentro da pasta da rota, de volta ao tempo em
+   que o FAQ existia num lugar só. Ele passou a aparecer também na landing,
+   abaixo dos três modelos, e CSS de componente compartilhado morando dentro da
+   pasta de uma das rotas que o usa é o caminho mais curto para o dia em que
+   alguém apaga a rota e derruba a seção da outra. Quem importa é `faq.tsx`, e
+   só ele — as páginas não precisam saber que este arquivo existe. */
 
 .faq {
   border-top: 1px solid var(--hair);
@@ -28,7 +34,7 @@
   display: none;
 }
 
-.faq-item > summary h3 {
+.faq-item > summary :is(h3, h4) {
   margin: 0;
   font-size: clamp(1rem, 1.9vw, 1.125rem);
   font-weight: 700;
@@ -44,7 +50,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .faq-item > summary:hover h3 {
+  .faq-item > summary:hover :is(h3, h4) {
     color: var(--fg-hot);
   }
 }
@@ -81,7 +87,7 @@
 }
 
 .faq-item[open] .faq-sinal::before,
-.faq-item[open] > summary h3 {
+.faq-item[open] > summary :is(h3, h4) {
   color: var(--fg-hot);
 }
 

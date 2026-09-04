@@ -15,7 +15,7 @@ export type RespostaLead = { ok: true } | { ok: false; erro: string };
 
    Antes cada botão de contato ia direto para o WhatsApp. Agora o primeiro
    contato é o formulário — e como ele existe no fechamento de
-   `/seja-franqueado`, `/galeria` e `/perguntas`, a âncora resolve na própria
+   `/seja-franqueado` e `/galeria`, a âncora resolve na própria
    página onde a pessoa está: nenhum botão de contato tira ninguém da página
    que estava convencendo.
 

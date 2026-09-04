@@ -114,10 +114,12 @@
    produto está na tela enquanto a esfera explode. Não há gatilho por bloco
    fazendo essa conta: são duas divisões iguais sobre o mesmo intervalo.
 
-   88svh e não 78: os blocos agora encostam nas bordas de cima e de baixo da
-   tela (é o que `topo` e `baixo` querem dizer), e com fatias mais curtas dois
-   deles apareceriam ao mesmo tempo — um saindo por cima enquanto o outro entra
-   por baixo, os dois legíveis, duas batidas disputando a mesma atenção.
+   76svh: o bloco ainda gruda o tempo da batida inteira, e ainda não há dois
+   legíveis ao mesmo tempo — quem sai por cima já está apagado quando o de
+   baixo entra (ver `.ctr-vivo .ctr-passo`, que apaga em 180ms). Eram 88, e as
+   doze centésimas de tela a mais por fatia só cobravam rolagem: com quatro
+   blocos, uma passagem e as duas constelações, a seção pedia onze telas para
+   dizer o que agora cabe em quase sete.
 
    `align-content: start` porque quem posiciona o texto dentro da fatia é o
    GRUDE do bloco, logo abaixo, e não o alinhamento da grade. Ele precisa
@@ -125,12 +127,12 @@
 .ctr-passo {
   display: grid;
   align-content: start;
-  min-height: 88svh;
+  min-height: 76svh;
 }
 
 /* O primeiro é mais curto: ele já tem o cabeçalho da seção em cima. */
 .ctr-passo:first-child {
-  min-height: 72svh;
+  min-height: 64svh;
 }
 
 /* ---- os quatro cantos ----
@@ -251,29 +253,243 @@
 
 /* A FAIXA DE PASSAGEM: a quinta fatia, sem texto.
 
-   Ela vale a mesma altura de um bloco porque as fatias da linha do tempo são
-   iguais — quatro blocos e a faixa dividem a rolagem em cinco pedaços do mesmo
-   tamanho, e cinco batidas de mesma duração dividem o tempo do mesmo jeito.
-   Encurtá-la acelera só o morfo do fio, que é o gesto mais longo dos cinco.
+   Ela é mais curta que um bloco (64 contra 76svh) porque não tem texto para
+   segurar na tela: o que acontece aqui é só o gesto — a esfera abre para fora
+   e o fio vira o hexágono. A linha do tempo não perde o passo, e é por isso
+   que a altura pode variar: cada batida recebe a fração de tempo que a fatia
+   dela ocupa na coluna, medida do DOM (ver `emT`/`durT` em `centro.tsx`).
 
    Nada dentro: o que acontece nela é a cena, que está na camada de trás. */
 .ctr-passagem {
-  min-height: 88svh;
+  min-height: 64svh;
 }
 
-/* A COLUNA DOS PILARES. Mesma gramática da lista de tópicos: blocos por cima
-   da cena, um por fatia, com o canto de cada um em `[data-lugar]`. Ela é uma
-   irmã da `<ol>` e não parte dela porque os quatro primeiros são as batidas da
-   criação e estes são os pilares — duas listas, um percurso só. */
-.ctr-pilares-texto {
+/* ============ AS DUAS CONSTELAÇÕES ============
+
+   ISTO ERAM OITO FATIAS. Os pilares e os papéis da IA eram, cada grupo, um
+   cabeçalho e três blocos em fila, um por tela — e nas oito a cena não mudava
+   de assunto: o hexágono parado enquanto um nó crescia e os outros recuavam.
+   Oito telas de rolagem para seis frases curtas.
+
+   Agora são duas, e o que mudou é a relação entre texto e desenho. Nos blocos
+   da narrativa o texto passa POR CIMA da cena, um de cada vez, e por isso cada
+   um precisa da fatia inteira. Aqui os três moram EM VOLTA: a grade reserva o
+   meio para o hexágono — a mesma medida da cena, `min(88%, 62svh)` — e os
+   textos ficam nas faixas que sobram, na direção dos vértices de que falam.
+   Três frases na tela ao mesmo tempo sem nenhuma encostar no desenho.
+
+   O QUE LIGA O TEXTO AO NÓ PASSA A SER A POSIÇÃO. Antes era o tempo: o nó da
+   vez acendia enquanto o texto dele passava, e os outros dois recuavam para
+   não haver dúvida. Ligação por tempo custa uma tela por item; por posição
+   custa zero, e a batida ainda entra os três em `stagger`, cada frase pousando
+   no instante em que o seu vértice acende.
+
+   ───────────────────────────────────────────────────────────────────────────
+   UMA MOLDURA GRUDADA, E NÃO QUATRO BLOCOS GRUDANDO CADA UM NA SUA ALTURA
+
+   O primeiro desenho dava a cada bloco o seu `top`, como os da narrativa têm.
+   Parecia coerente e estava errado: um bloco só gruda depois de SUBIR até a
+   altura dele, e nessa subida ele atravessa o desenho. O cabeçalho ainda
+   terminava o percurso encostado no alto da tela, por baixo da barra de
+   navegação flutuante.
+
+   Aqui os quatro pedaços são um quadro só, e quem gruda é a MOLDURA: uma caixa
+   da altura da tela, presa em `top: 0`, com as faixas desenhadas por dentro. Os
+   quatro entram e saem juntos, nas posições finais, e nenhum deles se move
+   sozinho por cima do hexágono.
+
+   AS FAIXAS SÃO MEDIDAS PELO HEXÁGONO, E NÃO PELA CENA.
+
+   Elas já foram a cena inteira (`min(88%, 62svh)` no meio, o resto dividido em
+   duas), e sobravam 19svh de faixa em cima — dos quais a barra de navegação
+   flutuante come uns 9. O cabeçalho ficava espremido em dez centésimos de tela
+   e subia por baixo da barra: ilegível.
+
+   Mas a cena é uma caixa QUADRADA que contém o desenho, e o desenho não a
+   preenche: o hexágono tem raio `R_HEX_CENA` = 33% dela, então ocupa 66% da
+   altura — o resto é ar. Medindo a linha do meio pelo POLÍGONO (`41svh`, que é
+   0,66 da cena), as faixas de fora passam de 19 para 29svh cada, e o cabeçalho
+   ganha vinte centésimos de tela livres abaixo da barra.
+
+   O `41svh` é `62 × 0,66` — a altura do polígono quando é a ALTURA que manda no
+   tamanho da cena, que é o caso de qualquer tela em pé ou de proporção comum.
+   Não há aqui o `min(…%, …)` da cena porque a porcentagem, num `grid-template-
+   rows`, mede a ALTURA da moldura e não a largura da coluna: ela não diria a
+   mesma coisa que diz em `.ctr-cena`. Entre 900 e 1180px de largura, numa tela
+   muito baixa, a cena encolhe pela largura e a faixa do meio fica um pouco maior
+   que o desenho — as de fora apertam na mesma medida, e é só isso. Mexer no raio
+   do hexágono ou na altura da cena é mexer neste número.
+
+   A ALTURA DA FATIA É O QUE PAGA O GRUDE. A moldura vale uma tela, então a
+   fatia precisa valer mais: os `160svh` dão 60 de percurso parado, e a linha do
+   tempo entra os textos depois que ela assenta e os apaga antes que ela solte
+   (ver os tempos da batida em `centro.tsx`, que saem dessas mesmas frações). */
+.ctr-const {
   position: relative;
   z-index: 1;
+  min-height: 160svh;
 }
 
-.ctr-pilares-lista {
+.ctr-const-grade {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, min(88%, 62svh)) 1fr;
+  grid-template-rows: 1fr 41svh 1fr;
+  column-gap: clamp(0.75rem, 2.4vw, 2rem);
+  justify-items: center;
+  /* Moldura, não superfície: nada aqui recebe clique, e uma caixa de tela
+     inteira interceptando o ponteiro seria uma tampa sobre a página. */
+  pointer-events: none;
+}
+
+/* O CABEÇALHO ocupa a largura toda da faixa — e não a coluna do meio, que é
+   estreita como a cena e quebrava "Três pilares sustentam a empresa." em três
+   linhas de título.
+
+   Nos pilares ele vai na faixa de cima, ENCOSTADO NO PÉ DELA (`align-self:
+   end`): assim a frase cresce para baixo, na direção do desenho, em vez de
+   subir para trás da barra de navegação. Na IA vai na de baixo, encostada no
+   alto pelo mesmo motivo invertido. A escolha da faixa não é variação: os
+   pilares ocupam 210°, −30° e 90° (esquerda-cima, direita-cima e baixo) e a IA
+   ocupa −90°, 30° e 150° (topo, direita-baixo e esquerda-baixo) — em cada grupo
+   o cabeçalho fica na única faixa livre. */
+.ctr-const-cab {
+  grid-column: 1 / -1;
+  max-width: 46ch;
+  text-align: center;
+  display: grid;
+  gap: 0.45rem;
+  padding-block: 0.8rem;
+}
+
+.ctr-const[data-fam="pilar"] .ctr-const-cab {
+  grid-row: 1;
+  align-self: end;
+  /* O PISO DA BARRA DE NAVEGAÇÃO. Ela flutua sobre o alto da página e ocupa
+     perto de 9svh; a margem impede que o cabeçalho entre lá mesmo se a frase
+     crescer (tela estreita, corpo maior, tradução mais longa). Com `align-self:
+     end` a caixa é empurrada para baixo, e não espremida: se um dia não couber,
+     ela avança sobre o ar acima do hexágono — que é espaço vazio — em vez de
+     sumir por trás da barra. */
+  margin-top: 11svh;
+}
+
+/* Embaixo, entre a ponta do hexágono e o rodapé da tela. Lida ali, com a marca
+   já aberta dentro do polígono, a frase é o que ela é: a assinatura do quadro
+   completo. */
+.ctr-const[data-fam="ia"] .ctr-const-cab {
+  grid-row: 3;
+  align-self: start;
+}
+
+/* A LISTA COBRE A MOLDURA E REPETE AS FAIXAS DELA, em vez de sumir com
+   `display: contents`. As duas põem os `<li>` nas células certas; a segunda
+   tira a caixa da lista da árvore de layout e, em vários leitores de tela, tira
+   junto a semântica de lista — três itens de igual peso deixariam de ser
+   anunciados como três.
+
+   As faixas estão escritas de novo, e não herdadas por `subgrid`, porque é a
+   mesma medida da cena e ela já aparece escrita em outros pontos deste arquivo
+   (`.ctr-cena`, `.ctr-flancos`): mais uma cópia da mesma conta é mais previsível
+   aqui do que um segundo mecanismo de grade no meio do caminho. Mexer na
+   largura da cena é mexer em todas. */
+.ctr-nos {
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, min(88%, 62svh)) 1fr;
+  grid-template-rows: 1fr 41svh 1fr;
+  column-gap: clamp(0.75rem, 2.4vw, 2rem);
+  justify-items: center;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.ctr-no {
+  max-width: 25ch;
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+/* As duas colunas de fora, na faixa do hexágono. O que muda entre os grupos é a
+   ALTURA dentro da faixa, porque os vértices laterais dos dois estão em metades
+   opostas do polígono: os pilares em 210° e −30° ficam acima do eixo, os papéis
+   da IA em 150° e 30°, abaixo. O empurrão de `4svh` é o que põe o texto na
+   altura do vértice (um quarto de polígono da borda) em vez de na quina da
+   faixa. */
+.ctr-no[data-lugar="esq"] {
+  grid-row: 2;
+  grid-column: 1;
+  justify-self: end;
+}
+
+.ctr-no[data-lugar="dir"] {
+  grid-row: 2;
+  grid-column: 3;
+  justify-self: start;
+}
+
+.ctr-const[data-fam="pilar"] .ctr-no[data-lugar="esq"],
+.ctr-const[data-fam="pilar"] .ctr-no[data-lugar="dir"] {
+  align-self: start;
+  margin-top: 4svh;
+}
+
+.ctr-const[data-fam="ia"] .ctr-no[data-lugar="esq"],
+.ctr-const[data-fam="ia"] .ctr-no[data-lugar="dir"] {
+  align-self: end;
+  margin-bottom: 4svh;
+}
+
+/* As duas pontas do eixo vertical, na coluna do meio: o pilar de 90° na faixa
+   de baixo, o papel de −90° na de cima. Cada um cai na faixa que o cabeçalho do
+   OUTRO grupo ocupa — nunca os dois ao mesmo tempo. */
+.ctr-no[data-lugar="baixo"] {
+  grid-row: 3;
+  grid-column: 2;
+  align-self: start;
+  margin-top: 3svh;
+  text-align: center;
+  max-width: 40ch;
+}
+
+.ctr-no[data-lugar="topo"] {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: end;
+  margin-bottom: 3svh;
+  text-align: center;
+  max-width: 40ch;
+}
+
+/* O nome do nó é um degrau abaixo dos títulos da narrativa: ali o título é a
+   fala do quadro e está sozinho em primeiro plano; aqui são três ao mesmo
+   tempo em volta de um desenho, e três falas de 3rem viram muro. */
+.ctr-no-tit {
+  margin: 0;
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.ctr-no .ctr-txt {
+  font-size: clamp(0.9375rem, 1.15vw, 1.0625rem);
+}
+
+/* O cabeçalho da constelação também desce um degrau: ele divide a tela com
+   três blocos e com o hexágono, e no corpo dos títulos da narrativa a frase
+   quebra em duas linhas de 3rem bem em cima do desenho. */
+.ctr-tit--cab {
+  font-size: clamp(1.5rem, 2.9vw, 2.25rem);
 }
 
 /* O bloco que não está sendo lido recua. É ESTADO, não animação: muda em
@@ -457,14 +673,6 @@
   max-width: 46ch;
   justify-items: center;
   text-align: center;
-}
-
-/* O cabeçalho dos pilares ganha mais medida que o de abertura: são 33
-   caracteres de título, e em 46ch eles quebram em duas linhas de 3rem bem no
-   alto da cena. Com a faixa maior a frase cabe deitada, e a altura que ela
-   deixa de ocupar é a que o hexágono precisa. */
-.ctr-pilares-texto .ctr-passo[data-lugar="topo"] .ctr-bloco {
-  max-width: 60ch;
 }
 
 .ctr-tit {
@@ -1053,8 +1261,9 @@
    duas vezes o raio de distância, ligados por raios que não chegam a lugar
    nenhum.
 
-   Nada se perde: os três pilares estão nomeados e explicados nos cartões da
-   seção seguinte, que é onde o texto deles sempre esteve. */
+   Nada se perde: os seis nomes e as seis explicações estão nos blocos das duas
+   constelações, que sem script ficam todos visíveis — o desenho é que cede, e
+   não o texto. */
 .ctr:not(.ctr-vivo) .ctr-raios,
 .ctr:not(.ctr-vivo) .ctr-pilar {
   display: none;
@@ -1141,6 +1350,19 @@
   .ctr-flancos .ctr-bloco:last-child::before {
     display: none;
   }
+
+  /* A CONSTELAÇÃO APERTA A MEDIDA ANTES DE QUEBRAR. A coluna lateral vale
+     `(largura − min(88%, 62svh)) / 2` — num monitor deitado isso ainda são uns
+     250px, e 25ch de texto de 1rem não cabem sem encostar no hexágono. Menos
+     medida e um corpo menor resolvem enquanto ainda EXISTE lateral; abaixo de
+     900px não existe mais, e aí a grade quebra (ver a faixa seguinte). */
+  .ctr-no {
+    max-width: 21ch;
+  }
+
+  .ctr-no .ctr-txt {
+    font-size: 0.9375rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1203,5 +1425,62 @@
 
   .ctr-vivo .e-ativo .ctr-bloco::before {
     transform: scaleX(1);
+  }
+
+  /* ---- A CONSTELAÇÃO VIRA CARTELA ----
+
+     Sem lateral livre não há como cercar o desenho: os quatro pedaços passam a
+     ser uma coluna centrada, grudada no meio da tela, com a cena atrás em 62%
+     de opacidade — o mesmo arranjo que os blocos da narrativa já têm aqui.
+
+     ELA CABE INTEIRA NUMA TELA, e é por isso que continua sendo UMA fatia: os
+     três textos são um nome de uma linha e duas de parágrafo, e os quatro
+     juntos ocupam pouco mais de um terço da altura. Quebrar em quatro fatias
+     de novo seria devolver ao celular a rolagem que a reforma tirou.
+
+     A grade perde as faixas (`none` nas duas), então tudo cai em linhas
+     automáticas na ordem do documento — cabeçalho primeiro nos dois grupos,
+     que é também a ordem em que o leitor de tela recebe.
+
+     A MOLDURA DEIXA DE VALER UMA TELA: sem faixas para reservar, ela passa a
+     ter a altura do próprio conteúdo e gruda centrada. O percurso parado é o
+     que sobra da fatia depois dela — bem mais do que na tela larga, onde a
+     moldura ocupa a tela inteira. */
+  .ctr-const-grade {
+    top: 22svh;
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: 1.15rem;
+    padding-inline: 6vw;
+  }
+
+  .ctr-nos {
+    grid-row: auto;
+    grid-column: 1;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    row-gap: 1rem;
+  }
+
+  .ctr-const[data-fam="pilar"] .ctr-const-cab,
+  .ctr-const[data-fam="ia"] .ctr-const-cab,
+  .ctr-no,
+  .ctr-no[data-lugar="esq"],
+  .ctr-no[data-lugar="dir"],
+  .ctr-no[data-lugar="topo"],
+  .ctr-no[data-lugar="baixo"],
+  .ctr-const[data-fam="pilar"] .ctr-no[data-lugar="esq"],
+  .ctr-const[data-fam="pilar"] .ctr-no[data-lugar="dir"],
+  .ctr-const[data-fam="ia"] .ctr-no[data-lugar="esq"],
+  .ctr-const[data-fam="ia"] .ctr-no[data-lugar="dir"] {
+    grid-row: auto;
+    grid-column: 1;
+    align-self: auto;
+    justify-self: center;
+    max-width: 32ch;
+    margin: 0;
+    padding: 0;
+    text-align: center;
   }
 }
