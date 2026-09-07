@@ -1405,6 +1405,50 @@
   margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
 }
 
+/* NO CELULAR A COLUNA DE ASSINATURA SAI DA TELA — a marca some de vez, a
+   manchete some só dos olhos.
+
+   Com uma coluna só, marca e manchete somam mais de 150px acima do primeiro
+   campo, e empurram o formulário para fora da dobra numa tela em que ele é o
+   objetivo da página inteira. Nenhum dos dois está dizendo algo novo aqui: a
+   marca já assina o topo e o rodapé, e a manchete repete o convite que o próprio
+   cartão faz na linha seguinte ("Receba a apresentação da franquia").
+
+   O `<h2>` NÃO É APAGADO, é escondido: ele é o título desta seção, e seção sem
+   título some do índice de quem navega por cabeçalho — que é como leitor de tela
+   percorre uma página longa. Mesma receita da `.sr`.
+
+   640px e não os 940px em que o par vira coluna: no tablet a coluna única ainda
+   tem altura sobrando, e ali a assinatura continua fazendo o que foi desenhada
+   para fazer. */
+@media (max-width: 640px) {
+  /* `contents` e não `none`: com `none` o `<h2>` sairia junto (é o que se quer
+     evitar), e mantendo a caixa ela continuaria sendo uma célula do par — uma
+     célula de altura zero, mas com o vão de 28px do `.form-fr-duo` acima do
+     formulário. `contents` dissolve a caixa: a imagem some por `display: none` e
+     a manchete sai do fluxo pelo recorte abaixo, então não sobra linha nenhuma
+     para o vão separar. */
+  .close-intro {
+    display: contents;
+  }
+
+  .close-intro .close-logo {
+    display: none;
+  }
+
+  .close-intro .sec-cab {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
 /* O fechamento usa o mesmo `.sec-cab` das seções. Ele tinha manchete um degrau
    maior, tracking mais apertado e quebra em 17ch — três diferenças que faziam
    dele outra família tipográfica no fim da mesma página. A ênfase de "este é o

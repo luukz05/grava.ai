@@ -488,9 +488,26 @@
      largura das duas margens de texto, mas aqui não existe texto na margem
      nenhuma — mantê-lo espremeria o console à toa, num tamanho de tela em que
      ele já não tem folga sobrando. */
+  /* O RESPIRO DE CIMA É A BARRA, e não um número escolhido a olho.
+
+     A cena é presa em tela cheia e a navbar flutua por cima dela, sticky no alto
+     da janela. Com o console alinhado ao topo, a primeira linha dele — a
+     saudação, que é irmã do `.est-topo` e não filha — nasce exatamente onde o
+     símbolo e as duas esferas da barra estão. Foi o que se viu: "O que você quer
+     gravar hoje?" atravessado pelos botões.
+
+     `var(--nav-gap) + 58px` é a altura do bloco da barra, a mesma conta que o
+     `.hero` desconta em `v5.css` e que a `.navbar-faixa` reserva em
+     `navbar.css`. Mudou lá, muda aqui. O `clamp` no fim é o respiro entre a
+     barra e a saudação, e é ele que encolhe em tela baixa.
+
+     Isto MOVE o console inteiro, e não muda a composição dele: o zoom da
+     digitação tem origem em 62% da própria caixa, então descer a caixa não mexe
+     no enquadramento do campo. Foi o contrário disso que quebrou a batida da
+     digitação uma vez — encolher a caixa por dentro, e não deslocá-la. */
   .est-vivo.pcs .est-ui {
     align-content: start;
-    padding-top: clamp(28px, 7vh, 64px);
+    padding-top: calc(var(--nav-gap) + 58px + clamp(6px, 2vh, 26px));
     padding-inline: clamp(20px, 6vw, 44px);
   }
 
@@ -503,12 +520,87 @@
   }
 }
 
-/* Abaixo de 640px cada segmento da régua tem ~30px, e a folga entre eles come
-   quase um terço disso. O vão encolhe para 3px: com a barra tão curta, o que
-   ainda se lê é a linha inteira enchendo — e é ela que precisa sobreviver. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   NO CELULAR, O TEXTO E A CENA DISPUTAM A MESMA TELA — E A CONTA NÃO FECHAVA
+
+   O palco é 100vh e tem dois moradores empilhados: o console no alto (respiro +
+   `.est-topo` + campo) e a legenda embaixo (rótulo + título + frase + apoio).
+   Cada um era medido por conta própria, sem orçamento comum. Medido num 375×667,
+   que é o celular pequeno ainda em uso:
+
+     console    47px de respiro + 173px de `.est-topo` + ~130px de campo ≈ 350px,
+                e o zoom da digitação (escala 1,18 com origem em 62%) empurra a
+                borda de baixo mais uns 20px — chega em ~370px.
+     legenda    ~185px de bloco + ~137px de apoio + 80px de respiro ≈ 400px, ou
+                seja: começa em 667 − 400 = 267px.
+
+   Os dois se cruzavam em mais de cem pixels, e o pior momento era exatamente a
+   batida da digitação — que é a única em que o texto do campo precisa ser lido.
+   O sintoma que se vê é o descrito: a legenda por cima do console e do vídeo.
+
+   O QUE MUDA AQUI, e é sempre a mesma ideia — devolver tela para a cena:
+
+   1. O APOIO SAI. Ele é a segunda voz da legenda ("o que está por trás"), custa
+      ~137px dos ~400px do bloco e é o único pedaço que não narra a cena que está
+      acontecendo na tela. Os fatos dele não somem do site: área e operação estão
+      na tabela dos modelos, plataforma inclusa e estoque monitorado estão no
+      bloco dos números, e o padrão da rede está no FAQ. Acima de 640px ele
+      continua inteiro.
+   2. O bloco principal encolhe o respiro de baixo, e a cena ganha essa faixa.
+   3. O `.est-topo` encolhe junto: com menos altura reservada para a conversa, o
+      campo — que é o que o zoom enquadra — sobe, e a distância entre ele e a
+      primeira linha da legenda deixa de ser negativa.
+   4. O véu solta o vídeo mais cedo (40% em vez de 52%): com a legenda mais
+      baixa, escurecer meia tela era escurecer o que ninguém ia ocupar.
+
+   Sobra em torno de 100px de vídeo limpo entre o campo e o título, e é essa
+   faixa que faz a cena voltar a ser cena. */
 @media (max-width: 640px) {
+  /* Cada segmento da régua tem ~30px aqui, e a folga entre eles comia quase um
+     terço disso. Com a barra tão curta o que ainda se lê é a linha inteira
+     enchendo — e é ela que precisa sobreviver. */
   .est-vivo .pcs-regua {
     gap: 3px;
+  }
+
+  .est-vivo .pcs-apoio {
+    display: none;
+  }
+
+  .est-vivo .pcs-legendas {
+    padding-bottom: clamp(32px, 6vh, 64px);
+  }
+
+  /* A CAIXA DA CONVERSA CRESCE AQUI, e não encolhe — ela já encolheu uma vez e
+     o resultado foi o passo "Ajustando à área da peça" cortado ao meio.
+
+     O CORTE SAI PELO LADO ERRADO, e vale entender por quê: `estudio.css` alinha
+     o conteúdo pelo fim (`align-items: end`) contando que o excesso saia POR
+     CIMA, como thread rolado até o fim. Só que a caixa tem `overflow: hidden`, o
+     que faz dela um contêiner de rolagem — e nesses o navegador usa alinhamento
+     SEGURO: quando o conteúdo não cabe, ele volta a alinhar pelo começo para não
+     esconder o início. O conteúdo passa a vazar por baixo, que é exatamente onde
+     está a última linha da lista de raciocínio.
+
+     Ou seja: não existe altura "quase suficiente" aqui. Ou a batida do
+     raciocínio cabe inteira, ou ela é cortada na parte que interessa. Medida no
+     celular: fala do cliente (~70px) + "Pensando" (~28px) + cinco passos
+     (~117px) ≈ 235px, e é por isso que o piso é 210px e não menos.
+
+     O respiro do topo NÃO entra nesta conta (ver o bloco de 1100px): mexer nele
+     é mexer em onde a caixa começa, e a barra do site é quem manda nisso. Quem
+     desce para dar espaço é o campo, que vem depois. */
+  .est-vivo .est-topo {
+    height: clamp(210px, 28vh, 280px);
+  }
+
+  .est-vivo .pcs-veu {
+    background: linear-gradient(
+      0deg,
+      rgba(3, 7, 11, 0.94) 0%,
+      rgba(3, 7, 11, 0.68) 20%,
+      rgba(3, 7, 11, 0) 40%
+    );
   }
 
   /* Em coluna única o título tem a largura inteira da tela e não precisa do
@@ -521,5 +613,69 @@
 
   .pcs-txt {
     font-size: clamp(1rem, 4.2vw, 1.125rem);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TELA BAIXA — O EIXO QUE OS OUTROS DOIS BLOCOS NÃO OLHAM
+
+   As regras acima medem por LARGURA, e a disputa desta cena é por ALTURA: são
+   dois blocos empilhados dentro de uma tela cheia. Num celular de 375×667 a
+   conta fecha por poucos pixels e o zoom da digitação come justamente esses
+   poucos — o console volta a encostar no título da legenda no único momento em
+   que o campo precisa ser lido.
+
+   Aqui a caixa da conversa encolhe mais um degrau e o respiro de baixo do texto
+   também. Nada muda em tela alta, que é onde a folga já existe. */
+@media (max-width: 1100px) and (max-height: 720px) {
+  /* A conversa não pode ser menor que a batida do raciocínio (ver o bloco de
+     640px: ou cabe inteira, ou corta a última linha). O que dá para fazer numa
+     tela desta altura é a conversa ocupar MENOS por dentro — corpo e vãos um
+     degrau abaixo —, e é isso que as regras seguintes fazem. */
+  .est-vivo .est-topo {
+    height: clamp(168px, 26vh, 205px);
+  }
+
+  .est-vivo .est-thread {
+    gap: 12px;
+  }
+
+  .est-vivo .est-falas {
+    gap: 6px;
+  }
+
+  .est-vivo .est-fala {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .est-vivo .est-fala--dita {
+    padding: 9px 14px;
+  }
+
+  .est-vivo .est-pensando {
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+
+  .est-vivo .est-passos {
+    gap: 3px;
+  }
+
+  .est-vivo .est-passo {
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  /* OS ATALHOS SAEM, e são os últimos 65px que faltavam. São as quatro pílulas
+     de material embaixo do campo: decoração de console, o único pedaço da cena
+     que não é dito por nenhuma batida. Mantê-los aqui seria empurrar a lista de
+     raciocínio para fora da caixa para caber enfeite. */
+  .est-vivo .est-atalhos {
+    display: none;
+  }
+
+  .est-vivo .pcs-legendas {
+    padding-bottom: clamp(20px, 4vh, 40px);
   }
 }

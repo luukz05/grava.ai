@@ -1,4 +1,4 @@
-/* Os três modelos de unidade — painéis que se abrem.
+/* Os três modelos de unidade — painéis de foto com nome e preço.
 
    ───────────────────────────────────────────────────────────────────────────
    SUBSTITUI A TABELA COMPARATIVA, E O MOTIVO NÃO É ESTÉTICO
@@ -10,26 +10,32 @@
    o candidato conseguiu. Um selo "menor investimento" transforma os outros dois
    em consolação, e o quiosque fechado não é a versão cara do aberto.
 
-   Em painéis, cada modelo é ele mesmo. A foto lidera, o detalhe aparece quando
-   a pessoa se interessa, e nada na tela diz que um perdeu.
+   Em painéis, cada modelo é ele mesmo. A foto lidera e nada na tela diz que um
+   perdeu.
 
    ───────────────────────────────────────────────────────────────────────────
-   O PAINEL FECHADO MOSTRA NOME E PREÇO, E MAIS NADA
+   O PAINEL MOSTRA NOME E PREÇO, E MAIS NADA
 
-   Havia aqui um ícone em bolinha acima do nome e uma linha de resumo abaixo do
-   preço ("Ilha no corredor, atendimento pelos quatro lados"). Os dois saíram a
-   pedido, e o desenho ficou melhor por dois motivos além do pedido:
+   Passaram por aqui um ícone em bolinha acima do nome, uma linha de resumo
+   abaixo do preço e — até agora — uma ficha de quatro linhas que aparecia no
+   hover: área, onde funciona, estoque no ponto e operação. Os três saíram a
+   pedido, nesta ordem.
 
-   — o ÍCONE não distinguia nada. Os três eram um pictograma genérico de lugar,
-     e a foto logo atrás dele já diz o que cada modelo é, com mais precisão do
-     que 16px de traço conseguem.
-   — o RESUMO já era conteúdo em fuga: ele desaparecia no hover justamente
-     porque repetia, pior, o que o detalhe diz melhor. Uma linha que existe para
-     sumir assim que a pessoa demonstra interesse é uma linha que a seção não
-     precisava ter.
+   A FICHA foi a última, e o que ela deixa para trás merece registro porque é
+   informação que existia e agora não existe em lugar nenhum do site:
 
-   O que sobra no painel fechado é a hierarquia mínima que a escolha pede: qual
-   modelo é, e quanto custa. O resto entra quando o painel abre.
+     Quiosque aberto    ≈ 4 m²  · corredor de shopping e frente de caixa ·
+                        reposição diária · uma pessoa
+     Quiosque fechado   ≈ 9 m²  · shopping, aeroporto e rodoviária ·
+                        estoque para a semana · uma a duas pessoas
+     Loja compacta      ≈ 18 m² · rua e praça de alimentação ·
+                        semana inteira com reserva · duas pessoas
+
+   Eram números PROVISÓRIOS, nunca confirmados pela franqueadora — o que já era
+   razão para não deixá-los na página sem revisão. Se voltarem, voltam daqui.
+
+   O que sobra é a hierarquia mínima que a escolha pede: qual modelo é, e quanto
+   custa. As duas linhas ficam no pé do painel, à esquerda, sobre a foto.
 
    ───────────────────────────────────────────────────────────────────────────
    VEIO DE UM COMPONENTE DE GALERIA, E FOI PORTADO — NÃO COPIADO
@@ -44,10 +50,10 @@
    biblioteca, não precisa de estado em React, e sai funcionando com teclado de
    graça via `:focus-within`. O componente continua sendo de servidor.
 
-   O que NÃO foi portado: o modal de imagem ampliada. Aqui o conteúdo que
-   importa é o detalhe do modelo, e ele cabe dentro do painel aberto — abrir uma
-   camada por cima da página para mostrar a mesma foto maior seria um passo a
-   mais para chegar à mesma informação.
+   O GESTO SOBREVIVEU À FICHA, e não por inércia: sem ela o painel que cresce
+   deixa de revelar texto e passa a revelar FOTO — o modelo sob o cursor mostra
+   mais da unidade e os irmãos cedem espaço. É o mesmo gesto servindo ao que
+   restou na tela, que é a imagem.
 
    ───────────────────────────────────────────────────────────────────────────
    OS VALORES SÃO PROVISÓRIOS
@@ -64,7 +70,6 @@ type Modelo = {
   /* PROVISÓRIO — aguardando a franqueadora. */
   investimento: string;
   imagem: string;
-  detalhes: { rotulo: string; valor: string }[];
 };
 
 const MODELOS: Modelo[] = [
@@ -73,24 +78,12 @@ const MODELOS: Modelo[] = [
     nome: "Quiosque aberto",
     investimento: "R$ 99.900",
     imagem: "Quiosque aberto no corredor",
-    detalhes: [
-      { rotulo: "Área", valor: "≈ 4 m²" },
-      { rotulo: "Onde funciona", valor: "Corredor de shopping e frente de caixa" },
-      { rotulo: "Estoque no ponto", valor: "Reposição diária" },
-      { rotulo: "Operação", valor: "Uma pessoa" },
-    ],
   },
   {
     id: "fechado",
     nome: "Quiosque fechado",
     investimento: "R$ 139.900",
     imagem: "Quiosque fechado com vitrine",
-    detalhes: [
-      { rotulo: "Área", valor: "≈ 9 m²" },
-      { rotulo: "Onde funciona", valor: "Shopping, aeroporto e rodoviária" },
-      { rotulo: "Estoque no ponto", valor: "Semana inteira" },
-      { rotulo: "Operação", valor: "Uma a duas pessoas" },
-    ],
   },
   {
     id: "compacta",
@@ -98,12 +91,6 @@ const MODELOS: Modelo[] = [
     nome: "Loja compacta",
     investimento: "R$ 189.900",
     imagem: "Loja compacta com fachada",
-    detalhes: [
-      { rotulo: "Área", valor: "≈ 18 m²" },
-      { rotulo: "Onde funciona", valor: "Rua e praça de alimentação" },
-      { rotulo: "Estoque no ponto", valor: "Semana inteira, com reserva" },
-      { rotulo: "Operação", valor: "Duas pessoas" },
-    ],
   },
 ];
 
@@ -130,15 +117,6 @@ export function Modelos() {
             <div className="mod-corpo">
               <h3 className="mod-nome">{m.nome}</h3>
               <p className="mod-preco">{m.investimento}</p>
-
-              <dl className="mod-detalhes">
-                {m.detalhes.map((d) => (
-                  <div className="mod-det" key={d.rotulo}>
-                    <dt className="mono">{d.rotulo}</dt>
-                    <dd>{d.valor}</dd>
-                  </div>
-                ))}
-              </dl>
             </div>
           </article>
         ))}

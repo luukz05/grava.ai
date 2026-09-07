@@ -14,9 +14,9 @@
 .mod {
   display: flex;
   gap: clamp(0.5rem, 1vw, 0.85rem);
-  /* Altura fixa: é o que permite a foto encher o painel e o detalhe deslizar
-     dentro dele sem a seção inteira mudar de tamanho a cada hover — que seria
-     a página pulando embaixo do cursor. */
+  /* Altura fixa: é o que permite a foto encher o painel e os três trocarem
+     largura entre si sem a seção mudar de tamanho a cada hover — que seria a
+     página pulando embaixo do cursor. */
   height: clamp(26rem, 52vh, 34rem);
 }
 
@@ -63,9 +63,9 @@
   border-radius: 0;
 }
 
-/* Escurece de baixo para cima, e escurece MAIS quando o painel abre: o detalhe
-   que aparece precisa de contraste garantido, e no estado fechado só o nome e o
-   preço estão sobre a imagem. */
+/* Escurece de baixo para cima. Sobre a imagem estão só o nome e o preço, no pé
+   do painel — é lá que o degradê é quase opaco, e ele clareia bem antes da
+   metade para a foto continuar sendo foto. */
 .mod-painel::after {
   content: "";
   position: absolute;
@@ -110,61 +110,14 @@
   color: var(--fg-hot);
 }
 
-/* ---- o detalhe, que só existe aberto ---- */
+/* A FICHA DE QUATRO LINHAS SAIU DAQUI. Ela morava no pé do painel e só
+   aparecia no hover, animando de `grid-template-rows: 0fr` para `1fr` — que é
+   como se anima altura automática sem medir nada em JavaScript. Se a
+   franqueadora confirmar área, ponto, estoque e operação e a ficha voltar, a
+   receita está no commit que a removeu; o que ficou dela em uso é o mesmo truque
+   do 0fr no acordeão do FAQ.
 
-.mod-detalhes {
-  margin: 0;
-  display: grid;
-  gap: 1px;
-  background: rgba(242, 248, 255, 0.14);
-  border: 1px solid rgba(242, 248, 255, 0.14);
-  border-radius: 10px;
-  overflow: hidden;
-  /* `grid-template-rows` de 0fr para 1fr é o que anima altura automática sem
-     precisar medir nada em JavaScript. `max-height` com número mágico erraria em
-     qualquer texto mais longo que o previsto. */
-  grid-template-rows: 0fr;
-  opacity: 0;
-  margin-top: 0;
-  transition: grid-template-rows 460ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 300ms ease, margin-top 460ms ease;
-}
-
-.mod-painel:hover .mod-detalhes,
-.mod-painel:focus-within .mod-detalhes {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  margin-top: 0.85rem;
-}
-
-/* O filho da grade precisa de `min-height: 0` e `overflow: hidden` para que a
-   linha de 0fr de fato colapse — sem isso o conteúdo segura a altura e a
-   transição não acontece. */
-.mod-det {
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0.85rem;
-  background: rgba(4, 8, 12, 0.72);
-}
-
-.mod-det dt {
-  font-size: 0.625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--fg-2);
-  white-space: nowrap;
-}
-
-.mod-det dd {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--fg);
-  text-align: right;
-}
+   O painel que cresce no hover continua: sem a ficha, o que ele revela é FOTO. */
 
 /* ---- o que é igual nos três ---- */
 
@@ -260,8 +213,9 @@
 /* ---- toque e telas estreitas ----
 
    Sem cursor não existe hover, e a expansão por flex deixa de fazer sentido: os
-   painéis empilham e o detalhe fica sempre aberto. Um "toque para expandir" aqui
-   seria um passo a mais para chegar a quatro linhas de texto. */
+   painéis empilham, cada um com a própria foto, o nome e o preço. Havia aqui uma
+   terceira regra abrindo a ficha de quatro linhas de vez neste tamanho — ela saiu
+   junto com a ficha. */
 @media (hover: none), (max-width: 900px) {
   .mod {
     display: grid;
@@ -275,13 +229,6 @@
   .mod .mod-painel:focus-within {
     flex: none;
     min-height: 24rem;
-  }
-
-  .mod-detalhes,
-  .mod-painel:hover .mod-detalhes {
-    grid-template-rows: 1fr;
-    opacity: 1;
-    margin-top: 0.85rem;
   }
 }
 

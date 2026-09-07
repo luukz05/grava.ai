@@ -280,7 +280,18 @@ export function Landing() {
             fazia esse papel saiu junto: quem monta as colunas agora é o
             `.form-fr-duo`. */}
         <FormFranqueado>
-          <div>
+          {/* A COLUNA DE ASSINATURA — marca e manchete —, e ela SOME NO CELULAR.
+
+              A classe existe para isso: no telefone o par vira uma coluna só, e
+              a marca empilhada mais a manchete empurram o formulário para baixo
+              da dobra. Quem chega aqui já rolou a página inteira e já viu a
+              marca no alto; repeti-la em 84px de altura logo antes do campo de
+              nome custa o único lugar da página em que a pessoa faz alguma
+              coisa. A manchete continua existindo para leitor de tela (ver
+              `.close-intro` no `v5.css`) — é o `<h2>` desta seção, e uma seção
+              sem título é uma seção sem nome no índice de quem navega por
+              cabeçalho. */}
+          <div className="close-intro">
             {/* A marca empilhada, que é a versão do documento do cliente para
                 assinatura. No topo ela é símbolo mais wordmark em linha; aqui,
                 onde a página assina, ela aparece inteira.

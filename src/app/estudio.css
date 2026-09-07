@@ -209,6 +209,48 @@
   overflow: hidden;
 }
 
+/* O RECORTE SAI POR CIMA, E QUEM GARANTE ISSO É O POSICIONAMENTO — NÃO O
+   ALINHAMENTO.
+
+   A regra acima diz `end` contando que o excesso saia pelo topo — thread rolado
+   até o fim. Só que `overflow: hidden` faz desta caixa um CONTÊINER DE ROLAGEM,
+   e neles o alinhamento é `safe` por padrão: quando o conteúdo não cabe, o
+   navegador volta a alinhar pelo começo para não esconder o início. O excesso
+   passa a vazar por BAIXO — e por baixo estão as falas que acabaram de chegar.
+
+   O sintoma tinha dois nomes na mesma cena: o passo "Ajustando à área da peça"
+   cortado ao meio na batida do raciocínio, e "Metal, cerâmica, lona, plástico —
+   grava em tudo isso" cortado na batida da resposta. Os dois são a mesma coisa:
+   a conversa cresce para baixo, e é a última linha que some.
+
+   Ela cresce mesmo: o bloco de raciocínio NÃO sai de cena quando a resposta
+   chega (é o que prova que houve trabalho), então a batida da resposta carrega
+   pedido + raciocínio + três falas. Não existe altura de caixa que caiba isso
+   num celular — o que existe é a caixa mostrar o FIM da conversa, que é o que
+   ela sempre quis mostrar.
+
+   `align-items: unsafe end` seria a resposta declarativa e foi tentada aqui;
+   não resolveu na prática. O que resolve sem depender de palavra-chave de
+   alinhamento é tirar a conversa do fluxo da caixa e ancorá-la pela borda de
+   baixo: caixa absoluta com `bottom: 0` e altura automática cresce para CIMA,
+   e o que não cabe passa da borda de cima. Não há fallback de alinhamento no
+   caminho, em navegador nenhum.
+
+   A máscara é a outra metade. Corte reto no meio de uma linha lê como defeito;
+   os mesmos pixels desaparecendo num degradê de meia dúzia de linhas leem como
+   conversa rolada — que é o que é. Quando a conversa é curta ela nem aparece:
+   o alto da caixa está vazio, e degradê sobre nada não se vê. */
+.est-vivo .est-topo {
+  position: relative;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 14%);
+}
+
+.est-vivo .est-thread {
+  position: absolute;
+  inset: auto 0 0;
+}
+
 .est-thread {
   display: flex;
   flex-direction: column;
