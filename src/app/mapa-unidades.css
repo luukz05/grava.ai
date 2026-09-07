@@ -120,17 +120,31 @@
    valem: o ciclo mostra uma cidade por vez, e quem quiser conferir outra sem
    esperar a vez dela só precisa passar por cima. */
 .mapa-ponto[data-ativo] .mapa-etiqueta,
-.mapa-ponto:focus-visible .mapa-etiqueta,
-.mapa-ponto:hover .mapa-etiqueta {
+.mapa-ponto:focus-visible .mapa-etiqueta {
   opacity: 1;
 }
 
 .mapa-ponto[data-ativo] .mapa-halo,
-.mapa-ponto:focus-visible .mapa-halo,
-.mapa-ponto:hover .mapa-halo {
+.mapa-ponto:focus-visible .mapa-halo {
   transform: scale(1.35);
   opacity: 0.8;
   animation: none;
+}
+
+/* O cursor entra pela porta, como o pino logo acima. Sem ela, em tela de toque
+   o ponto tocado ficava com a etiqueta aberta e o halo parado em 1,35 — dois
+   pontos acesos ao mesmo tempo, o da vez e o que alguém encostou, e o ciclo
+   perdia justamente a leitura de "uma cidade por vez". */
+@media (hover: hover) and (pointer: fine) {
+  .mapa-ponto:hover .mapa-etiqueta {
+    opacity: 1;
+  }
+
+  .mapa-ponto:hover .mapa-halo {
+    transform: scale(1.35);
+    opacity: 0.8;
+    animation: none;
+  }
 }
 
 /* O ponto em foco cresce e ganha um anel próprio. É o que amarra o mapa ao

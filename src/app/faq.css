@@ -89,7 +89,7 @@
   height: 1.5px;
   background: var(--fg-2);
   border-radius: 2px;
-  transition: rotate var(--t-mov) var(--e-mola),
+  transition: rotate var(--t-estado) var(--e-mola),
     opacity var(--t-ui) var(--e-ui), background-color var(--t-ui) var(--e-ui);
 }
 
@@ -140,9 +140,9 @@
       /* `content-visibility` entra na transição junto: sem ele o conteúdo fica
          inacessível ao Ctrl+F durante o fechamento, e o navegador o esconde
          antes de a altura terminar de animar. */
-      transition: height var(--t-mov) var(--e-ui),
+      transition: height var(--t-estado) var(--e-ui),
         opacity var(--t-ui) var(--e-ui),
-        content-visibility var(--t-mov) allow-discrete;
+        content-visibility var(--t-estado) allow-discrete;
     }
 
     .faq-item[open]::details-content {

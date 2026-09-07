@@ -1562,12 +1562,42 @@
 
   .ctr-vivo .ctr-passo {
     visibility: hidden;
-    transition: opacity 180ms var(--e-ui), visibility 0s linear 180ms;
+    transition: opacity 140ms var(--e-ui), visibility 0s linear 140ms;
   }
 
   .ctr-vivo .ctr-passo.e-ativo {
     visibility: visible;
-    transition-delay: 0s;
+    transition: opacity 200ms var(--e-ui), visibility 0s linear 0s;
+  }
+
+  /* A DISSOLVÊNCIA PRECISA DE MAIS QUE OPACIDADE AQUI, e é o único lugar da
+     página onde isso vale: os textos são caixas FIXAS no mesmo pé, então a
+     troca acontece pixel sobre pixel. Só com opacidade o olho enxerga dois
+     objetos sobrepostos no meio do caminho — duas frases diferentes ocupando as
+     mesmas linhas — em vez de uma virando a outra.
+
+     O borrão de 2px costura as duas: no meio da troca não há duas frases
+     legíveis, há uma massa de texto trocando de forma. E os 6px de deslocamento
+     dão DIREÇÃO — sem eles a troca não diz "próximo", diz "piscou".
+
+     VAI NO ELEMENTO FIXO, e não na fatia: deslocamento num ancestral cria bloco
+     de contenção e o filho fixo deixaria de ser fixo — é o mesmo mecanismo que
+     derrubaria a barra do celular se alguém pusesse transformação na coluna.
+
+     Entra em 200ms e sai em 140: quem sai é o quadro sendo limpo, quem entra é
+     o que a pessoa vai ler. */
+  .ctr-vivo .ctr-passo > .ctr-bloco,
+  .ctr-vivo .ctr-flancos {
+    filter: blur(2px);
+    translate: 0 6px;
+    transition: filter 140ms var(--e-ui), translate 140ms var(--e-ui);
+  }
+
+  .ctr-vivo .ctr-passo.e-ativo > .ctr-bloco,
+  .ctr-vivo .ctr-passo.e-ativo .ctr-flancos {
+    filter: blur(0);
+    translate: none;
+    transition-duration: 200ms;
   }
 
   /* A MEDIDA ERA CURTA DEMAIS, e o número mostra: 30ch medidos na fonte do

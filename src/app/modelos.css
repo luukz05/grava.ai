@@ -31,15 +31,35 @@
   border-radius: var(--r-lg, 24px);
   background: var(--bg-2);
   cursor: default;
-  transition: flex 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* 260ms, e eram 520. Meio segundo é tempo de cena, não de resposta a um
+     cursor que já está em cima do painel — o teto de uma troca de interface é
+     300ms, e passar disso faz o painel parecer pesado em vez de suave.
+
+     A propriedade continua sendo `flex`, que é LAYOUT e não composição: os três
+     painéis dividem uma linha e crescer um encolhe os outros, o que nenhuma
+     transformação faz (transformação não empurra irmão). O custo é real e é o
+     preço da mecânica; o que dava para cortar era a duração. */
+  transition: flex 260ms var(--e-ui);
   outline: none;
 }
 
-.mod:hover .mod-painel {
-  flex: 0.7;
+/* SÓ ONDE HÁ CURSOR DE VERDADE. Em tela de toque o `:hover` gruda no tap: o
+   painel tocado ficava aberto e os outros dois encolhidos até alguém tocar em
+   outro lugar. O bloco de `hover: none` mais abaixo já neutralizava isso no
+   celular, mas notebook com tela sensível responde `hover: hover` E toque —
+   ali o defeito continuava. */
+@media (hover: hover) and (pointer: fine) {
+  .mod:hover .mod-painel {
+    flex: 0.7;
+  }
+
+  .mod .mod-painel:hover {
+    flex: 2.1;
+  }
 }
 
-.mod .mod-painel:hover,
+/* O foco por teclado fica FORA da porta de hover: quem navega por tabulação
+   precisa do painel abrindo em qualquer aparelho. */
 .mod .mod-painel:focus-within {
   flex: 2.1;
 }

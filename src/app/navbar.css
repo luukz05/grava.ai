@@ -415,9 +415,13 @@
   transform-origin: 100% 0;
   scale: 0.96;
   translate: 0 -6px;
-  transition: opacity var(--t-ui) var(--e-ui), scale var(--t-mov) var(--e-mola),
-    translate var(--t-mov) var(--e-mola),
-    visibility 0s linear var(--t-mov);
+  /* `--t-estado` e não `--t-mov`: menu que abre é interface trocando de estado,
+     e a pessoa está esperando a lista — não assistindo ao gesto. 340ms aqui
+     colocavam um terço de segundo entre o toque e a primeira linha legível. */
+  transition: opacity var(--t-ui) var(--e-ui),
+    scale var(--t-estado) var(--e-mola),
+    translate var(--t-estado) var(--e-mola),
+    visibility 0s linear var(--t-estado);
 }
 
 .nav-menu[data-aberto] {

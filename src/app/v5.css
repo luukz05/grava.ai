@@ -37,8 +37,14 @@
                 pessoa ainda está apertando, senão o botão lê como morto. Abaixo
                 de 100ms o olho não percebe como animação, só como resposta.
      --t-ui     mudança de estado sem deslocamento: cor, borda, sublinhado.
-     --t-mov    algo que muda de lugar ou de tamanho. É o `response` de 0,34s da
-                mola padrão da Apple, escrito como duração.
+     --t-estado abrir, fechar, girar um sinal: interface trocando de estado COM
+                deslocamento. Entrou porque `--t-mov` estava fazendo esse papel,
+                e 340ms num acordeão ou num menu é longo — acima de 300ms a
+                interface deixa de responder e passa a se apresentar. Aqui a
+                pessoa está esperando o conteúdo, não assistindo ao gesto.
+     --t-mov    algo que muda de lugar ou de tamanho E É O ASSUNTO: a volta do
+                botão apertado, uma peça entrando na cena. É o `response` de
+                0,34s da mola padrão da Apple, escrito como duração.
 
      As curvas:
 
@@ -48,10 +54,17 @@
                 escrita em `linear()`. `x(t) = 1 − (1 + ωt)·e^⁻ωt`, ω = 2π/0.34.
                 É mola de verdade — o mesmo perfil de chegada —, sem carregar
                 uma biblioteca de animação numa página que não tem gesto para
-                interromper. Onde `linear()` não existe, o fallback logo abaixo
-                mantém a curva padrão. */
+                interromper. Onde `linear()` não existe, o fallback aqui embaixo
+                mantém a curva padrão.
+
+                A DECLARAÇÃO NESTE BLOCO É O FALLBACK, e não o valor: a mola de
+                verdade é escrita no `@supports` logo abaixo, sobre o `.v5`. Ler
+                só esta linha dá a impressão de que `--e-mola` é apelido de
+                `--e-ui` — não é, e a diferença aparece em qualquer navegador
+                dos últimos três anos. */
   --t-press: 90ms;
   --t-ui: 180ms;
+  --t-estado: 240ms;
   --t-mov: 340ms;
   --e-ui: cubic-bezier(0.32, 0.72, 0, 1);
   --e-mola: var(--e-ui);
@@ -1855,8 +1868,10 @@
   overflow: hidden;
   /* A troca de cor do fundo acompanha a fase; o `transform` continua vindo do
      `.cta`, e por isso não é redeclarado aqui. */
-  transition: background-color var(--t-mov) var(--e-ui),
-    color var(--t-mov) var(--e-ui);
+  /* Troca de COR acompanha o tempo de estado sem deslocamento: em 340ms o
+     botão terminava de mudar de cor bem depois de o dedo ter saído. */
+  transition: background-color var(--t-ui) var(--e-ui),
+    color var(--t-ui) var(--e-ui);
 }
 
 .form-fr-enviar:disabled {
