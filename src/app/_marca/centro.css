@@ -487,8 +487,14 @@
 
 /* O cabeçalho da constelação também desce um degrau: ele divide a tela com
    três blocos e com o hexágono, e no corpo dos títulos da narrativa a frase
-   quebra em duas linhas de 3rem bem em cima do desenho. */
-.ctr-tit--cab {
+   quebra em duas linhas de 3rem bem em cima do desenho.
+
+   DUAS CLASSES NO SELETOR, e isso era um degrau que não estava acontecendo. O
+   elemento tem `class="ctr-tit ctr-tit--cab"`, e a regra do `.ctr-tit` mora mais
+   abaixo neste arquivo: mesma especificidade, e a última vence. Medido no
+   celular, o cabeçalho da constelação saía com os mesmos 28px do título da
+   narrativa — o degrau existia só no comentário. */
+.ctr-tit.ctr-tit--cab {
   font-size: clamp(1.5rem, 2.9vw, 2.25rem);
 }
 
@@ -1417,8 +1423,11 @@
     top: calc(var(--nav-gap) + 58px);
   }
 
+  /* 38svh e não 34: com o texto ocupando o pé e a medida do parágrafo corrigida,
+     sobravam ~120px de vão morto entre o desenho e a primeira linha. O desenho
+     cresce para dentro desse vão em vez de deixá-lo vazio. */
   .ctr-cena {
-    width: min(86%, 34svh);
+    width: min(90%, 38svh);
     opacity: 0.9;
   }
 
@@ -1426,6 +1435,19 @@
   .ctr-passo:first-child {
     min-height: 84svh;
     justify-items: center;
+  }
+
+  /* AS FATIAS SEM TEXTO ENCOLHEM AQUI. A passagem vale 64svh e as duas
+     constelações 160svh cada porque na tela larga a moldura precisa de uma tela
+     inteira de grude antes de assentar e outra depois de soltar. No celular a
+     moldura não gruda — ela é fixa —, e essa corda vira rolagem sem nada na
+     tela: medido, eram ~900px de vazio depois de cada constelação. */
+  .ctr-passagem {
+    min-height: 44svh;
+  }
+
+  .ctr-const {
+    min-height: 120svh;
   }
 
   /* ── SEM MOVIMENTO, A CENA SAI DE TRÁS DO TEXTO ──
@@ -1531,6 +1553,13 @@
     text-align: center;
   }
 
+  /* 0,4rem era o vão de quando o título tinha o corpo da tela larga e o par
+     lia como uma coisa só. Com 28px em cima de 16px, seis pixels e meio entre
+     os dois deixam o parágrafo colado na descendente do título. */
+  .ctr-bloco {
+    gap: 0.55rem;
+  }
+
   .ctr-vivo .ctr-passo {
     visibility: hidden;
     transition: opacity 180ms var(--e-ui), visibility 0s linear 180ms;
@@ -1541,11 +1570,20 @@
     transition-delay: 0s;
   }
 
+  /* A MEDIDA ERA CURTA DEMAIS, e o número mostra: 30ch medidos na fonte do
+     bloco davam 221px numa faixa de 344 — o parágrafo saía com 23 caracteres
+     por linha e SEIS linhas, e o título com dez. Medida confortável de leitura
+     começa nos 45; abaixo de 30 o olho volta mais vezes do que avança, e o texto
+     fica alto à toa bem em cima do desenho.
+
+     O teto passa a ser a própria faixa: a caixa fixa já desconta 6vw de cada
+     lado, então 100% aqui é a linha inteira do celular. O limite em rem só entra
+     no tablet, onde a faixa cresce e a medida voltaria a passar dos 75. */
   .ctr-bloco,
   .ctr-passo[data-lugar="topo"] .ctr-bloco,
   .ctr-flancos .ctr-bloco:first-child,
   .ctr-flancos .ctr-bloco:last-child {
-    max-width: 30ch;
+    max-width: min(100%, 30rem);
     justify-items: center;
     text-align: center;
   }
@@ -1641,7 +1679,9 @@
     grid-column: 1;
     align-self: auto;
     justify-self: center;
-    max-width: 32ch;
+    /* Mesma conta dos blocos da narrativa: 32ch aqui eram 286px de 344, e o
+       item perdia uma linha inteira de medida por nada. */
+    max-width: min(100%, 30rem);
     margin: 0;
     padding: 0;
     text-align: center;
@@ -1666,7 +1706,7 @@
    800 de largura, e é ele quem mais precisa disto. */
 @media (max-width: 900px) and (max-height: 760px) {
   .ctr-cena {
-    width: min(86%, 30svh);
+    width: min(90%, 33svh);
   }
 
   /* A âncora sobe um pouco: em tela baixa cada svh vale menos pixel, e o pé
@@ -1674,7 +1714,7 @@
   .ctr-vivo .ctr-passo > .ctr-bloco,
   .ctr-vivo .ctr-flancos,
   .ctr-vivo .ctr-const-grade {
-    bottom: clamp(0.75rem, 3svh, 1.5rem);
+    bottom: clamp(1.25rem, 3.5svh, 1.75rem);
   }
 
   .ctr-tit {
@@ -1685,7 +1725,7 @@
     font-size: 0.9375rem;
   }
 
-  .ctr-tit--cab {
+  .ctr-tit.ctr-tit--cab {
     font-size: 1.3125rem;
   }
 

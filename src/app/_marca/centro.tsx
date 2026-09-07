@@ -1155,11 +1155,37 @@ export function Centro() {
              batida) e solta 110svh adiante (69%, +3,42). Tudo entra DEPOIS de
              assentar e apaga ANTES de soltar — senão o texto atravessa o
              hexágono no caminho, que é o defeito que a moldura veio corrigir. */
+          /* ── OS TEMPOS DAS CONSTELAÇÕES, NO CELULAR, SÃO OUTROS ──
+
+             Na tela larga a moldura da constelação GRUDA: ela precisa de meia
+             tela de rolagem para assentar e solta outra meia adiante, e é por
+             isso que o texto entra tarde (31% da fatia) e sai cedo (69%) — fora
+             dessa janela ele atravessaria o hexágono.
+
+             No celular a moldura não gruda, ela é FIXA: não há janela para
+             respeitar, e manter os mesmos tempos custava caro. Medido, o texto
+             ficava na tela em três de dez amostras da fatia e o resto era
+             rolagem com o pé da tela vazio — ~900px depois de cada constelação.
+
+             As frações abaixo são da DURAÇÃO DA FATIA, não segundos soltos:
+             entra aos 10% e sai aos 86%, e a conta se refaz sozinha se a altura
+             da fatia mudar. A leitura da faixa de mídia acontece na montagem; um
+             telefone não troca de faixa ao girar (844px de largura deitado ainda
+             é celular), e num tablet que atravesse o limite os tempos ficam
+             deslocados dentro da mesma janela, sem quebrar nada. */
+          const celular = window.matchMedia("(max-width: 900px)").matches;
+          const naFatia = (i: number, fracao: number) =>
+            (durT[i] ?? T_BATIDA) * fracao;
+          const tPil = (seg: number, frac: number) =>
+            "pilares+=" + (celular ? naFatia(5, frac) : seg);
+          const tIa = (seg: number, frac: number) =>
+            "motor+=" + (celular ? naFatia(6, frac) : seg);
+
           batida("pilares", 5);
           tl.to(
             cabPilares,
             { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
-            "pilares+=1.65"
+            tPil(1.65, 0.1)
           )
             .to(
               raios,
@@ -1169,7 +1195,7 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.2,
               },
-              "pilares+=1.75"
+              tPil(1.75, 0.13)
             )
             .to(
               pilares,
@@ -1181,7 +1207,7 @@ export function Centro() {
                 ease: E_MOLA_SOLTA,
                 stagger: 0.2,
               },
-              "pilares+=1.95"
+              tPil(1.95, 0.18)
             )
             /* O texto entra COM o nó — mesmo instante, mesmo intervalo. É o
                par que substitui a batida por item: o olho vê o vértice acender
@@ -1196,7 +1222,7 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.2,
               },
-              "pilares+=2"
+              tPil(2, 0.2)
             )
             /* A aura fecha um degrau acima: o quadro tem mais desenho no meio
                do que qualquer outro, e sem isso o hexágono com três nós fica
@@ -1204,7 +1230,7 @@ export function Centro() {
             .to(
               aura,
               { opacity: 0.66, duration: 1.2, ease: E_LUZ },
-              "pilares+=1.7"
+              tPil(1.7, 0.11)
             )
             /* E APAGA ANTES DE A MOLDURA SOLTAR. Enquanto ela está presa o
                texto fica parado nas faixas livres; solta, ele sobe — e subir
@@ -1214,7 +1240,7 @@ export function Centro() {
             .to(
               [cabPilares, ...txtPilares],
               { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
-              "pilares+=3.1"
+              tPil(3.1, 0.86)
             );
 
           /* ── 7 · O HEXÁGONO FECHA: A MARCA ABRE E A IA OCUPA O RESTO ──
@@ -1266,7 +1292,7 @@ export function Centro() {
                 duration: 1.5,
                 ease: E_MOLA,
               },
-              "motor+=1.6"
+              tIa(1.6, 0.1)
             )
             /* Os raios saem de cena: eles ligavam três nós a um ponto no meio,
                e o meio virou uma área. Linha por baixo de uma marca chapada é
@@ -1274,7 +1300,7 @@ export function Centro() {
             .to(
               raios,
               { autoAlpha: 0, duration: 0.7, ease: E_UI },
-              "motor+=1.6"
+              tIa(1.6, 0.1)
             )
             .to(
               pilares,
@@ -1285,12 +1311,12 @@ export function Centro() {
                 duration: 0.8,
                 ease: E_UI,
               },
-              "motor+=1.65"
+              tIa(1.65, 0.11)
             )
             .to(
               cabIa,
               { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
-              "motor+=1.7"
+              tIa(1.7, 0.12)
             )
             .to(
               nosIa,
@@ -1303,7 +1329,7 @@ export function Centro() {
                 ease: E_MOLA_SOLTA,
                 stagger: 0.2,
               },
-              "motor+=1.95"
+              tIa(1.95, 0.18)
             )
             .to(
               txtIa,
@@ -1314,14 +1340,14 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.18,
               },
-              "motor+=1.95"
+              tIa(1.95, 0.18)
             )
             /* E o quadro se limpa antes de a moldura soltar, como na batida
                anterior: o que fica na tela daqui em diante é a cena. */
             .to(
               [cabIa, ...txtIa],
               { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
-              "motor+=3.1"
+              tIa(3.1, 0.92)
             );
 
           /* A última fatia precisa existir inteira na linha do tempo, senão a
