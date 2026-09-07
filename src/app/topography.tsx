@@ -78,6 +78,12 @@ uniform float uMorphAmount;
 uniform float uBands;
 uniform float uThickness;
 uniform float uScale;
+/* Correção de aspecto. A conta está em medirAspecto, e o porquê na prop
+   aspectRef — sem crase nos dois nomes de propósito: isto aqui é o interior de
+   um template literal, e uma crase fecharia o shader no meio.
+   Aqui só se aplica o número: multiplica em x, divide em y, em torno do centro.
+   Vale 1 com a correção desligada, e aí as duas contas somem. */
+uniform float uAspectFix;
 uniform float uPixelSize;
 uniform float uGlow;
 uniform float uColorMode;
@@ -122,7 +128,10 @@ void main() {
   vec2 res = iResolution.xy;
   vec2 uv = gl_FragCoord.xy / res;
 
-  vec2 suv = (uv - 0.5) / max(uScale, 0.001) + 0.5;
+  float k = max(uAspectFix, 0.001);
+  vec2 auv = vec2((uv.x - 0.5) * k, (uv.y - 0.5) / k);
+
+  vec2 suv = auv / max(uScale, 0.001) + 0.5;
 
   vec2 sampleUv = suv;
   if (uPixelSize > 1.0) {
@@ -199,6 +208,7 @@ type Uniformes = {
   uBands: Uniforme<number>;
   uThickness: Uniforme<number>;
   uScale: Uniforme<number>;
+  uAspectFix: Uniforme<number>;
   uPixelSize: Uniforme<number>;
   uGlow: Uniforme<number>;
   uColorMode: Uniforme<number>;
@@ -251,6 +261,23 @@ export type TopographyProps = {
   bands?: number;
   thickness?: number;
   scale?: number;
+  /* A PROPORÇÃO DE REFERÊNCIA DO DESENHO, e a razão de ela existir.
+
+     O campo é amostrado em `uv` normalizado: `x` e `y` vão de 0 a 1 de borda a
+     borda, seja qual for a caixa. Isso quer dizer que uma célula do terreno tem
+     sempre a FORMA DA CAIXA — num monitor de 1440×930 ela nasce larga e deitada,
+     e num celular de 390×880 ela nasce alta e fina. É o mesmo desenho esticado,
+     e é por isso que a carta lia como terreno no desktop e como listra vertical
+     no celular.
+
+     Com um valor aqui, a amostragem corrige: `k = √(aspecto real / esta
+     referência)` multiplica em `x` e divide em `y`, e a célula passa a manter
+     ESTA proporção em qualquer viewport. As duas correções se multiplicam por
+     1, então a quantidade de célula na tela quase não muda — o que muda é a
+     forma dela.
+
+     `0` desliga e devolve o comportamento original do componente. */
+  aspectRef?: number;
   pixelSize?: number;
   glow?: number;
   colorMode?: ModoCor;
@@ -278,6 +305,7 @@ export default function Topography({
   bands = 2.0,
   thickness = 0.01,
   scale = 1.0,
+  aspectRef = 0,
   pixelSize = 1.0,
   glow = 0.5,
   colorMode = "elevation",
@@ -301,6 +329,13 @@ export default function Topography({
   useEffect(() => {
     aoQuadroRef.current = aoQuadro;
   }, [aoQuadro]);
+
+  /* Por ref, e não na lista do segundo efeito: quem lê este valor é o
+     `medirAspecto`, que vive dentro do efeito de montagem e precisa do valor de
+     agora sem que trocá-lo derrube o contexto de WebGL. A releitura na mudança
+     de prop está no segundo efeito, logo abaixo. */
+  const aspectRefRef = useRef(aspectRef);
+  aspectRefRef.current = aspectRef;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -335,6 +370,7 @@ export default function Topography({
         uBands: { value: 2.0 },
         uThickness: { value: 0.01 },
         uScale: { value: 1.0 },
+        uAspectFix: { value: 1.0 },
         uPixelSize: { value: 1.0 },
         uGlow: { value: 0.5 },
         uColorMode: { value: 0.0 },
@@ -364,6 +400,21 @@ export default function Topography({
 
     const u = program.uniforms as Uniformes;
 
+    /* A correção de aspecto sai do tamanho medido, e por isso mora junto do
+       `setSize`: ela muda quando a caixa muda, e em mais nenhum momento.
+
+       A raiz quadrada é o que reparte a correção entre os dois eixos. Corrigir
+       só em `x` deixaria a célula com a altura de sempre e uma largura de duas
+       telas no celular; só em `y`, o contrário. Repartindo, o produto das duas
+       continua sendo 1 — a mesma quantidade de terreno na tela, com a forma
+       certa. */
+    const medirAspecto = () => {
+      const res = u.iResolution.value;
+      const ref = aspectRefRef.current;
+      const ar = res[0] / Math.max(res[1], 1);
+      u.uAspectFix.value = ref > 0 ? Math.sqrt(ar / ref) : 1;
+    };
+
     const setSize = () => {
       const rect = container.getBoundingClientRect();
       const w = Math.max(1, Math.floor(rect.width));
@@ -372,6 +423,7 @@ export default function Topography({
       const res = u.iResolution.value;
       res[0] = gl.drawingBufferWidth;
       res[1] = gl.drawingBufferHeight;
+      medirAspecto();
       renderer.render({ scene: mesh });
     };
 
@@ -440,11 +492,16 @@ export default function Topography({
       const ouvinte = aoQuadroRef.current;
       if (ouvinte) {
         const escala = Math.max(u.uScale.value, 0.001);
+        /* A MESMA correção do fragmento, e ela tem que estar aqui: o marco
+           procura o `y` em que a elevação vale um inteiro, e ler o campo por um
+           mapeamento diferente do que a tela mostra põe o hexágono numa curva
+           que não existe naquele pixel. */
+        const k = Math.max(u.uAspectFix.value, 0.001);
         const faixas = u.uBands.value;
         const [A, B, C, D] = ctrlArrays;
         ouvinte((ux, vy) => {
-          const su = (ux - 0.5) / escala + 0.5;
-          const sv = (vy - 0.5) / escala + 0.5;
+          const su = ((ux - 0.5) * k) / escala + 0.5;
+          const sv = ((vy - 0.5) / k) / escala + 0.5;
           const ax = bez(su, A);
           const ay = bez(su, B);
           const bx = bez(sv, C);
@@ -549,6 +606,13 @@ export default function Topography({
     u.uBands.value = bands;
     u.uThickness.value = thickness;
     u.uScale.value = scale;
+    /* Trocar a referência refaz a conta com a resolução que já está medida — não
+       há por que esperar o próximo redimensionamento para o desenho mudar. */
+    {
+      const res = u.iResolution.value;
+      const ar = res[0] / Math.max(res[1], 1);
+      u.uAspectFix.value = aspectRef > 0 ? Math.sqrt(ar / aspectRef) : 1;
+    }
     u.uPixelSize.value = pixelSize;
     u.uGlow.value = glow;
     u.uColorMode.value = colorModeToFloat(colorMode);
@@ -574,6 +638,7 @@ export default function Topography({
     bands,
     thickness,
     scale,
+    aspectRef,
     pixelSize,
     glow,
     colorMode,

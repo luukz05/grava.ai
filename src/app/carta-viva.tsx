@@ -307,6 +307,20 @@ export function CartaViva({ marcos = true }: { marcos?: boolean } = {}) {
         bands={3.4}
         thickness={0.012}
         scale={1.05}
+        /* A CARTA TEM PROPORÇÃO PRÓPRIA AGORA, e não mais a da caixa.
+
+           O shader amostra o campo em `uv` de 0 a 1 nos dois eixos, então uma
+           célula do terreno saía com a forma do elemento: deitada no monitor e
+           em pé no celular. Não era o mesmo desenho reagindo à tela — era o
+           mesmo desenho esticado, e no celular ele lia como listra vertical em
+           vez de curva de nível.
+
+           1,6 é a proporção da caixa da carta num desktop comum (a `.fundo` do
+           herói mais os 18% de folga do parallax), ou seja: o desenho que já
+           estava aprovado vira a referência, e é o celular que passa a mostrar
+           um recorte dele em vez de uma deformação. Ver `aspectRef` em
+           `topography.tsx`. */
+        aspectRef={1.6}
         glow={0.34}
         colorMode="elevation"
         contrast={2.6}

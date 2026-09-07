@@ -19,6 +19,12 @@
   /* Folga da barra até o topo da viewport. Entra em três contas: o padding do
      bloco dela, o `top` do sticky e a margem negativa da chapa. */
   --nav-gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  /* Respiro lateral da coluna. Ele era um valor solto dentro do `.hold`, e
+     virou variável porque um segundo elemento precisa do MESMO número sem
+     poder herdá-lo: a `.navbar` do celular é `position: absolute`, e absoluto
+     se mede contra a caixa de PADDING do ancestral — `left: 0` ali significa a
+     borda da tela, não a margem do texto. Ver `navbar.css`. */
+  --hold-pad: clamp(0.85rem, 1.8vw, 1.25rem);
 
   /* ---------- movimento ----------
      A página tinha oito durações e cinco curvas diferentes, cada uma escolhida
@@ -153,7 +159,7 @@
      margem negativa (`--est-sangria`, em `estudio.css`). */
   max-width: 90rem;
   margin-inline: auto;
-  padding-inline: clamp(0.85rem, 1.8vw, 1.25rem);
+  padding-inline: var(--hold-pad);
 }
 
 .mono {

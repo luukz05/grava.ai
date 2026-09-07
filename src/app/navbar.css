@@ -494,38 +494,40 @@
    sem ajuda. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   NO CELULAR, A ROLAGEM EMPILHA A BARRA À DIREITA
+   NO CELULAR A BARRA NÃO MUDA DE LAYOUT — ELA SÓ GANHA SUPERFÍCIE
 
-   Estado do topo: como sempre foi — marca à esquerda, CTA com rótulo e o botão
-   do menu à direita, na largura da coluna.
+   Estado do topo: marca à esquerda, CTA com rótulo e o botão do menu à direita,
+   na largura da coluna.
 
-   Fora do topo: os três viram uma coluna de esferas de 42px encostada na
-   direita, nesta ordem, de cima para baixo — o menu, o CTA (envelope) e a
-   marca. Sem barra em volta: no desktop as peças se recolhem para dentro de um
-   oblongo, e aqui não existe oblongo para recolher; cada esfera carrega a
-   própria superfície.
+   Fora do topo: a MESMA linha. A marca continua na esquerda e vira esfera de
+   42px, o CTA fecha o rótulo e vira a esfera do envelope, e ela fica à esquerda
+   do botão do menu — a ordem que o DOM já tem. O que a rolagem acrescenta é
+   superfície: cada uma das três ganha o próprio fundo. Não há oblongo em volta
+   como no desktop; três círculos encostados dentro de uma cápsula seria caixa
+   dentro de caixa numa tela que não tem largura para gastar com moldura.
 
-   A ORDEM SAI DO `column-reverse`, e não de uma reordenação no DOM. O DOM é
-   marca → pílulas → ações, e a ordem de leitura e de tabulação tem que continuar
-   sendo essa: quem chega de teclado ou de leitor de tela encontra a marca
-   primeiro, como em qualquer site. `column-reverse` inverte só a pintura, que é
-   exatamente a diferença entre `order`/`*-reverse` (visual) e mexer no HTML
-   (semântico).
+   AQUI HAVIA UMA COLUNA. Os três viravam uma pilha de esferas encostada na
+   direita — menu em cima, CTA no meio, marca embaixo, por `column-reverse` —, e
+   ela saiu a pedido. O que a pilha custava, e que a linha não custa: a marca ia
+   parar no canto inferior direito, longe do lugar em que toda página do mundo a
+   coloca; o painel do menu tinha que sair pelo LADO para não cobrir os dois
+   ícones abaixo dele; e o dedo que quisesse a marca precisava atravessar dois
+   alvos de conversão para chegar nela.
 
    ───────────────────────────────────────────────────────────────────────────
-   POR QUE `.navbar` VIRA ABSOLUTO AQUI, E ESSA É A PARTE QUE NÃO É ENFEITE
-
-   A coluna tem 142px de altura (três esferas e dois vãos) contra os 58px da
-   linha. Com a barra em fluxo, essa diferença é altura que NASCE no meio da
-   rolagem: a `.navbar-faixa` cresceria 84px e empurraria a página inteira para
-   baixo — deslocamento de layout no exato momento em que a pessoa está lendo, e
-   causado pelo próprio ato de rolar.
+   POR QUE `.navbar` VIRA ABSOLUTO AQUI, E ISSO FICA MESMO SEM A COLUNA
 
    Absoluto dentro da faixa (que é `sticky`, e sticky é elemento posicionado, e
-   por isso serve de âncora sem precisar de `position: relative`), a coluna
-   deixa de ter altura em fluxo. A faixa ganha uma altura fixa igual à da linha
-   do topo, e o espaço reservado no alto da página não muda mais — nem quando a
-   coluna cresce, nem quando ela volta.
+   por isso serve de âncora sem precisar de `position: relative`), a barra deixa
+   de ter altura em fluxo — e a faixa passa a reservar uma altura fixa, a da
+   linha do topo, com `min-height`.
+
+   Isso nasceu para a coluna, que era 84px mais alta que a linha e empurrava a
+   página inteira para baixo no meio da rolagem. Com a linha, a diferença de
+   altura é zero e o defeito não existe mais. O que continua valendo é o outro
+   lado: a barra do celular não desenha superfície nenhuma em volta, e um
+   elemento em fluxo sem fundo ainda ocupa altura de fluxo. Fora do fluxo, a
+   altura reservada é uma conta só, escrita num lugar só.
 
    Os 58px são os mesmos que o `.hero` desconta em `v5.css` (`margin-top` e
    `padding-top` de `calc(var(--nav-gap) + 58px)`). Mudou um, mudam os dois. */
@@ -571,20 +573,43 @@
       top: calc(var(--nav-gap) * (1 - var(--nav-cond)));
       left: 0;
       right: 0;
-      /* Encostada na direita quando encolhe. `margin-inline: auto` centraliza,
-         que é o certo no desktop e errado aqui: a coluna é do polegar, e o
-         polegar está do lado. */
-      margin-left: auto;
-      margin-right: 0;
-      padding: 0;
+      /* A LINHA CHEIA NOS DOIS ESTADOS, e é isto que mantém a marca na esquerda
+         com as ações na direita depois que a página rola.
+
+         No desktop a largura é animada — `min-width` cai de 100% a zero e a
+         barra se recolhe num oblongo abraçado ao conteúdo. Aqui não há oblongo
+         para abraçar: deixar a largura encolher juntaria as três esferas do
+         lado direito, que é exatamente a pilha que saiu, só que deitada. Fixar
+         em 100% desliga a interpolação de largura e deixa a rolagem cuidar só
+         do que ela deve cuidar aqui: as superfícies e o rótulo do CTA.
+
+         `margin-inline: auto` do bloco de cima continua valendo e é inofensivo
+         numa caixa que já ocupa a linha inteira. */
+      min-width: 100%;
+      /* O RESPIRO LATERAL, QUE ESTAVA FALTANDO — e faltava pelo mesmo motivo do
+         `top` acima: absoluto se mede contra a caixa de PADDING do ancestral,
+         então `left: 0` / `right: 0` passam POR DENTRO do `padding-inline` que
+         o `.hold` dá à faixa. A barra encostava nas duas bordas da tela
+         enquanto o `<h1>` logo abaixo começava 13px para dentro; no estado
+         empilhado, a coluna de esferas sangrava na direita.
+
+         O conserto é padding no próprio oblongo, e não `left`/`right` com a
+         medida: a `.navbar` carrega `min-width: calc((1 - var(--nav-cond)) *
+         100%)` do bloco de cima, e esses 100% são da caixa de padding da faixa
+         — afastar as duas bordas deixaria a caixa sobre-restringida e o
+         navegador descartaria o `right`, jogando a barra 13px para FORA da
+         tela à direita. Com padding, a caixa continua indo de borda a borda e
+         quem anda para dentro é o conteúdo.
+
+         `--hold-pad` mora no `v5.css` e é o mesmo valor que o `.hold` usa: este
+         número precisa bater exatamente com o da coluna, e um `clamp()` copiado
+         à mão em dois arquivos diverge no primeiro dia em que alguém mexer. */
+      padding: 0 var(--hold-pad);
       background: none;
       box-shadow: none;
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
       border-color: transparent;
-      animation: navEmpilha linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 160px;
     }
 
     /* A ALTURA RESERVADA NO ALTO DA PÁGINA, FIXA E IGUAL À DO ESTADO DO TOPO.
@@ -599,25 +624,16 @@
       min-height: calc(var(--nav-gap) + 58px);
     }
 
-    .nav-acoes {
-      animation: navEmpilha linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 160px;
-    }
+    /* AQUI HAVIA UM `@keyframes navEmpilha` — `flex-direction: column-reverse`,
+       `align-items: flex-end` e vão de 8px, aplicado à `.navbar` e às
+       `.nav-acoes` pela mesma linha de rolagem. Ele era o que deitava a barra
+       de pé. Sem coluna, não há o que virar: a linha do topo e a linha rolada
+       têm a mesma direção, o mesmo alinhamento e o mesmo vão, e o único
+       movimento que sobra é o das superfícies aparecendo e o do rótulo do CTA
+       fechando — que já são função de `--nav-cond`, e derretem sozinhos.
 
-    /* `flex-direction` e `align-items` não interpolam — são propriedades
-       discretas, e numa animação CSS elas trocam de valor na metade do
-       intervalo. É o que se quer: layout não derrete, ele troca. O que derrete
-       em volta (o vão, a superfície das esferas, o rótulo do CTA fechando) é o
-       que faz a troca aos 80px de rolagem passar como transição e não como
-       salto. */
-    @keyframes navEmpilha {
-      to {
-        flex-direction: column-reverse;
-        align-items: flex-end;
-        gap: 8px;
-      }
-    }
+       O vão das ações volta a ser o `0.5rem` do `v5.css`, que é o mesmo que o
+       estado do topo sempre usou. */
 
     /* A superfície da marca acompanha a rolagem por `--nav-cond`, como todo o
        resto: no topo ela é só o símbolo solto, e fora dele é a esfera que faz
@@ -649,23 +665,15 @@
         );
     }
 
-    /* O PAINEL DO MENU SAI PELO LADO, e não mais para baixo.
+    /* O PAINEL DO MENU VOLTOU A DESCER DO BOTÃO, em qualquer ponto da rolagem.
 
-       Abaixo do menu passaram a morar o CTA e a marca. Um painel descendo do
-       botão cobriria os dois — e ícone que some debaixo de uma folha lê como
-       defeito, não como camada.
+       Ele saía pelo LADO enquanto existia a coluna, e por um motivo bom: abaixo
+       do menu moravam o CTA e a marca, e um painel descendo cobriria os dois.
+       Com a linha, abaixo do botão não há nada além da página — que é
+       exatamente o que um menu deve cobrir quando abre.
 
-       `top` e `right` são comprimentos e interpolam: o painel migra de "abaixo
-       do botão" para "ao lado dele" ao longo da mesma faixa de rolagem, sem
-       ponto de troca. A origem da escala continua na quina de cima à direita,
-       que é a quina do botão nos dois estados.
-
-       O `max-width` abre espaço para a coluna: são os 42px da esfera mais o
-       respiro dos dois lados. */
-    .nav-menu {
-      top: calc((1 - var(--nav-cond)) * (100% + 10px));
-      right: calc(var(--nav-cond) * (100% + 10px));
-      max-width: calc(100vw - 5rem);
-    }
+       Nada a declarar aqui, portanto: o `top: calc(100% + 10px)` e o `right: 0`
+       da regra base já são o comportamento certo nos dois estados, e a origem
+       da escala continua na quina de cima à direita, que é a quina do botão. */
   }
 }
