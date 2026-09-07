@@ -46,3 +46,6 @@ public/cena/bruto/
 
 # log do `npm run dev:log`
 dev.log
+
+.claude
+.agents
