@@ -1428,6 +1428,48 @@
     justify-items: center;
   }
 
+  /* ── SEM MOVIMENTO, A CENA SAI DE TRÁS DO TEXTO ──
+
+     Este é o estado da página quando a classe de movimento NÃO entra: sem
+     script, com o GSAP falhando, ou — e este é o caso que aparece de verdade —
+     com MOVIMENTO REDUZIDO ligado no sistema, que em telefone Android é uma
+     opção comum de economia de bateria ("remover animações").
+
+     Nesse estado os quatro blocos ficam todos visíveis, a cena fica no estado
+     final e nada disso é problema na tela larga: o texto mora nas laterais e a
+     cena no meio. No celular é a seção inteira ilegível — a cena continua
+     GRUDADA no alto e os quatro textos passam rolando por cima dela, um atrás
+     do outro. Medido: com movimento reduzido, o primeiro bloco pousa em 93px e
+     a cena ocupa de 70 a 357.
+
+     A correção é tirar a cena do posicionamento grudado e devolver tudo ao
+     fluxo: o desenho aparece uma vez, no alto da seção, e os textos viram o que
+     sempre foram sem script — uma lista, um abaixo do outro. As fatias perdem a
+     altura de rolagem, que só existia para dar percurso a uma animação que aqui
+     não acontece. */
+  .ctr:not(.ctr-vivo) .ctr-fundo,
+  .ctr:not(.ctr-vivo) .ctr-visual,
+  .ctr:not(.ctr-vivo) .ctr-passo > .ctr-bloco,
+  .ctr:not(.ctr-vivo) .ctr-flancos,
+  .ctr:not(.ctr-vivo) .ctr-const-grade {
+    position: static;
+  }
+
+  .ctr:not(.ctr-vivo) .ctr-const-grade {
+    height: auto;
+  }
+
+  .ctr:not(.ctr-vivo) .ctr-passo,
+  .ctr:not(.ctr-vivo) .ctr-passo:first-child,
+  .ctr:not(.ctr-vivo) .ctr-const {
+    min-height: 0;
+    margin-top: clamp(2rem, 7vw, 3.25rem);
+  }
+
+  .ctr:not(.ctr-vivo) .ctr-cena {
+    opacity: 1;
+  }
+
   /* NO CELULAR O TEXTO NÃO ROLA: ELE FICA FIXO NO PÉ DA TELA.
 
      Aqui os quatro blocos eram GRUDADOS, e grudado é meio-termo — o bloco para
