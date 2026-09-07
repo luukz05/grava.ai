@@ -206,11 +206,12 @@ export function Landing() {
             entre o número e o pedido, que é onde a dúvida acontece.
 
             ELA JÁ FOI UMA ROTA, `/perguntas`, e esta seção mostrava seis das
-            doze com um link para o resto. A rota saiu a pedido e as doze vieram
-            junto — o porquê de trazer todas está no cabeçalho de `faq.tsx`. Em
-            resumo: sem uma segunda página, "não mostrar" virava "apagar do
-            site", e o que sairia incluía a ressalva de que o payback é
-            estimativa e não garantia.
+            doze com um link para o resto. A rota saiu, as doze vieram para cá e
+            agora são CINCO: numa página que já responde preço, taxas, ticket e
+            onde a unidade fica, sete das doze repetiam em forma de pergunta o
+            que a seção logo acima afirma. O critério do corte — só entra o que
+            a página não responde em outro lugar — e o que saiu para onde estão
+            no cabeçalho de `faq.tsx`.
 
             `/perguntas` redireciona para cá (ver `next.config.ts`): a URL foi
             publicada, e link morto é pior que redirect. */}

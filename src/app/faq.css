@@ -12,6 +12,23 @@
   border-top: 1px solid var(--hair);
 }
 
+/* UMA LINHA INTEIRA, E NENHUMA COLUNA.
+
+   Duas tentativas moram na história deste bloco. A primeira era a pilha com
+   `max-width: 46ch` na pergunta e `68ch` na resposta: dentro de um `.hold` de
+   90rem as duas ficavam encostadas na esquerda e metade da linha sobrava vazia
+   — o fio corria 1440px para segurar texto que ocupava 600. A segunda foi uma
+   grade de duas colunas, com a resposta jogada para a direita; ela tapava o
+   vazio mudando o texto de lugar, e o vazio só trocava de canto.
+
+   O que ficou é o pedido, e é mais simples que as duas: pergunta e resposta
+   usam a LINHA INTEIRA, de fio a fio. Sem `max-width`, sem coluna, sem recuo.
+
+   O QUE ISSO CUSTA, dito aqui porque é a única coisa que este arquivo não
+   consegue defender sozinha: em 90rem a linha da resposta passa de 100
+   caracteres, e o limite confortável de leitura fica na casa dos 70. O texto
+   fica largo de propósito. Se um dia isso incomodar, o conserto não é voltar o
+   `max-width` — é a seção inteira andar para dentro, no `.hold`. */
 .faq-item {
   border-bottom: 1px solid var(--hair);
 }
@@ -41,7 +58,6 @@
   letter-spacing: -0.015em;
   line-height: 1.3;
   color: var(--fg);
-  max-width: 46ch;
 }
 
 .faq-item > summary:focus-visible {
@@ -95,12 +111,13 @@
   background: var(--fg-hot);
 }
 
+/* Sem `max-width`: a resposta vai de fio a fio, como a pergunta acima dela. O
+   único recuo é o da direita, e ele não é estético — é o que impede a linha de
+   passar por baixo do sinal de mais/menos. */
 .faq-item > p {
   margin: 0;
   padding-bottom: clamp(1rem, 2.4vw, 1.35rem);
-  /* Alinhada com a pergunta, e recuada do sinal à direita. */
   padding-right: 2.5rem;
-  max-width: 68ch;
   color: var(--fg-2);
 }
 
