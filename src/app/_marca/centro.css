@@ -1365,14 +1365,61 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   NO CELULAR, DUAS BANDAS — CENA EM CIMA, TEXTO EMBAIXO
+
+   Aqui a cena era centrada na tela (`top` em 27svh, 46svh de lado) e o texto
+   grudava em 30svh, ou seja: EM CIMA DELA. A cena recuava para 62% de opacidade
+   para o texto sobreviver, e o resultado era o que se vê no telefone — três
+   linhas de manchete atravessando a esfera, o hexágono lendo como sujeira atrás
+   da letra, e o pior nas constelações, onde o cartão inteiro (cabeçalho mais
+   três itens, uns 420px) cobre o desenho de ponta a ponta.
+
+   Na tela larga o arranjo é outro e está certo: existe lateral livre, e o texto
+   mora ao LADO. No telefone não existe lateral — existe altura. Então a divisão
+   passa a ser horizontal:
+
+   E A CENA NÃO FICA NO MESMO LUGAR NAS DUAS METADES DA SEÇÃO:
+
+     narrativa      quatro blocos curtos, um por vez. Sobra tela, então a cena
+                    fica CENTRADA e o texto gruda embaixo dela, em 70svh.
+     constelações   cabeçalho e três itens ao mesmo tempo, ~50svh de cartão.
+                    Aqui a cena sobe para o alto — encostada na barra —, que é a
+                    única forma de o cartão caber inteiro abaixo dela, em 44svh.
+
+   O CSS SÓ SABE DA SEGUNDA. `.ctr-visual` é um elemento grudado só, com um
+   `top`, e esse `top` é o do alto: `--nav-gap` + 58px, a mesma conta de barra do
+   resto do site — ela flutua sobre a página, e uma esfera nascendo por baixo das
+   esferas do menu é a mesma colisão que a cena do totem teve em `percurso.css`.
+
+   Quem entrega a posição centrada da narrativa é a LINHA DO TEMPO: a cena nasce
+   descida até o meio e sobe de volta na passagem, junto com a abertura da esfera
+   (ver `descidaCena`, em `centro.tsx`). Mexer nesta banda sem olhar lá deixa as
+   duas metades brigando.
+
+   AS FATIAS CRESCERAM PARA 100svh por causa disso. Um bloco grudado em 70svh com
+   21svh de altura precisa de 91svh só para si — numa fatia de 84svh ele não
+   chegaria a grudar, passaria direto e atravessaria o desenho no caminho. O
+   preço são ~16svh a mais de rolagem por bloco; o que se compra é texto parado
+   embaixo de um desenho parado.
+
+   Os números saem da conta, e não do gosto. Num 390×844: cena de 34svh (287px)
+   centrada ocupa de 33svh a 67svh; bloco com manchete de 28px em duas ou três
+   linhas mais parágrafo, ~180px (21svh) — de 70svh a 91svh. A constelação é o
+   caso apertado, e tem bloco próprio no fim do arquivo.
+
+   A EXPLOSÃO DA QUARTA BATIDA CABE: a esfera vai a `scale: 1.9` e desce 15% da
+   altura da cena, o que a leva a ~40svh — e a linha do tempo ainda sobe a cena
+   em 10% abaixo de 1180px (`yPercent: -10`, em `centro.tsx`), que é o que abre
+   a folga contra os 44svh do texto. */
 @media (max-width: 900px) {
   .ctr-visual {
-    top: calc((100svh - 46svh) / 2);
+    top: calc(var(--nav-gap) + 58px);
   }
 
   .ctr-cena {
-    width: min(92%, 46svh);
-    opacity: 0.62;
+    width: min(86%, 34svh);
+    opacity: 0.9;
   }
 
   .ctr-passo,
@@ -1381,12 +1428,75 @@
     justify-items: center;
   }
 
-  /* Uma altura de grude só: sem laterais livres, os quatro blocos param no
-     mesmo lugar e a troca vira corte, não deslocamento. O da última batida está
-     no invólucro, que é quem gruda ali. */
-  .ctr-passo .ctr-bloco,
-  .ctr-flancos {
-    top: 30svh;
+  /* NO CELULAR O TEXTO NÃO ROLA: ELE FICA FIXO NO PÉ DA TELA.
+
+     Aqui os quatro blocos eram GRUDADOS, e grudado é meio-termo — o bloco para
+     na altura dele por um tempo e depois volta a andar com a página. Esse
+     "depois" é o defeito: no telefone o texto mora abaixo do desenho, então
+     andar significa subir POR CIMA da cena, e nenhuma janela de esmaecimento
+     conserta isso de vez, porque a altura de cada bloco é diferente e o ponto em
+     que ele solta muda com ela.
+
+     Posição fixa acaba com a categoria do problema em vez de ajustar o sintoma: o
+     bloco não tem percurso nenhum, fica ancorado no pé da janela e a única coisa
+     que muda entre um passo e outro é a OPACIDADE. Os quatro (e os dois pedaços
+     da última batida) ocupam exatamente o mesmo lugar, e a troca é uma
+     dissolvência — que é o que a rolagem já fazia de bom, sem o que ela fazia de
+     ruim.
+
+     SÓ COM A CLASSE DE MOVIMENTO, e isso não é detalhe: sem script os quatro textos estão
+     todos visíveis, e fixá-los no mesmo ponto empilharia os quatro um sobre o
+     outro. Sem a classe eles continuam em fluxo, um abaixo do outro, como a
+     página degradada sempre foi.
+
+     A visibilidade entra junto da opacidade porque uma camada fixa e invisível continua
+     sendo alvo de toque no pé da tela — e ela existe durante a página inteira,
+     não só nesta seção. O atraso na saída deixa a dissolvência acontecer antes
+     de o bloco sumir de fato.
+
+     FILHO DIRETO (`>`), E ISSO NÃO É ZELO DE SELETOR. A última batida tem DOIS
+     `.ctr-bloco` dentro de um `.ctr-flancos` — título num, parágrafo no outro —,
+     e eles são descendentes do `.ctr-passo` como todos os outros. Com o seletor
+     solto, os dois viravam caixas fixas ancoradas no MESMO pé: "Juntas,
+     concebem" impresso por cima de "Do par nasce um produto único", que foi
+     exatamente o que apareceu na tela. Aqui quem fixa é sempre UM elemento por
+     batida — o bloco, quando ele é filho direto da fatia; o invólucro dos
+     flancos, quando os dois pedaços moram dentro dele —, e o que está dentro
+     continua empilhando normalmente. */
+  .ctr-vivo .ctr-passo > .ctr-bloco,
+  .ctr-vivo .ctr-passo[data-lugar="topo"] > .ctr-bloco,
+  .ctr-vivo .ctr-passo[data-lugar="esq"] > .ctr-bloco,
+  .ctr-vivo .ctr-passo[data-lugar="dir"] > .ctr-bloco,
+  .ctr-vivo .ctr-passo[data-lugar="baixo"] > .ctr-bloco,
+  .ctr-vivo .ctr-flancos {
+    position: fixed;
+    top: auto;
+    bottom: clamp(1.25rem, 5svh, 3rem);
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    padding-inline: 6vw;
+    justify-self: center;
+  }
+
+  /* Centrado sempre, e no eixo da tela — não no da coluna. A caixa fixa vale a
+     largura da janela, então quem centra o texto dentro dela é a margem
+     automática mais o alinhamento do texto; sem os dois, um bloco de 30ch numa
+     janela de 390px encosta na esquerda. */
+  .ctr-vivo .ctr-passo > .ctr-bloco,
+  .ctr-vivo .ctr-flancos > .ctr-bloco {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .ctr-vivo .ctr-passo {
+    visibility: hidden;
+    transition: opacity 180ms var(--e-ui), visibility 0s linear 180ms;
+  }
+
+  .ctr-vivo .ctr-passo.e-ativo {
+    visibility: visible;
+    transition-delay: 0s;
   }
 
   .ctr-bloco,
@@ -1446,12 +1556,23 @@
      ter a altura do próprio conteúdo e gruda centrada. O percurso parado é o
      que sobra da fatia depois dela — bem mais do que na tela larga, onde a
      moldura ocupa a tela inteira. */
+  /* A moldura desce para a banda do texto, como os blocos da narrativa. Ela é o
+     pedaço mais alto da seção — cabeçalho mais três itens — e por isso ganha
+     2svh a mais de corda que eles, e vãos internos menores. */
+  .ctr-vivo .ctr-const-grade {
+    position: fixed;
+    top: auto;
+    bottom: clamp(1.25rem, 5svh, 3rem);
+    left: 0;
+    right: 0;
+  }
+
   .ctr-const-grade {
-    top: 22svh;
+    top: 44svh;
     height: auto;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    row-gap: 1.15rem;
+    row-gap: 0.9rem;
     padding-inline: 6vw;
   }
 
@@ -1460,7 +1581,7 @@
     grid-column: 1;
     grid-template-columns: none;
     grid-template-rows: none;
-    row-gap: 1rem;
+    row-gap: 0.8rem;
   }
 
   .ctr-const[data-fam="pilar"] .ctr-const-cab,
@@ -1482,5 +1603,55 @@
     margin: 0;
     padding: 0;
     text-align: center;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TELA BAIXA — ONDE AS DUAS BANDAS DISPUTAM O MESMO SVH
+
+   A divisão de cima fecha com folga num 390×844. Num 375×667 ela não fecha: a
+   constelação — cabeçalho mais três itens, o pedaço mais alto da seção — mede
+   ~424px, que ali são 64svh. Com o cartão começando em 44svh, ele terminaria
+   8svh abaixo da tela; e a cena centrada empurraria o texto da narrativa para
+   além dos 100svh da fatia.
+
+   Não dá para roubar da cena sem ela virar selo, então quem cede é o CORPO DO
+   TEXTO: um degrau em cada tamanho, o mesmo degrau que a cena do totem levou em
+   `percurso.css`. A conta passa a fechar em 92svh, com a cena inteira visível e
+   nenhuma letra sobre o desenho.
+
+   Por ALTURA e não por largura: um celular grande deitado tem 390px de altura e
+   800 de largura, e é ele quem mais precisa disto. */
+@media (max-width: 900px) and (max-height: 760px) {
+  .ctr-cena {
+    width: min(86%, 30svh);
+  }
+
+  /* A âncora sobe um pouco: em tela baixa cada svh vale menos pixel, e o pé
+     folgado do celular alto aqui empurraria a última linha para fora. */
+  .ctr-vivo .ctr-passo > .ctr-bloco,
+  .ctr-vivo .ctr-flancos,
+  .ctr-vivo .ctr-const-grade {
+    bottom: clamp(0.75rem, 3svh, 1.5rem);
+  }
+
+  .ctr-tit {
+    font-size: 1.5rem;
+  }
+
+  .ctr-txt {
+    font-size: 0.9375rem;
+  }
+
+  .ctr-tit--cab {
+    font-size: 1.3125rem;
+  }
+
+  .ctr-no-tit {
+    font-size: 1rem;
+  }
+
+  .ctr-no .ctr-txt {
+    font-size: 0.875rem;
   }
 }

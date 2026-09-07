@@ -632,6 +632,9 @@ export function Centro() {
           no.classList.add("ctr-vivo");
 
           const cena = um<HTMLElement>(".ctr-cena");
+          /* A caixa grudada por fora da cena. Ela entra na conta da descida no
+             celular, logo abaixo: o `top` dela é de onde a cena parte. */
+          const visual = um<HTMLElement>(".ctr-visual");
           const aura = um<HTMLElement>(".ctr-aura");
           const guia = um<HTMLElement>(".ctr-guia");
           const onda = um<HTMLElement>(".ctr-onda");
@@ -720,6 +723,39 @@ export function Centro() {
             autoAlpha: 0,
             y: 14,
           });
+
+          /* ── A CENA DESCE PARA O MEIO DA TELA NO CELULAR, E SÓ NA NARRATIVA ──
+
+             No telefone o texto não tem lateral para ocupar: ele mora ABAIXO do
+             desenho (ver as duas bandas em `centro.css`). Só que as duas metades
+             da seção querem a cena em lugares diferentes:
+
+               narrativa      quatro blocos curtos, um por vez. Sobra tela, e o
+                              desenho fica melhor CENTRADO, com o texto embaixo.
+               constelações   cabeçalho e três itens ao mesmo tempo, ~50svh de
+                              cartão. Aqui a cena PRECISA estar no alto, senão
+                              não há onde pôr o texto.
+
+             O CSS só sabe de uma posição — `.ctr-visual` é um elemento grudado
+             só, com um `top` — então quem faz a diferença é a linha do tempo: a
+             cena nasce descida até o centro e SOBE de volta na passagem, que é
+             exatamente a batida em que a narrativa acaba e a esfera abre para
+             virar hexágono. O movimento não é um ajuste escondido; ele acontece
+             junto com o gesto que emenda as duas seções.
+
+             A conta é medida, não escrita: metade do que sobra da tela depois da
+             cena, menos o `top` que o CSS já deu. Função e não número porque o
+             gatilho tem `invalidateOnRefresh` — vira o telefone e ela se refaz.
+
+             `y` e não `yPercent`: a quarta batida já usa `yPercent` na mesma
+             caixa (a subida de 10% abaixo de 1180px), e as duas são componentes
+             separadas da mesma transformação — uma não apaga a outra. */
+          const descidaCena = () => {
+            if (!window.matchMedia("(max-width: 900px)").matches) return 0;
+            const topo = parseFloat(getComputedStyle(visual).top) || 0;
+            return Math.max(0, (window.innerHeight - cena.offsetHeight) / 2 - topo);
+          };
+          gsap.set(cena, { y: descidaCena });
 
           const tl = gsap.timeline({
             scrollTrigger: {
@@ -1045,6 +1081,12 @@ export function Centro() {
              O QUE FICA NA TELA no fim: o hexágono e a marca no meio dele —
              pronto para receber os três pilares, que é a batida seguinte. */
           batida("passagem", 4);
+          /* A SUBIDA DA CENA, no celular (no desktop `descidaCena` vale 0 e este
+             tween não move nada). Ela vai junto com a abertura da esfera: a
+             narrativa acabou, o texto que morava embaixo dá lugar ao cartão da
+             constelação, e o desenho toma o alto da tela para abrir espaço para
+             ele. Ver `descidaCena`, na montagem. */
+          tl.to(cena, { y: 0, duration: 1.6, ease: E_MOLA }, "passagem");
           tl.to(esfera, { scale: 2.75, duration: 1.6, ease: E_UI }, "passagem")
             .to(
               orbes,
@@ -1294,11 +1336,32 @@ export function Centro() {
              é ESTADO, e estado nesta página muda em `--t-mov`/`--e-ui`, pelo
              CSS. Amarrá-lo à linha do tempo raspada faria o texto piscar junto
              com a rolagem, que é ruído em cima de leitura. */
+          /* NO CELULAR A JANELA ENCOSTA NA DA VIZINHA, E ISSO É O PONTO.
+
+             Na tela larga o texto mora nas laterais e a janela é folgada nas
+             duas pontas ("top 62%" → "bottom 42%"): sobra um pedaço de rolagem
+             sem nenhum bloco aceso, e não faz falta, porque o que está no meio
+             da tela é a cena.
+
+             No telefone os blocos são FIXOS no pé da janela (ver `.ctr-vivo` no
+             `centro.css`) — quatro textos no mesmo lugar, e a rolagem não move
+             nenhum. Aí a janela deixa de ser uma questão de conforto e vira a
+             troca em si: com folga nas pontas, ou dois ficam acesos ao mesmo
+             tempo no mesmo pixel (ilegível), ou nenhum fica e o pé da tela pisca
+             vazio no meio da seção.
+
+             `top 50%` → `bottom 50%` é a única janela sem folga E sem
+             sobreposição: cada fatia está acesa exatamente enquanto a linha de
+             meia tela está dentro dela. Duas fatias vizinhas trocam no mesmo
+             instante, e as duas transições de 180ms se cruzam — que é a
+             dissolvência pedida. */
+          const noCelular = () => window.matchMedia("(max-width: 900px)").matches;
+
           blocos.forEach((el) => {
             ScrollTrigger.create({
               trigger: el,
-              start: "top 62%",
-              end: "bottom 42%",
+              start: () => (noCelular() ? "top 50%" : "top 62%"),
+              end: () => (noCelular() ? "bottom 50%" : "bottom 42%"),
               toggleClass: { targets: el, className: "e-ativo" },
             });
           });
