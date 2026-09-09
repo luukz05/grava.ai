@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./reset.css";
 import { SITE_URL, SITE_NOME, WHATSAPP_E164, INSTAGRAM } from "./site";
 
@@ -112,7 +114,20 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* A contagem de página vista da Vercel. Mora no layout raiz porque é
+            daqui que ela vale para todas as rotas: o componente registra a
+            navegação do App Router sozinho, sem cookie e sem identificar quem
+            visita, e o script só é injetado em produção. */}
+        <Analytics />
+        {/* O par da linha de cima, do outro lado da medida: o Analytics conta
+            quem chega, o Speed Insights mede o que essa pessoa esperou. Coleta
+            as Core Web Vitals (LCP, CLS, INP) do navegador real de quem visita,
+            por rota — o que o Lighthouse rodando aqui na máquina não consegue
+            dizer, porque ele mede um aparelho só. Também só em produção. */}
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

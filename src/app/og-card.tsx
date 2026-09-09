@@ -6,7 +6,11 @@
    inventar um contrariava a regra que mantém número e depoimento fora da
    página. A regra continua de pé — o que mudou é que este card não afirma
    nada: ele é a marca, uma frase que já está na `<title>` da própria rota e o
-   endereço do site. Nenhum dado novo entra por aqui.
+   rótulo do assunto da página. Nenhum dado novo entra por aqui, e nenhum
+   número — o payback que chegou a sair no pé do card de captação foi retirado
+   pelo mesmo motivo: promessa de retorno estampada numa imagem que circula
+   solta, fora da página que a contextualiza, é o tipo de afirmação que uma
+   captação de franqueado não deve deixar viajar sozinha.
 
    POR QUE UM CARD IMPORTA MAIS QUE O NORMAL NESTE SITE. A captação começa em
    link colado: o time da franqueadora manda a página no WhatsApp e no Teams
@@ -36,7 +40,6 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { SITE_URL } from "./site";
 
 export const TAMANHO = { width: 1200, height: 630 };
 export const TIPO_CONTEUDO = "image/png";
@@ -127,16 +130,23 @@ function carta(largura: number, altura: number) {
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 }
 
-/* O endereço sem protocolo nem `www`, tirado do mesmo `SITE_URL` que alimenta
-   canônicas, sitemap e robots. Escrever "gravaai.com.br" à mão aqui seria a
-   quinta cópia do domínio — e a que ninguém lembraria de trocar no dia da
-   decisão (ver o aviso no `site.ts`: o domínio ainda não está fechado). */
-const HOST = new URL(SITE_URL).host.replace(/^www\./, "");
+/* O ENDEREÇO SAIU DO PÉ DO CARD.
 
-/* Os dois cards do site chamam esta função. Ela existe para que a moldura —
-   fundo, terreno, logotipo, régua do pé — seja UMA, e o que muda entre a home
-   e a landing de captação seja só a frase. Duas cópias da mesma moldura são o
-   começo de dois cards que envelhecem separados. */
+   Ele esteve ali, escrito a partir do mesmo `SITE_URL` que alimenta canônicas,
+   sitemap e robots — a ideia era que se corrigisse sozinho no dia em que o
+   domínio fosse decidido. O que a primeira publicação mostrou é o outro lado
+   disso: enquanto a decisão não sai, o que se imprime na imagem é o endereço
+   provisório da Vercel, e endereço de hospedagem estampado num card é o
+   contrário de marca — diz onde o site está, não de quem ele é.
+
+   Não faz falta. Quem vê o card está olhando para um link: o endereço já está
+   na prévia, logo abaixo da imagem, escrito pelo próprio WhatsApp. Repetir
+   dentro da arte é gastar a única linha do pé com o que já está na tela. */
+
+/* As três rotas do site chamam esta função. Ela existe para que a moldura —
+   fundo, terreno, logotipo, régua do pé — seja UMA, e o que muda entre a marca,
+   a captação e a galeria seja só a frase. Três cópias da mesma moldura são o
+   começo de três cards que envelhecem separados. */
 export async function CardOg({
   titulo,
   destaque,
@@ -147,9 +157,9 @@ export async function CardOg({
      mark`, no `v5.css`), que lá também não pinta fundo — só troca a cor. */
   titulo: string;
   destaque: string;
-  /* A linha do pé, à direita do endereço. Só o que já está na `<title>` ou na
-     `description` da rota. */
-  rodape?: string;
+  /* A linha do pé: o rótulo que diz de que página é o card. Não é claim nem
+     número — é o nome do assunto, curto o bastante para caber numa linha. */
+  rodape: string;
 }) {
   const [fonte, logo] = await Promise.all([
     /* NÃO É O ARQUIVO QUE O SITE SERVE. O navegador recebe o
@@ -255,8 +265,13 @@ export async function CardOg({
           </div>
 
           {/* A régua do pé. Fio de 1px na mesma cor da `--hair` do site, e
-              abaixo dele o endereço em versalete espaçado — que é como o site
-              escreve rótulo técnico desde que as três famílias viraram uma. */}
+              abaixo dele o rótulo em versalete espaçado — que é como o site
+              escreve rótulo técnico desde que as três famílias viraram uma.
+
+              Alinhado à esquerda, no mesmo eixo da manchete e do logotipo. Ele
+              já dividiu esta linha com o endereço do site, um em cada ponta;
+              sozinho e centrado ou à direita, ficaria pendurado sem nada
+              sustentando do outro lado. */}
           <div
             style={{
               marginTop: 44,
@@ -269,16 +284,13 @@ export async function CardOg({
             style={{
               marginTop: 22,
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
               fontSize: 22,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: FG_2,
             }}
           >
-            <span>{HOST}</span>
-            {rodape ? <span>{rodape}</span> : null}
+            {rodape}
           </div>
         </div>
       </div>

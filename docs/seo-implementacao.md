@@ -495,22 +495,29 @@ site converte por link colado.
 
 | Arquivo | Papel |
 |---|---|
-| `src/app/og-card.tsx` | A moldura, uma só: fundo, curvas de nível, hexágono, logotipo, régua do pé. As duas rotas passam só a frase |
-| `src/app/opengraph-image.tsx` | Card da marca. Por ser a raiz do `app`, vale também para `/galeria` |
+| `src/app/og-card.tsx` | A moldura, uma só: fundo, curvas de nível, hexágono, logotipo, régua do pé. As três rotas passam só a frase |
+| `src/app/opengraph-image.tsx` | Card da marca — e o de reserva de qualquer rota futura, por estar na raiz do `app` |
 | `src/app/seja-franqueado/opengraph-image.tsx` | Card da captação — é este link que vai no anúncio e no WhatsApp do time |
+| `src/app/galeria/opengraph-image.tsx` | Card da galeria |
 | `scripts/og-fonte.mjs` | Gera a Switzer estática que o gerador de imagem consegue ler (`npm run og:fonte`) |
 | `layout.tsx` | `twitter: { card: "summary_large_image" }` |
 
-A imagem é desenhada em build (as duas rotas saem `○ Static`), então não há
+A imagem é desenhada em build (as três rotas saem `○ Static`), então não há
 custo de função em produção nem risco de o card falhar sob carga.
 
 ### 7.2 Três decisões que valem registro
 
-**Nada de novo é afirmado na imagem.** A regra que mantém número e depoimento
-fora da página vale igual aqui: as frases dos cards são as mesmas `<title>` das
-rotas, e o pé do card de captação repete o payback que já está na
-`description`. O card é composição própria — curvas de nível e hexágono, a
-assinatura de material do site —, não foto de peça que ainda não existe.
+**Nada de novo é afirmado na imagem — e nenhum número.** A regra que mantém
+número e depoimento fora da página vale igual aqui: as frases dos cards são as
+mesmas `<title>` das rotas, e o pé traz só o rótulo do assunto. O card é
+composição própria — curvas de nível e hexágono, a assinatura de material do
+site —, não foto de peça que ainda não existe.
+
+O pé do card de captação chegou a trazer o payback estimado, e o do de galeria,
+o ticket. Os dois saíram: a `description` viaja junto da página, uma imagem
+não — ela é reencaminhada solta, vira captura de tela, aparece sem a palavra
+"estimado" ao lado. Promessa de retorno e tabela de preço são exatamente as
+afirmações que não devem circular sem o contexto que as qualifica.
 
 **O peso do arquivo é requisito.** O WhatsApp só desenha a miniatura se a
 imagem for pequena. Os cards saem em ~160 KB porque são gráficos e não
@@ -528,8 +535,22 @@ manchete recupera o corpo com um contorno fino da própria cor.
 ### 7.3 Ainda depende do domínio
 
 A `og:image` sai absoluta a partir do `metadataBase`, que herda o
-`NEXT_PUBLIC_SITE_URL`. Enquanto o domínio não estiver decidido (§3.1), o card
-aponta para o endereço chutado — e o endereço impresso no pé da imagem vem do
-mesmo lugar, então ele se corrige sozinho no dia da troca. **Um deploy depois
-da troca é obrigatório**: WhatsApp, Teams e LinkedIn guardam a
-pré-visualização em cache por dias.
+`NEXT_PUBLIC_SITE_URL`. Com o fallback chutado do `site.ts`, a tag apontava
+para `gravaai.com.br` — um domínio que não serve o site — e o validador de card
+respondia `fetch failed`: a imagem existia e ninguém conseguia buscá-la.
+
+**Em 09/09/2026 a variável foi definida na produção da Vercel** apontando para
+`https://grava-ai-five.vercel.app`, que é o que fez o card renderizar. Duas
+consequências:
+
+- **O endereço saiu do pé da imagem.** Ele era escrito a partir do mesmo
+  `SITE_URL` e passou a estampar a URL provisória da Vercel. Endereço de
+  hospedagem num card diz onde o site está, não de quem ele é — e o link já
+  aparece na prévia, escrito pelo próprio WhatsApp.
+- **Canônicas, `sitemap.xml` e o `Host:` do robots apontam para o
+  `.vercel.app`** 🟡. Com `Allow: /` no robots, o Google pode indexar o domínio
+  de staging como canônico. É reversível — trocar a variável e publicar de novo
+  —, mas enquanto durar, vale considerar o `noindex` já discutido no §3.4.
+
+**Um deploy depois da troca para o domínio real é obrigatório**: WhatsApp,
+Teams e LinkedIn guardam a pré-visualização em cache por dias.

@@ -9,9 +9,12 @@
    entre a imagem e o título faria o card dizer uma coisa em cima da outra na
    mesma pré-visualização.
 
-   O pé traz o payback estimado porque ele já está na `description` da página e
-   é o filtro que economiza o primeiro contato — quem lê "6 a 12 meses" e não
-   se reconhece no perfil não clica, e a única métrica do site é contato. */
+   O PÉ TROUXE O PAYBACK ESTIMADO E NÃO TRAZ MAIS. O raciocínio de pôr era bom
+   — o número já está na `description` e filtra quem não tem o perfil antes do
+   primeiro contato. O de tirar é melhor: a `description` viaja junto da página,
+   e uma imagem não. Ela é reencaminhada solta, vira captura de tela, aparece
+   sem a palavra "estimado" ao lado. Promessa de retorno é a afirmação que menos
+   pode circular sem contexto numa captação de franqueado. */
 
 import { CardOg, TAMANHO, TIPO_CONTEUDO } from "../og-card";
 
@@ -23,6 +26,6 @@ export default async function Image() {
   return CardOg({
     titulo: "Uma franquia que a",
     destaque: "IA opera junto com você",
-    rodape: "Payback estimado 6–12 meses",
+    rodape: "Seja franqueado",
   });
 }
