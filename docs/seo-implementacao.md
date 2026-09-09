@@ -3,6 +3,8 @@
 > Estado: implementado em 04/08/2026. Build e lint passando.
 > Segunda rodada em 11/08/2026 (§5): `llms.txt`, correção do `lastmod`,
 > descrições reescritas, decisão sobre meta keywords.
+> Terceira rodada em 11/08/2026 (§6): IndexNow, robôs de IA, outros buscadores.
+> Quarta rodada em 09/09/2026 (§7): imagem de Open Graph.
 > Mapa de termos por página: `palavras-chave.md`.
 > Público: técnico (Lucas). Não é material de cliente.
 
@@ -132,9 +134,7 @@ precisa de confirmação — principalmente as quatro de dinheiro.
 
 ### 3.4 O que continua faltando e não foi feito
 
-- **Sem imagem de Open Graph.** Decisão anterior do projeto, registrada no
-  `layout.tsx`: não existe ativo real e inventar um contraria a mesma regra que
-  mantém números e depoimentos fora da página. Entra quando houver foto.
+- ~~**Sem imagem de Open Graph.**~~ **Feito em 09/09/2026** — ver §7.
 - **`/perguntas` não está na navbar**, só no rodapé. A navbar tem três pílulas e
   um quarto item mudaria o desenho dela. A página se identifica como
   `atual="franqueado"`, então a pílula de Franqueado fica acesa.
@@ -311,8 +311,7 @@ aparece como "Página com redirecionamento", que é o estado esperado.
   arquivos.
 - 🟡 **`noindex` na galeria e no institucional** continua sem decisão (§3.4).
   Página de casca indexada puxa a média do domínio para baixo.
-- 🟡 **Sem imagem de Open Graph** (§3.4). É o item de maior efeito prático que
-  falta, porque o site converte por link colado no WhatsApp.
+- ~~🟡 **Sem imagem de Open Graph** (§3.4)~~ — **resolvido em 09/09/2026**, ver §7.
 
 ---
 
@@ -483,3 +482,54 @@ sempre, e o rastro que deixam é de perfil de spam.
 - [honeyb.ai — AI Crawler User Agents Reference 2026](https://www.honeyb.ai/blog/ai-crawler-user-agents-reference-2026)
 - [Pressonify — How to Get Cited by ChatGPT Search in 2026](https://pressonify.ai/blog/how-to-get-cited-chatgpt-search-2026)
 - [Opace — Structured Data for Google, AI Search and LLMs (2026)](https://opace.agency/blog/structured-data-schema-for-seo/) — traz o número do estudo de GEO de Princeton
+
+---
+
+## 7. Quarta rodada — 09/09/2026 — a imagem de compartilhamento
+
+Pedido: um card de Open Graph para o link renderizar com imagem no WhatsApp, no
+Teams e afins. Era a única 🟡 do §5 com efeito prático imediato, porque este
+site converte por link colado.
+
+### 7.1 O que entrou
+
+| Arquivo | Papel |
+|---|---|
+| `src/app/og-card.tsx` | A moldura, uma só: fundo, curvas de nível, hexágono, logotipo, régua do pé. As duas rotas passam só a frase |
+| `src/app/opengraph-image.tsx` | Card da marca. Por ser a raiz do `app`, vale também para `/galeria` |
+| `src/app/seja-franqueado/opengraph-image.tsx` | Card da captação — é este link que vai no anúncio e no WhatsApp do time |
+| `scripts/og-fonte.mjs` | Gera a Switzer estática que o gerador de imagem consegue ler (`npm run og:fonte`) |
+| `layout.tsx` | `twitter: { card: "summary_large_image" }` |
+
+A imagem é desenhada em build (as duas rotas saem `○ Static`), então não há
+custo de função em produção nem risco de o card falhar sob carga.
+
+### 7.2 Três decisões que valem registro
+
+**Nada de novo é afirmado na imagem.** A regra que mantém número e depoimento
+fora da página vale igual aqui: as frases dos cards são as mesmas `<title>` das
+rotas, e o pé do card de captação repete o payback que já está na
+`description`. O card é composição própria — curvas de nível e hexágono, a
+assinatura de material do site —, não foto de peça que ainda não existe.
+
+**O peso do arquivo é requisito.** O WhatsApp só desenha a miniatura se a
+imagem for pequena. Os cards saem em ~160 KB porque são gráficos e não
+fotográficos; uma foto de peça em PNG a 1200×630 passa de 800 KB e derruba a
+pré-visualização justamente onde ela mais é usada.
+
+**A fonte do card não é a fonte do site.** O gerador de imagem do Next (Satori)
+não abre WOFF2 e quebra na tabela `fvar` da Switzer variável — erro real:
+`Cannot read properties of undefined (reading '256')`, porque o nome do eixo
+está no ID 256 e o parser só lê de 0 a 25. O `npm run og:fonte` descomprime e
+remove as tabelas de variação, deixando a instância padrão (peso 400). Nada se
+perde: o Satori não aplica `gvar`, então já desenhava 400 de qualquer jeito. A
+manchete recupera o corpo com um contorno fino da própria cor.
+
+### 7.3 Ainda depende do domínio
+
+A `og:image` sai absoluta a partir do `metadataBase`, que herda o
+`NEXT_PUBLIC_SITE_URL`. Enquanto o domínio não estiver decidido (§3.1), o card
+aponta para o endereço chutado — e o endereço impresso no pé da imagem vem do
+mesmo lugar, então ele se corrige sozinho no dia da troca. **Um deploy depois
+da troca é obrigatório**: WhatsApp, Teams e LinkedIn guardam a
+pré-visualização em cache por dias.

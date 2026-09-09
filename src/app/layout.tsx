@@ -30,9 +30,25 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
   },
-  /* Sem imagem de OG: não existe ativo real e inventar um contraria a mesma
-     regra que mantém números e depoimentos fora da página. Entra quando houver
-     foto ou composição própria. */
+  /* A IMAGEM DE OG NÃO MORA AQUI. Aqui já esteve escrito que ela não existia —
+     não havia ativo real e inventar um contrariava a regra que mantém número e
+     depoimento fora da página. Agora existe, como composição própria: o
+     `opengraph-image.tsx` na raiz do `app` desenha o card da marca (e vale para
+     tudo que não declare o seu), e a `/seja-franqueado` declara o dela. Nenhum
+     dado novo entra na imagem — ver o cabeçalho do `og-card.tsx`.
+
+     A convenção de arquivo emite `og:image` com URL absoluta, tipo, largura,
+     altura e texto alternativo sozinha; declarar `openGraph.images` aqui só
+     acrescentaria uma segunda imagem à mesma página. */
+
+  /* O X é o único que não lê `og:image` sozinho: sem `twitter:card` ele desenha
+     a miniatura quadrada pequena em vez do card de 1200×630. Uma linha resolve,
+     e o `summary_large_image` é ignorado por quem já usa Open Graph — WhatsApp,
+     Teams, Slack, LinkedIn e iMessage. O Next reaproveita as tags de OG para o
+     resto do cartão do X (título, descrição e a própria imagem). */
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 /* `viewportFit: "cover"` é o que faz as variáveis `env(safe-area-inset-*)`
