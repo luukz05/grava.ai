@@ -187,22 +187,31 @@
     min-height: calc(58px - var(--nav-cond) * 58px);
   }
 
-  /* A cápsula dos links perde o próprio fundo ao entrar no oblongo: superfície
-     dentro de superfície é caixa dentro de caixa, e a leitura de "você está
-     aqui" passa a vir só da pílula preenchida. */
-  .nav-pilulas {
-    padding: calc(6px * (1 - var(--nav-cond)));
-    background: color-mix(
-      in srgb,
-      var(--fg) calc(4% * (1 - var(--nav-cond))),
-      transparent
-    );
-  }
+  /* AQUI A CÁPSULA DOS LINKS SE DISSOLVIA, E AS PÍLULAS ENCOLHIAM JUNTO. As
+     duas regras saíram, e é a correção do estado rolado.
 
-  .pilula {
-    padding-block: calc(0.7rem - var(--nav-cond) * 0.16rem);
-    padding-inline: calc(1.5rem - var(--nav-cond) * 0.45rem);
-  }
+     O argumento delas era bom no papel: superfície dentro de superfície é
+     caixa dentro de caixa. O que ele não previa é QUANDO isso acontecia — a
+     cápsula sumia no mesmo quadro em que o oblongo nascia. Contagem de
+     superfícies: uma antes, uma depois. O olho não lê condensação, lê
+     SUBSTITUIÇÃO — um objeto morre e outro aparece no lugar, e o que aparece
+     ainda por cima funde as três peças que até então estavam soltas.
+
+     Somado ao resto (pílulas −23% na vertical e −30% na horizontal, marca
+     −19%), o estado rolado não guardava uma âncora sequer da escala do topo.
+     Duas barras diferentes, e não a mesma barra recolhida — que era exatamente
+     a queixa.
+
+     Agora a rolagem mexe em DUAS coisas, e só nelas: o oblongo aparecendo em
+     volta e o CTA fechando em esfera. O resto fica na medida do topo, e essas
+     medidas moram no `v5.css` — `padding: 6px` e o fundo de 4% na
+     `.nav-pilulas`, `padding: 0.7rem 1.5rem` na `.pilula`. Não há nada a
+     declarar aqui: NÃO SOBRESCREVER é o comportamento.
+
+     A caixa dentro de caixa continua existindo, e agora é deliberada: é o
+     preço de o grupo de links continuar sendo um objeto reconhecível dos dois
+     lados da transição. Os 4% são um degrau de superfície, não um cartão —
+     dentro do oblongo eles se leem como agrupamento, não como moldura. */
 
   /* O BOTÃO VIRA ESFERA — 42×42, o mesmo alvo de dedo do resto da barra. Os
      dois são controles da mesma linha; um redondo de 42 ao lado de um
@@ -299,11 +308,20 @@
     opacity: calc(var(--btn) * 2.5 - 1.5);
   }
 
-  /* A marca encolhe junto, senão ela vira a peça mais alta do oblongo e define
-     sozinha a altura dele. */
-  .brand-simbolo {
-    height: calc(32px - var(--nav-cond) * 6px);
-  }
+  /* A MARCA TAMBÉM PAROU DE ENCOLHER, e pelo mesmo motivo das duas de cima.
+
+     Ela ia de 32px a 26px enquanto o CTA ficava em 42. No topo isso não se vê:
+     a marca está sozinha na ponta esquerda, longe do botão. Fora do topo as
+     três peças ficam encostadas dentro do oblongo, e 26 ao lado de 42 é razão
+     0,62 — num trio apertado isso lê como peça de outro desenho.
+
+     O argumento antigo era que sem encolher ela viraria a peça mais alta e
+     definiria sozinha a altura do oblongo. Não vira: 32px de marca contra 42px
+     de CTA, e o botão continua sendo o mais alto dos dois com folga.
+
+     A CONTA CONTINUA VALENDO NO CELULAR, onde a marca vira esfera de 42px e o
+     símbolo precisa caber centrado dentro dela. Ela desceu para o bloco de lá,
+     colada no `padding-left` que depende do valor dela. */
 }
 
 /* AQUI O RÓTULO DO CTA FICAVA SEMPRE ABERTO NO CELULAR, e a regra saiu.
@@ -639,6 +657,20 @@
        O vão das ações volta a ser o `0.5rem` do `v5.css`, que é o mesmo que o
        estado do topo sempre usou. */
 
+    /* A MARCA SÓ ENCOLHE AQUI, e a regra desceu do bloco de cima.
+
+       No desktop ela ficou congelada em 32px: lá as três peças entram num
+       oblongo comum e a marca menor que o CTA lê como peça de outro desenho.
+       Aqui não há oblongo — a marca vira uma esfera de 42px que faz par com o
+       CTA e com o menu, e o símbolo tem que caber DENTRO dela com respiro. Aos
+       32px do topo ele encostaria nas paredes da esfera.
+
+       Os 26px são o número de que o `padding-left` logo abaixo depende. Mexeu
+       num, refaz a conta do outro. */
+    .brand-simbolo {
+      height: calc(32px - var(--nav-cond) * 6px);
+    }
+
     /* A superfície da marca acompanha a rolagem por `--nav-cond`, como todo o
        resto: no topo ela é só o símbolo solto, e fora dele é a esfera que faz
        par com o CTA e com o menu.
@@ -681,3 +713,4 @@
        da escala continua na quina de cima à direita, que é a quina do botão. */
   }
 }
+
