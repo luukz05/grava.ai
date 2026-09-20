@@ -27,8 +27,10 @@ import "./v5.css";
 import "./variacoes.css";
 import "./_marca/marca.css";
 import "./_marca/centro.css";
+import Link from "next/link";
 import { Casca, Heroi } from "./casca";
 import { FundoFecho } from "./fundos";
+import { ROTA_FRANQUEADO } from "./lead";
 import { Centro } from "./_marca/centro";
 import { Portais, PORTAL_FRANQUEADO, PORTAL_GALERIA } from "./portais";
 import { Rodape } from "./rodape";
@@ -68,15 +70,17 @@ export default function Home() {
           um degrau menor, na quina de uma tela larga. Abrir menor que a página
           de franqueado fazia a marca ler como anexo dela.
 
-          O que continua fora: a segunda coluna (a onda em ASCII dentro de um
-          `.scope`) e os dois botões grandes, que eram cópia exata do
-          fechamento lá embaixo. O CTA segue na barra do topo, no par
-          flutuante e na barra fixa do celular, e os três descem para o mesmo
-          formulário. Sem painel à direita, a coluna
-          vai para o meio — ver `[data-leitura="centro"]` no `v5.css`. */}
+          O que continua fora é a segunda coluna (a onda em ASCII dentro de um
+          `.scope`). Os dois botões voltaram — ver o comentário na `.row`. O
+          CTA segue também na barra do topo e no flutuante, e os dois levam
+          para `/seja-franqueado`. Sem painel à direita, a coluna vai para o
+          meio — ver `[data-leitura="centro"]` no `v5.css`. */}
       <Heroi>
         <header className="hold hero" id="topo">
           <div>
+            {/* O rótulo acima da manchete diz em quatro palavras o que a
+                página é; a manchete diz o que a marca faz. */}
+            <p className="hero-rotulo mono">Personalização com IA, na hora</p>
             <h1>
               Transformando ideias em <mark>produtos personalizados</mark>.
             </h1>
@@ -85,6 +89,18 @@ export default function Home() {
               produtos exclusivos na hora — onde tem gente em movimento em busca
               de algo especial.
             </p>
+            {/* OS BOTÕES VOLTARAM, a pedido. Saíram por serem cópia do
+                fechamento; agora o fechamento são os portais, e o par aqui é
+                outro: o cheio leva à franquia, o vazado à galeria — os dois
+                destinos da página, na ordem em que interessam. */}
+            <div className="row">
+              <Link className="cta cta--lg" href={ROTA_FRANQUEADO}>
+                Seja um franqueado
+              </Link>
+              <Link className="cta cta--lg cta--out" href="/galeria">
+                Ver a galeria
+              </Link>
+            </div>
           </div>
         </header>
       </Heroi>

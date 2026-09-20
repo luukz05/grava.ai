@@ -376,6 +376,21 @@
   color: var(--fg-2);
 }
 
+/* O RÓTULO ACIMA DA MANCHETE — home e galeria. Voz do `.mono` (12px, caixa
+   alta, tracking aberto) na tinta de realce: diz em poucas palavras o que a
+   página é antes de a manchete dizer o que a marca faz. É um `<p>` dentro do
+   `.hero`, e o `.hero p` de cima venceria o `.mono` por especificidade — daí
+   o seletor com o elemento, para o rótulo não herdar corpo e cor de apoio. */
+.hero p.hero-rotulo {
+  margin: 0 0 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  color: var(--fg-hot);
+}
+
 /* Os botões do herói são maiores que os `.cta--lg` do resto da página: aqui
    ancoram um bloco de manchete maior, e no tamanho padrão ficavam soltos
    embaixo dela. Escopado ao `.hero` de propósito — o `.cta--lg` global segue
@@ -390,6 +405,45 @@
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: 1.5rem;
+}
+
+/* NO CELULAR O HERÓI DA LANDING SE ALINHA COM O DAS OUTRAS DUAS ROTAS.
+
+   A home e a galeria abrem centradas (`[data-leitura="centro"]`); a landing
+   abre à esquerda porque na tela larga tem a arte ao lado. No telefone a arte
+   desce para baixo do texto e a coluna fica sozinha — e sozinha, encostada à
+   esquerda, ela era a única abertura do site fora do eixo. Aqui as três
+   passam a abrir iguais.
+
+   OS DOIS BOTÕES VIRAM UM PAR DE MESMA MEDIDA, um em cima do outro, na
+   largura da coluna. Lado a lado eles quebravam em linhas desiguais — o
+   cheio numa linha, o vazado sobrando na seguinte, mais estreito e com o fio
+   quase invisível sobre a carta —, e o par lia como um botão e um link. O
+   vazado ganha o fio de realce para existir como botão sobre o fundo. */
+@media (max-width: 780px) {
+  .hero h1,
+  .hero p {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .hero .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero .row .cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-block: 1rem;
+  }
+
+  .hero .row .cta--out {
+    border-color: var(--hair-hot);
+  }
 }
 
 .scope {
@@ -4028,12 +4082,10 @@
   margin-inline: auto;
 }
 
-/* A fila de botões, quando houver, centra junto. Nenhuma das duas páginas tem
-   uma hoje — as duas perderam os botões do herói de propósito, porque eram
-   cópia do fechamento —, e a regra existe para o dia em que uma voltar a ter:
-   `.row` é `flex` com início à esquerda, e sem isto ela seria a única coisa
-   fora do eixo. A regra é escopada ao `.hero`: a `.row` do fechamento fica
-   onde está. */
+/* A fila de botões centra junto: `.row` é `flex` com início à esquerda, e
+   sem isto ela seria a única coisa fora do eixo. As duas páginas têm o par
+   de botões no herói de novo (franquia + o outro destino de cada uma). A
+   regra é escopada ao `.hero`: a `.row` do fechamento fica onde está. */
 [data-leitura="centro"] .hero .row {
   justify-content: center;
 }

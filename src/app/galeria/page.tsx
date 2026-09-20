@@ -10,9 +10,11 @@
 import type { Metadata } from "next";
 import "../v5.css";
 import "../variacoes.css";
+import Link from "next/link";
 import { Casca, Heroi } from "../casca";
 import { Portais, PORTAL_FRANQUEADO, PORTAL_MARCA } from "../portais";
 import { FundoFecho } from "../fundos";
+import { ROTA_FRANQUEADO } from "../lead";
 import { Ph } from "../ph";
 import { Rodape } from "../rodape";
 
@@ -54,19 +56,30 @@ export default function Galeria() {
           bloco, com a barra do topo flutuando sobre ela.
 
           Herói do mesmo tamanho do da landing, centrado: as três rotas abrem
-          na mesma altura, e é isso que faz as três lerem como um site só. Os
-          dois botões grandes seguem fora — repetiam o fechamento desta mesma
-          página. Sem painel à direita, a coluna vai para o meio; ver
+          na mesma altura, e é isso que faz as três lerem como um site só. Sem
+          painel à direita, a coluna vai para o meio; ver
           `[data-leitura="centro"]` no `v5.css`. */}
       <Heroi>
         <header className="hold hero" id="topo">
           <div>
+            <p className="hero-rotulo mono">Galeria de peças</p>
             <h1>O que sai do totem.</h1>
             <p>
               Cada peça começa numa conversa de trinta segundos com a IA e
               termina gravada. As imagens entram quando a rede enviar o material
               de fotografia.
             </p>
+            {/* O par de botões, como na home: o cheio leva à franquia, o
+                vazado à marca — os dois destinos que os portais do fechamento
+                também oferecem, aqui na abertura para quem já chegou decidido. */}
+            <div className="row">
+              <Link className="cta cta--lg" href={ROTA_FRANQUEADO}>
+                Seja um franqueado
+              </Link>
+              <Link className="cta cta--lg cta--out" href="/">
+                Conhecer a marca
+              </Link>
+            </div>
           </div>
         </header>
       </Heroi>
