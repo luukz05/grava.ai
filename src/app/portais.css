@@ -1,0 +1,178 @@
+/* Os portais do fechamento — ver `portais.tsx`.
+
+   Mesmo material dos outros cartões (`.loja`, `.cellart`): fio de 1px, canto
+   do `--r-lg` — mas em chapa sólida um degrau mais clara. O que é só daqui: a
+   pastilha do ícone no alto, a marca d'água sangrando pela direita e o brilho
+   que segue o ponteiro. */
+
+.portais {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (max-width: 720px) {
+  .portais {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Posição, recorte e o brilho do ponteiro vêm da classe `.brilho`
+   (`brilho.css`), que o cartão carrega junto. */
+.portal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-lg, 0);
+  /* CHAPA SÓLIDA, um degrau acima do `--bg-2`. O cartão fica em cima da carta
+     topográfica do fechamento, e em `--bg-2` (#0b1219, quase o preto da
+     página) ele lia como recorte transparente com as curvas passando por
+     trás. Cor opaca, sem alfa em lugar nenhum — o hover não muda o fundo, só
+     o fio e o brilho. */
+  background: #101a25;
+  color: var(--fg);
+  text-decoration: none;
+  /* `--t-ui` no material, como o `.cellart`: hover é visto dezenas de vezes por
+     sessão e reação a hover deve ser reduzida, não coreografada. */
+  transition: border-color var(--t-ui) var(--e-ui),
+    transform var(--t-mov) var(--e-mola);
+}
+
+/* A PASTILHA DO ÍCONE: quadrado de canto médio, um tom acima da superfície do
+   cartão, com o ícone na tinta de realce. É o mesmo `.ico` dos blocos da
+   landing, com chão embaixo — aqui ele é a primeira coisa do cartão e precisa
+   de peso para abrir a leitura. */
+.portal-ico {
+  /* Acima da marca d'água, que é absoluta e vem depois no DOM. */
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: clamp(1.25rem, 2.6vw, 1.75rem);
+  border-radius: var(--r-md, 12px);
+  background: rgba(102, 205, 255, 0.08);
+  color: var(--fg-hot);
+  transition: background-color var(--t-ui) var(--e-ui);
+}
+
+.portal-ico svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: block;
+  /* O deslocamento do ícone é o único movimento do cartão além da marca
+     d'água: vai na mola, como o ícone do `.cellart`. */
+  transition: transform var(--t-mov) var(--e-mola);
+}
+
+/* A marca (`Marca`) é sólida e mais alta que larga: um pouco menor na
+   pastilha para pesar o mesmo que os de traço. */
+.portal--solida .portal-ico svg {
+  width: 1.25rem;
+  height: 1.5rem;
+}
+
+/* O título: corpo de título de cartão, um degrau acima do `.loja h3` — o
+   cartão é de meia página e tem uma linha só para dizer aonde leva. */
+.portal-t {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  max-width: 22ch;
+  /* Texto acima da marca d'água, que é absoluta e vem depois no DOM. */
+  position: relative;
+}
+
+.portal-p {
+  margin-top: 0.5rem;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  max-width: 40ch;
+  position: relative;
+}
+
+/* A MARCA D'ÁGUA.
+
+   O mesmo ícone da pastilha, no lado direito, grande o bastante para sangrar
+   pela borda e pelo pé. Quase apagado: é sombra, não ilustração — o cartão
+   precisa ler pela pastilha e pelo título, e a silhueta entra depois, como
+   quem reconhece o assunto pelo canto do olho.
+
+   Traço de 1 e não os 1,5 do sistema: a caixa de 24 esticada a 220px faria do
+   traço uma barra de 14px, e a silhueta fecharia. */
+.portal-marca {
+  position: absolute;
+  right: -6%;
+  bottom: -18%;
+  width: clamp(9rem, 20vw, 13.5rem);
+  height: auto;
+  color: var(--fg);
+  opacity: 0.05;
+  stroke-width: 1;
+  pointer-events: none;
+  transition: opacity var(--t-ui) var(--e-ui),
+    transform var(--t-mov) var(--e-mola);
+}
+
+/* A marca sólida pesa mais que um traço na mesma opacidade: menor e mais
+   apagada. */
+.portal--solida .portal-marca {
+  width: clamp(7rem, 15vw, 10.5rem);
+  bottom: -14%;
+  opacity: 0.04;
+}
+
+/* Gate de hover: em toque o :hover gruda no tap e fica aceso depois do dedo
+   sair. */
+@media (hover: hover) and (pointer: fine) {
+  .portal:hover {
+    border-color: var(--hair-hot);
+  }
+
+  .portal:hover .portal-ico {
+    background: rgba(102, 205, 255, 0.14);
+  }
+
+  .portal:hover .portal-ico svg {
+    transform: translateY(-2px);
+  }
+
+  .portal:hover .portal-marca {
+    opacity: 0.1;
+    transform: translate(-4px, -4px);
+  }
+
+  .portal--solida:hover .portal-marca {
+    opacity: 0.08;
+  }
+}
+
+/* Quem pediu menos movimento continua recebendo o realce — a pastilha e a
+   marca d'água clareiam. O que sai é o deslocamento. */
+@media (prefers-reduced-motion: reduce) {
+  .portal:hover .portal-ico svg,
+  .portal:hover .portal-marca {
+    transform: none;
+  }
+}
+
+/* Mesma assimetria do `.cta`: a ida em 90ms lineares, a volta na mola. */
+.portal:active {
+  transform: scale(0.99);
+  transition-duration: var(--t-ui), var(--t-press);
+  transition-timing-function: var(--e-ui), linear;
+}
+
+/* No celular a marca d'água encolhe junto com o cartão — sem isso ela
+   cobriria o apoio. */
+@media (max-width: 720px) {
+  .portal-marca {
+    width: 8rem;
+    right: -8%;
+  }
+}

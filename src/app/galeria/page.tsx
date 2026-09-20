@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 import "../v5.css";
 import "../variacoes.css";
 import { Casca, Heroi } from "../casca";
-import { FormFranqueado } from "../form-franqueado";
+import { Portais, PORTAL_FRANQUEADO, PORTAL_MARCA } from "../portais";
 import { FundoFecho } from "../fundos";
 import { Ph } from "../ph";
 import { Rodape } from "../rodape";
@@ -102,23 +102,28 @@ export default function Galeria() {
       {/* Mesmo fechamento das outras duas rotas: a carta volta ao fundo. */}
       <div className="close-fundo">
         <FundoFecho />
-      {/* O MESMO FORMULÁRIO DAS OUTRAS TRÊS ROTAS, e não uma âncora para a
-          home. Todo CTA do site desce até `#falar`; se o fechamento daqui
-          fosse só um botão para outra página, o CTA da barra do topo levaria
-          para fora da página que estava convencendo. O formulário existe onde
-          a pessoa está. */}
+      {/* O FORMULÁRIO SAIU DAQUI. Ele era o mesmo `FormFranqueado` da landing,
+          e a razão de estar aqui era o CTA da barra do topo descer para
+          `#falar` sem sair da página. Só que a galeria é a página de quem quer
+          ver peça, não de quem está avaliando a franquia: pedir nome, e-mail e
+          WhatsApp no fim dela é cobrar dado antes de haver intenção — o mesmo
+          argumento que tirou o formulário da home.
+
+          No lugar, os dois portais: a franquia e a marca, cartões de tipografia
+          grande com o ícone da página de destino em marca d'água (ver
+          `portais.tsx`). Os fixos desta rota passaram a encaminhar para
+          `/seja-franqueado`, como os da home — ver `destinoCta` em `lead.ts`. */}
       <footer className="hold close" id="falar">
-        <FormFranqueado>
-          <div className="sec-cab">
-            <h2>
-              Quer ver <mark>de perto?</mark>
-            </h2>
-            <p>
-              A apresentação demonstrativa da franquia vai para o seu e-mail,
-              com as peças, os números e como a unidade opera.
-            </p>
-          </div>
-        </FormFranqueado>
+        <div className="sec-cab">
+          <h2>
+            Quer ver <mark>de perto?</mark>
+          </h2>
+          <p>
+            A franquia tem página própria, com modelos, investimento e a
+            apresentação. E a marca conta o resto.
+          </p>
+        </div>
+        <Portais itens={[PORTAL_FRANQUEADO, PORTAL_MARCA]} />
         <Rodape
           links={[
             { href: "/seja-franqueado", rotulo: "Seja um franqueado" },

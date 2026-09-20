@@ -321,13 +321,16 @@
    do hexágono ou na altura da cena é mexer neste número.
 
    A ALTURA DA FATIA É O QUE PAGA O GRUDE. A moldura vale uma tela, então a
-   fatia precisa valer mais: os `160svh` dão 60 de percurso parado, e a linha do
-   tempo entra os textos depois que ela assenta e os apaga antes que ela solte
-   (ver os tempos da batida em `centro.tsx`, que saem dessas mesmas frações). */
+   fatia precisa valer mais — e ela é UMA para as duas constelações: os `220svh`
+   dão 120 de percurso parado, metade para os pilares e metade para a IA. Eram
+   duas fatias de 160 (60 de percurso cada), e entre uma e outra a moldura
+   seguinte gastava uma tela inteira só para subir e assentar — rolagem morta
+   com o hexágono parado. A linha do tempo entra os textos depois que a moldura
+   assenta e os apaga antes que ela solte (ver os tempos em `centro.tsx`). */
 .ctr-const {
   position: relative;
   z-index: 1;
-  min-height: 160svh;
+  min-height: 220svh;
 }
 
 .ctr-const-grade {
@@ -344,17 +347,53 @@
   pointer-events: none;
 }
 
+/* OS DOIS GRUPOS SÃO CAMADAS DA MESMA MOLDURA: cada um cobre a grade inteira
+   e repete as faixas dela, na mesma célula — um por cima do outro. É o que
+   permite a troca pilares → IA sem uma segunda moldura subindo do pé da tela.
+   Só um dos dois está aceso por vez (a linha do tempo garante), então a
+   sobreposição nunca aparece. */
+.ctr-const-grupo {
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, min(88%, 62svh)) 1fr;
+  grid-template-rows: 1fr 41svh 1fr;
+  column-gap: clamp(0.75rem, 2.4vw, 2rem);
+  justify-items: center;
+}
+
+/* Sem movimento os dois grupos não podem dividir a célula — ficariam um em
+   cima do outro, ilegíveis. A moldura volta ao fluxo e eles empilham, cada um
+   com a sua tela, na ordem do documento. */
+.ctr:not(.ctr-vivo) .ctr-const-grade {
+  position: static;
+  height: auto;
+  grid-template-rows: auto;
+}
+
+.ctr:not(.ctr-vivo) .ctr-const-grupo {
+  grid-row: auto;
+  height: 100svh;
+}
+
 /* O CABEÇALHO ocupa a largura toda da faixa — e não a coluna do meio, que é
    estreita como a cena e quebrava "Três pilares sustentam a empresa." em três
    linhas de título.
 
-   Nos pilares ele vai na faixa de cima, ENCOSTADO NO PÉ DELA (`align-self:
-   end`): assim a frase cresce para baixo, na direção do desenho, em vez de
-   subir para trás da barra de navegação. Na IA vai na de baixo, encostada no
-   alto pelo mesmo motivo invertido. A escolha da faixa não é variação: os
-   pilares ocupam 210°, −30° e 90° (esquerda-cima, direita-cima e baixo) e a IA
-   ocupa −90°, 30° e 150° (topo, direita-baixo e esquerda-baixo) — em cada grupo
-   o cabeçalho fica na única faixa livre. */
+   Na faixa de cima, ENCOSTADO NO PÉ DELA (`align-self: end`): assim a frase
+   cresce para baixo, na direção do desenho, em vez de subir para trás da barra
+   de navegação.
+
+   NOS DOIS GRUPOS, no mesmo lugar. A IA já teve o cabeçalho na faixa de baixo
+   e os itens nas metades inferiores, seguindo os vértices dela (−90°, 30°,
+   150°). Com os dois grupos na MESMA moldura, a troca pilares → IA virou um
+   fade no mesmo quadro — e um fade em que título e itens pulam de faixa lê
+   como layout quebrando, não como troca de assunto. O texto da IA reproduz a
+   posição do texto dos pilares: cabeçalho em cima, dois itens nas laterais
+   altas, um embaixo. O que muda no quadro é a cena (a marca abre, os três nós
+   novos acendem), e é ela que carrega a diferença. */
 .ctr-const-cab {
   grid-column: 1 / -1;
   max-width: 46ch;
@@ -362,9 +401,6 @@
   display: grid;
   gap: 0.45rem;
   padding-block: 0.8rem;
-}
-
-.ctr-const[data-fam="pilar"] .ctr-const-cab {
   grid-row: 1;
   align-self: end;
   /* O PISO DA BARRA DE NAVEGAÇÃO. Ela flutua sobre o alto da página e ocupa
@@ -374,14 +410,6 @@
      ela avança sobre o ar acima do hexágono — que é espaço vazio — em vez de
      sumir por trás da barra. */
   margin-top: 11svh;
-}
-
-/* Embaixo, entre a ponta do hexágono e o rodapé da tela. Lida ali, com a marca
-   já aberta dentro do polígono, a frase é o que ela é: a assinatura do quadro
-   completo. */
-.ctr-const[data-fam="ia"] .ctr-const-cab {
-  grid-row: 3;
-  align-self: start;
 }
 
 /* A LISTA COBRE A MOLDURA E REPETE AS FAIXAS DELA, em vez de sumir com
@@ -417,53 +445,33 @@
   align-content: start;
 }
 
-/* As duas colunas de fora, na faixa do hexágono. O que muda entre os grupos é a
-   ALTURA dentro da faixa, porque os vértices laterais dos dois estão em metades
-   opostas do polígono: os pilares em 210° e −30° ficam acima do eixo, os papéis
-   da IA em 150° e 30°, abaixo. O empurrão de `4svh` é o que põe o texto na
-   altura do vértice (um quarto de polígono da borda) em vez de na quina da
-   faixa. */
+/* As duas colunas de fora, na faixa do hexágono, na metade de CIMA dela — nos
+   dois grupos (ver o cabeçalho, acima). O empurrão de `4svh` é o que põe o
+   texto na altura do vértice de 210°/−30° (um quarto de polígono da borda) em
+   vez de na quina da faixa. */
 .ctr-no[data-lugar="esq"] {
   grid-row: 2;
   grid-column: 1;
   justify-self: end;
+  align-self: start;
+  margin-top: 4svh;
 }
 
 .ctr-no[data-lugar="dir"] {
   grid-row: 2;
   grid-column: 3;
   justify-self: start;
-}
-
-.ctr-const[data-fam="pilar"] .ctr-no[data-lugar="esq"],
-.ctr-const[data-fam="pilar"] .ctr-no[data-lugar="dir"] {
   align-self: start;
   margin-top: 4svh;
 }
 
-.ctr-const[data-fam="ia"] .ctr-no[data-lugar="esq"],
-.ctr-const[data-fam="ia"] .ctr-no[data-lugar="dir"] {
-  align-self: end;
-  margin-bottom: 4svh;
-}
-
-/* As duas pontas do eixo vertical, na coluna do meio: o pilar de 90° na faixa
-   de baixo, o papel de −90° na de cima. Cada um cai na faixa que o cabeçalho do
-   OUTRO grupo ocupa — nunca os dois ao mesmo tempo. */
+/* A ponta de baixo do eixo vertical, na coluna do meio, na faixa que o
+   cabeçalho não usa. */
 .ctr-no[data-lugar="baixo"] {
   grid-row: 3;
   grid-column: 2;
   align-self: start;
   margin-top: 3svh;
-  text-align: center;
-  max-width: 40ch;
-}
-
-.ctr-no[data-lugar="topo"] {
-  grid-row: 1;
-  grid-column: 2;
-  align-self: end;
-  margin-bottom: 3svh;
   text-align: center;
   max-width: 40ch;
 }
@@ -943,15 +951,36 @@
   aspect-ratio: 1;
   color: #66cdff;
   border-radius: 999px;
-  background: rgb(7, 13, 19);
-  box-shadow: 0 0 0 1px rgba(102, 205, 255, 0.45),
-    0 0 24px rgba(102, 205, 255, 0.35);
+  /* SEM CHAPA. Tinha um disco escuro com anel, herdado de quando o selo
+     precisava cobrir o fio da coroa atrás dele. Os raios agora passam POR
+     BAIXO (ordem da marcação), e o disco virava uma bolacha preta tampando o
+     meio do hexágono — a marca lê melhor solta, só o glifo e o halo.
+
+     E O HALO NÃO PODE SER `box-shadow`. Sombra de caixa é pintada FORA da
+     borda e nunca por dentro: numa caixa transparente, o miolo fica com o
+     fundo escuro da página e o brilho em volta — que é exatamente um disco
+     preto com aro de luz, o mesmo desenho que a chapa fazia. O brilho vai no
+     GLIFO, como `drop-shadow`, que segue a forma das letras e não a caixa.
+
+     A força do brilho é uma variável porque a linha do tempo a apaga na
+     batida da IA (escalado doze vezes, o halo viraria uma mancha de meia
+     cena) — e `filter` como texto não se interpola bem, um número sim. */
+  --selo-luz: 0.55;
+  background: transparent;
+  /* O ANEL, e SÓ o anel: um traço de 1px, sem desfoque — desfoque é o que
+     fazia a caixa transparente virar disco preto. É nele que os raios dos
+     pilares encostam, e a linha do tempo o apaga junto com o halo na batida
+     da IA (`--selo-anel`). */
+  --selo-anel: 0.45;
+  box-shadow: 0 0 0 1px rgba(102, 205, 255, var(--selo-anel));
 }
 
 .ctr-selo svg {
   display: block;
   width: 58%;
   height: auto;
+  filter: drop-shadow(0 0 6px rgba(102, 205, 255, var(--selo-luz)))
+    drop-shadow(0 0 14px rgba(102, 205, 255, calc(var(--selo-luz) * 0.6)));
 }
 
 /* ============ O BALÃO DA IDEIA ============
@@ -1046,6 +1075,48 @@
   stroke-width: 0.2;
   stroke-dasharray: 1;
   stroke-linecap: round;
+}
+
+/* O PULSO: o segmento que corre em cima do fio, do centro ao nó e de volta.
+
+   `pathLength=1` no elemento, então a conta é em frações do raio: o traço
+   vale 0,16 dele e a lacuna vale 1 — um só traço visível por vez. O
+   `stroke-dashoffset` desloca o padrão ao longo do caminho: em 0,16 o traço
+   está inteiro ANTES do início (no respiro entre a marca e a linha, onde não
+   há caminho para pintar) e em −0,96 está quase inteiro depois do fim (dentro
+   do nó). Entre um e outro ele atravessa
+   o fio — e o `alternate` traz de volta. Ida e volta, e não só ida: pulso que
+   só sai do centro é transmissão; o que vai e volta é troca, que é o que a
+   seção diz ("o que precisa funcionar junto").
+
+   `ease-in-out` porque ele SAI de um disco e CHEGA em outro: arranca devagar
+   e freia ao encostar, como algo que é absorvido e reemitido, não um projétil.
+   A cor é um degrau abaixo do branco do ponto de luz da coroa, puxada para o
+   azul da paleta: branco puro em cima de um fio cinza lia como brilho de
+   sistema, não como a luz da marca.
+
+   OS TRÊS EM FASE, sem `animation-delay`. Chegaram fora de fase e leu errado:
+   com o segundo e o terceiro pulso ainda parados dentro da marca, o quadro
+   dizia que só um pilar estava ligado e os outros esperavam a vez — o
+   contrário dos três nós que acendem numa batida só. Em sincronia é o centro
+   respirando com os três ao mesmo tempo. */
+.ctr-raio-pulso {
+  fill: none;
+  stroke: #9ddcff;
+  stroke-width: 0.34;
+  stroke-linecap: round;
+  stroke-dasharray: 0.16 1;
+  stroke-dashoffset: 0.16;
+  animation: ctr-pulso 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes ctr-pulso {
+  from {
+    stroke-dashoffset: 0.16;
+  }
+  to {
+    stroke-dashoffset: -0.96;
+  }
 }
 
 /* O NÓ: um disco com o ícone, e nada mais. O nome está no bloco de texto da
@@ -1277,7 +1348,8 @@
 
 .ctr:not(.ctr-vivo) .ctr-giro,
 .ctr:not(.ctr-vivo) .ctr-orbe-face,
-.ctr:not(.ctr-vivo) .ctr-orbe-peca {
+.ctr:not(.ctr-vivo) .ctr-orbe-peca,
+.ctr:not(.ctr-vivo) .ctr-raio-pulso {
   animation: none;
 }
 
@@ -1447,7 +1519,7 @@
   }
 
   .ctr-const {
-    min-height: 120svh;
+    min-height: 220svh;
   }
 
   /* ── SEM MOVIMENTO, A CENA SAI DE TRÁS DO TEXTO ──
@@ -1682,8 +1754,23 @@
     height: auto;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    row-gap: 0.9rem;
     padding-inline: 6vw;
+  }
+
+  /* Os dois grupos na mesma célula, ancorados no pé: a moldura é fixa embaixo
+     e o cartão de cada grupo cresce para cima a partir da mesma linha. */
+  .ctr-const-grupo {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    justify-self: stretch;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: 0.9rem;
+  }
+
+  .ctr:not(.ctr-vivo) .ctr-const-grupo {
+    height: auto;
   }
 
   .ctr-nos {
@@ -1694,17 +1781,11 @@
     row-gap: 0.8rem;
   }
 
-  .ctr-const[data-fam="pilar"] .ctr-const-cab,
-  .ctr-const[data-fam="ia"] .ctr-const-cab,
+  .ctr-const-cab,
   .ctr-no,
   .ctr-no[data-lugar="esq"],
   .ctr-no[data-lugar="dir"],
-  .ctr-no[data-lugar="topo"],
-  .ctr-no[data-lugar="baixo"],
-  .ctr-const[data-fam="pilar"] .ctr-no[data-lugar="esq"],
-  .ctr-const[data-fam="pilar"] .ctr-no[data-lugar="dir"],
-  .ctr-const[data-fam="ia"] .ctr-no[data-lugar="esq"],
-  .ctr-const[data-fam="ia"] .ctr-no[data-lugar="dir"] {
+  .ctr-no[data-lugar="baixo"] {
     grid-row: auto;
     grid-column: 1;
     align-self: auto;

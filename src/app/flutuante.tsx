@@ -23,9 +23,9 @@
 
 import { IcoEnvelope, IcoTopo } from "./icons";
 
-/* O destino vem da casca, e não de uma constante daqui: na home ele atravessa
-   para `/seja-franqueado` e nas outras desce até o formulário do fechamento.
-   Ver `destinoCta` em `./lead`. */
+/* O destino vem da casca, e não de uma constante daqui: na home e na galeria
+   ele atravessa para `/seja-franqueado`; em `/seja-franqueado` desce até o
+   formulário do fechamento. Ver `destinoCta` em `./lead`. */
 export function Flutuante({
   cta,
 }: {
@@ -33,12 +33,10 @@ export function Flutuante({
 }) {
   return (
     <div className="flut">
-      <a className="cta flut-falar" href={cta.href}>
-        <IcoEnvelope />
-        <span>{cta.rotulo}</span>
-      </a>
+      {/* O topo vem antes do CTA: o botão principal fica no canto, na ponta
+          do par, e a seta fica do lado de dentro.
 
-      {/* O tamanho da seta vem do wrapper, e não de uma regra em `svg`: dentro
+          O tamanho da seta vem do wrapper, e não de uma regra em `svg`: dentro
           de um botão em grid o ícone não tem tamanho intrínseco para o CSS
           esticar, e sem uma caixa própria ele encolhia para o mínimo. */}
       <a
@@ -49,6 +47,11 @@ export function Flutuante({
         <span className="flut-seta">
           <IcoTopo />
         </span>
+      </a>
+
+      <a className="cta flut-falar" href={cta.href}>
+        <IcoEnvelope />
+        <span>{cta.rotulo}</span>
       </a>
     </div>
   );

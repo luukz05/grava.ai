@@ -1351,8 +1351,7 @@
    sensação conforme a velocidade da rolagem. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .ico svg path,
-    .ico svg rect {
+    .ico svg > * {
       stroke-dasharray: 90;
       animation: trace linear both;
       animation-timeline: view();
@@ -1471,112 +1470,155 @@
 /* O rodapé perdeu a classe mono: a linha institucional tem 58 caracteres
    e caixa alta em frase inteira é ilegível. Os links ficam em caixa mista. */
 /* ---------- rodapé ----------
-   Marca de um lado, canais do outro, um fio, e embaixo a assinatura à esquerda
-   com os links empurrados para a direita. A grade de dez colunas é o que faz
-   isso: a assinatura ocupa as três primeiras e atravessa as duas linhas, os
-   links ficam com o resto e se alinham ao fim. */
+   Três andares: a grade (marca + duas colunas de links), um fio, a linha
+   institucional. Ver o cabeçalho de `rodape.tsx` para o porquê de ter deixado
+   o desenho anterior.
+
+   O fio de cima separa o rodapé do formulário, que é o último bloco de
+   conteúdo: sem ele, os links de navegação leem como continuação do
+   fechamento. O respiro em cima é maior do que o entre andares — é a escala
+   de seção, não a de linha. */
 
 .rodape {
-  margin-top: clamp(2.5rem, 6vw, 4rem);
-  font-size: 0.8125rem;
-  color: var(--fg-2);
-}
-
-.rodape-topo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-}
-
-.rodape-marca img {
-  height: 26px;
-  width: auto;
-  display: block;
-}
-
-.rodape-redes {
-  list-style: none;
-  display: flex;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-}
-
-/* Mesmo material dos botões da barra do topo: os dois são botão de
-   ícone da mesma página, e dois desenhos para o mesmo papel seria
-   inconsistência, não variedade. */
-.rodape-redes a {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--fg) 4%, transparent);
-  color: var(--fg-2);
-  transition: color var(--t-ui) var(--e-ui),
-    background-color var(--t-ui) var(--e-ui),
-    transform var(--t-mov) var(--e-mola);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .rodape-redes a:hover {
-    color: var(--fg);
-    background: color-mix(in srgb, var(--fg) 9%, transparent);
-  }
-}
-
-.rodape-redes a:focus-visible {
-  color: var(--fg);
-  background: color-mix(in srgb, var(--fg) 9%, transparent);
-}
-
-/* O mesmo aperto do `.cta`, pelo mesmo motivo: são botões, e botão que não
-   afunda no toque não diz que ouviu. Estes ficam no rodapé, onde o dedo chega
-   depois de nove telas — é o pior lugar possível para um controle mudo. */
-.rodape-redes a:active {
-  transform: scale(0.92);
-  transition-duration: var(--t-press);
-  transition-timing-function: linear;
-}
-
-.rodape-redes svg {
-  width: 19px;
-  height: 19px;
-}
-
-.rodape-grade {
-  margin-top: clamp(1.5rem, 4vw, 2rem);
-  padding-top: clamp(1.25rem, 3vw, 1.75rem);
+  margin-top: clamp(3rem, 8vw, 5rem);
+  padding-top: clamp(2rem, 5vw, 3.25rem);
   border-top: 1px solid var(--hair);
+  font-size: 0.875rem;
+  color: var(--fg-2);
+}
+
+/* Marca à esquerda com o resto da largura; as colunas de links à direita, em
+   `auto`, medem o próprio conteúdo e se alinham ao fim. O vão entre colunas
+   é o que separa "Navegar" de "Fale com a gente" sem precisar de fio. */
+.rodape-grade {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 2.75rem);
+}
+
+@media (min-width: 640px) {
+  .rodape-grade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .rodape-marca-col {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 900px) {
   .rodape-grade {
-    grid-template-columns: repeat(10, minmax(0, 1fr));
-    gap: 0.75rem 1.5rem;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: clamp(3rem, 7vw, 7rem);
+    align-items: start;
   }
 
-  .rodape-nav {
-    grid-column: 4 / 11;
-  }
-
-  .rodape-legais {
-    grid-column: 4 / 11;
-  }
-
-  /* Atravessa as duas linhas: é o bloco mais alto e ancora a coluna da
-     esquerda enquanto os links descem à direita. */
-  .rodape-copy {
-    grid-row: 1 / 3;
-    grid-column: 1 / 4;
+  .rodape-marca-col {
+    grid-column: auto;
+    max-width: 30ch;
   }
 }
 
-.rodape-nav ul,
+.rodape-marca {
+  display: inline-block;
+}
+
+/* 26px era menor que o corpo de texto ao lado. 34px é a altura da marca na
+   barra do topo — o rodapé é a outra ponta da mesma página. */
+.rodape-marca img {
+  height: clamp(30px, 2.4vw, 34px);
+  width: auto;
+  display: block;
+}
+
+.rodape-assinatura {
+  margin: 1rem 0 0;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Herda `.mono` (12px, caixa alta, tracking 0.1em). A tinta cheia é o que
+   separa o título dos itens abaixo, que ficam no cinza. */
+.rodape-titulo {
+  margin: 0 0 1rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.rodape-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rodape-col a {
+  color: var(--fg-2);
+  text-decoration: none;
+  transition: color var(--t-ui) var(--e-ui);
+}
+
+.rodape-col a:hover,
+.rodape-col a:focus-visible {
+  color: var(--fg);
+}
+
+/* Contato: ícone + rótulo pequeno + o dado em tinta cheia. O dado é o que a
+   pessoa veio buscar; o rótulo só diz qual canal é. */
+.rodape-contato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.rodape-contato svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--fg-2);
+  transition: color var(--t-ui) var(--e-ui);
+}
+
+.rodape-contato > span {
+  display: grid;
+  gap: 0.1rem;
+  line-height: 1.3;
+}
+
+.rodape-contato-rotulo {
+  font-size: 0.75rem;
+  color: var(--fg-2);
+}
+
+.rodape-contato-valor {
+  color: var(--fg);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.rodape-contato:hover svg,
+.rodape-contato:focus-visible svg {
+  color: var(--fg-hot);
+}
+
+/* Linha institucional. */
+.rodape-base {
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hair);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  font-size: 0.8125rem;
+}
+
+.rodape-copy {
+  margin: 0;
+}
+
 .rodape-legais {
   list-style: none;
   display: flex;
@@ -1586,45 +1628,28 @@
   padding: 0;
 }
 
-@media (min-width: 900px) {
-  .rodape-nav ul,
-  .rodape-legais {
-    justify-content: flex-end;
-  }
-}
-
-.rodape-nav a {
-  color: var(--fg);
-  text-decoration: none;
-}
-
 .rodape-legais a {
   color: var(--fg-2);
   text-decoration: none;
+  transition: color var(--t-ui) var(--e-ui);
 }
 
-.rodape-nav a:hover,
-.rodape-nav a:focus-visible,
 .rodape-legais a:hover,
 .rodape-legais a:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.rodape-copy {
-  display: grid;
-  gap: 0.3rem;
-  max-width: 34ch;
-  line-height: 1.5;
+  color: var(--fg);
 }
 
 /* Alvo de polegar nos links, sem esticar a linha no desktop. */
 @media (any-pointer: coarse) {
-  .rodape-nav a,
+  .rodape-col a,
   .rodape-legais a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+  }
+
+  .rodape-col ul {
+    gap: 0;
   }
 }
 
@@ -1937,13 +1962,6 @@
   border-left: 2px solid #d6604a;
   color: #d6604a;
   font-size: 0.875rem;
-  max-width: 44ch;
-}
-
-.form-fr-aviso {
-  margin: 0;
-  color: var(--fg-2);
-  font-size: 0.8125rem;
   max-width: 44ch;
 }
 
@@ -2905,19 +2923,6 @@
 }
 
 
-
-/* ---------- dedo, não cursor ----------
-   Não é questão de largura de tela: um notebook com toque tem 1440px e o mesmo
-   dedo. `any-pointer` e não `pointer`: num híbrido com mouse plugado o
-   ponteiro primário é fino, mas a tela continua sendo tocada. */
-@media (any-pointer: coarse) {
-  /* Os botões de canal do rodapé são material de controle: alvo de dedo é
-     regra do controle, não do componente. */
-  .rodape-redes a {
-    width: 44px;
-    height: 44px;
-  }
-}
 
 /* ---------- os números do contrato ----------
    R$ 99.900 saía em corpo negrito de 15px, na linha 12 de uma tabela. É o
@@ -4124,13 +4129,6 @@
        parágrafo de apoio, rótulo de campo e célula de tabela — metade do texto
        da página. */
     --fg-2: color-mix(in srgb, var(--fg) 82%, var(--bg));
-  }
-
-  /* Superfície com borda declarada em vez de superfície por diferença de
-     luminância: 4% de mistura não sobrevive a nenhum ajuste de contraste. */
-  .v5 .rodape-redes a {
-    background: var(--bg-2);
-    border: 1px solid var(--hair);
   }
 
   .v5 .nav-menu {

@@ -39,8 +39,9 @@ import "./navbar.css";
    funcionando em quem já escrevia assim. */
 export type { Pagina } from "./rotas";
 
-/* `cta` vem da casca: na home ele atravessa para `/seja-franqueado` e nas
-   outras desce até o formulário do fechamento. Ver `destinoCta` em `./lead`. */
+/* `cta` vem da casca: na home e na galeria ele atravessa para
+   `/seja-franqueado`; em `/seja-franqueado` desce até o formulário do
+   fechamento. Ver `destinoCta` em `./lead`. */
 export function NavBar({
   atual,
   cta,

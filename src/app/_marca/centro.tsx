@@ -439,6 +439,22 @@ const PILARES = [
   },
 ];
 
+/* A ESCALA DO SELO quando ele desce para o meio (quarta batida). Vive aqui,
+   e não só dentro do tween, porque os raios dos pilares precisam dela: eles
+   começam na BORDA do anel da marca, e o anel tem o tamanho do selo escalado. */
+const ESCALA_SELO_NO_CENTRO = 1.9;
+
+/* ONDE O RAIO COMEÇA, contado do centro em unidades da cena (1 = 1cqw) — o
+   valor do HTML, que só vale até o script medir.
+
+   Não é 0 porque a marca está no meio e não tem chapa atrás: com a linha
+   partindo do centro exato, ela passava POR DENTRO do glifo. O ponto certo é
+   a borda do anel, e o anel nasce de um `clamp()` em rem — não dá para
+   escrever em cqw. Então a linha do tempo MEDE o selo antes de desenhar os
+   raios (ver a batida dos pilares) e reescreve `x1/y1`; este número é só o
+   chute do servidor, para a marcação não nascer com a linha dentro da marca. */
+const R_RAIO_INICIO = 6;
+
 const emCena = (ang: number) => ({
   left: `${n3(50 + R_HEX_CENA * Math.cos(rad(ang)))}%`,
   top: `${n3(50 + R_HEX_CENA * Math.sin(rad(ang)))}%`,
@@ -470,7 +486,7 @@ const IA = [
     id: "criacao",
     nome: "Na criação",
     ang: -90,
-    lugar: "topo" as const,
+    lugar: "esq" as const,
     Ico: IcoArte,
     texto:
       "O cliente gera a arte ideal em segundos, com Inteligência Artificial.",
@@ -487,7 +503,7 @@ const IA = [
     id: "atendimento",
     nome: "No atendimento",
     ang: 150,
-    lugar: "esq" as const,
+    lugar: "baixo" as const,
     Ico: IcoJornada,
     texto: "A IA conduz o cliente do primeiro toque até a retirada.",
   },
@@ -650,15 +666,20 @@ export function Centro() {
           const esfera = um<HTMLElement>(".ctr-esfera");
           const orbes = q(".ctr-orbe-face");
           const raios = q(".ctr-raio");
+          const pulsos = q(".ctr-raio-pulso");
           const pilares = q('.ctr-pilar[data-fam="pilar"]');
           const nosIa = q('.ctr-pilar[data-fam="ia"]');
           /* Os textos das constelações. Estão na ordem do DOM, que é a ordem
              de `PILARES` e de `IA` — é o que permite entrar CADA UM junto do
              seu nó, no mesmo `stagger`, sem um gatilho por item. */
-          const cabPilares = um<HTMLElement>('.ctr-const[data-fam="pilar"] .ctr-const-cab');
-          const cabIa = um<HTMLElement>('.ctr-const[data-fam="ia"] .ctr-const-cab');
-          const txtPilares = q('.ctr-const[data-fam="pilar"] .ctr-no');
-          const txtIa = q('.ctr-const[data-fam="ia"] .ctr-no');
+          const cabPilares = um<HTMLElement>(
+            '.ctr-const-grupo[data-fam="pilar"] .ctr-const-cab',
+          );
+          const cabIa = um<HTMLElement>(
+            '.ctr-const-grupo[data-fam="ia"] .ctr-const-cab',
+          );
+          const txtPilares = q('.ctr-const-grupo[data-fam="pilar"] .ctr-no');
+          const txtIa = q('.ctr-const-grupo[data-fam="ia"] .ctr-no');
           /* Estado do morfo do fio: 1 é o círculo, 0 é o hexágono. */
           const morfo = { t: 1 };
           const blocos = q(".ctr-passo");
@@ -712,6 +733,9 @@ export function Centro() {
              recolhido (`pathLength={1}`, então 1 é "nada desenhado") e os nós
              ausentes. */
           gsap.set(raios, { strokeDashoffset: 1 });
+          /* O pulso não existe antes do fio: um ponto correndo num caminho que
+             ainda não foi desenhado seria luz sem estrada. */
+          gsap.set(pulsos, { autoAlpha: 0 });
           gsap.set([...pilares, ...nosIa], { autoAlpha: 0, scale: 0.72 });
           /* Os textos das constelações nascem ausentes pelo mesmo motivo que a
              cena: sem script a página os mostra prontos, e escondê-los pelo
@@ -753,7 +777,10 @@ export function Centro() {
           const descidaCena = () => {
             if (!window.matchMedia("(max-width: 900px)").matches) return 0;
             const topo = parseFloat(getComputedStyle(visual).top) || 0;
-            return Math.max(0, (window.innerHeight - cena.offsetHeight) / 2 - topo);
+            return Math.max(
+              0,
+              (window.innerHeight - cena.offsetHeight) / 2 - topo,
+            );
           };
           gsap.set(cena, { y: descidaCena });
 
@@ -830,17 +857,17 @@ export function Centro() {
           tl.to(
             aura,
             { opacity: 0.5, scale: 1, duration: 1.4, ease: E_LUZ },
-            "credo"
+            "credo",
           )
             .to(
               guia,
               { autoAlpha: 1, scale: 1, duration: 1.6, ease: E_MOLA },
-              "credo+=0.15"
+              "credo+=0.15",
             )
             .to(
               eu,
               { autoAlpha: 1, scale: 1, duration: 1.1, ease: E_MOLA },
-              "credo+=0.5"
+              "credo+=0.5",
             );
 
           /* ── 2 · A IDEIA É DELE ──
@@ -860,7 +887,7 @@ export function Centro() {
               duration: 1.2,
               ease: E_MOLA_SOLTA,
             },
-            "ideia+=0.2"
+            "ideia+=0.2",
           )
             /* ACENDER É O HALO, não a troca de cor. O traço clareia junto —
                vidro aceso é mais claro que vidro apagado —, mas quem diz
@@ -877,12 +904,12 @@ export function Centro() {
                 duration: 0.8,
                 ease: E_MOLA_SOLTA,
               },
-              "ideia+=0.95"
+              "ideia+=0.95",
             )
             .to(
               lampada,
               { stroke: "#eaf7ff", duration: 0.5, ease: E_LUZ },
-              "ideia+=0.95"
+              "ideia+=0.95",
             );
 
           /* ── 3 · A IA PROJETA EM VOLTA ──
@@ -913,17 +940,17 @@ export function Centro() {
               duration: 0.9,
               ease: E_UI,
             },
-            "ia"
+            "ia",
           )
             .to(
               cabeca,
               { autoAlpha: 1, scale: 1, duration: 0.5, ease: E_MOLA_SOLTA },
-              "ia+=0.25"
+              "ia+=0.25",
             )
             .to(
               orbita,
               { rotation: 360, duration: 1.7, ease: E_UI },
-              "ia+=0.35"
+              "ia+=0.35",
             )
             /* O fio acende junto com a partida do ponto — antes disso ele não
                existe, nem como ponta arredondada. */
@@ -931,7 +958,7 @@ export function Centro() {
             .to(
               coroa,
               { strokeDashoffset: 0, duration: 1.7, ease: E_UI },
-              "ia+=0.35"
+              "ia+=0.35",
             )
             .to(aura, { opacity: 0.76, duration: 1.2, ease: E_LUZ }, "ia+=0.4")
             /* A cabeça encolhe para dentro do ponto em que começou em vez de
@@ -940,12 +967,12 @@ export function Centro() {
             .to(
               cabeca,
               { autoAlpha: 0, scale: 0.4, duration: 0.5, ease: E_LUZ },
-              "ia+=1.95"
+              "ia+=1.95",
             )
             .to(
               selo,
               { autoAlpha: 1, scale: 1, duration: 0.9, ease: E_MOLA_SOLTA },
-              "ia+=1.95"
+              "ia+=1.95",
             );
 
           /* ── 4 · O PRODUTO ──
@@ -1003,27 +1030,27 @@ export function Centro() {
                  nasceria acesa no meio da cena desde o primeiro quadro. */
               immediateRender: false,
             },
-            "produto"
+            "produto",
           )
             .to(
               guia,
               { autoAlpha: 0, scale: 1.3, duration: 0.9, ease: E_UI },
-              "produto+=0.1"
+              "produto+=0.1",
             )
             .to(
               esfera,
               { scale: 1, duration: 1.9, ease: E_MOLA },
-              "produto+=0.12"
+              "produto+=0.12",
             )
             .to(
               orbes,
               { autoAlpha: 1, duration: 0.7, ease: E_LUZ, stagger: 0.06 },
-              "produto+=0.2"
+              "produto+=0.2",
             )
             .to(
               eu,
               { autoAlpha: 0, scale: 0.62, duration: 0.9, ease: E_UI },
-              "produto+=0.3"
+              "produto+=0.3",
             )
             /* A descida e o crescimento vão no SELO, nunca no marco: o marco
                centra com `translate: -50% -50%` na propriedade própria, e o
@@ -1034,16 +1061,16 @@ export function Centro() {
               selo,
               {
                 y: () => cena.getBoundingClientRect().height * 0.15,
-                scale: 1.9,
+                scale: ESCALA_SELO_NO_CENTRO,
                 duration: 1.4,
                 ease: E_MOLA,
               },
-              "produto+=0.3"
+              "produto+=0.3",
             )
             .to(
               aura,
               { opacity: 0.58, duration: 1, ease: E_LUZ },
-              "produto+=0.4"
+              "produto+=0.4",
             )
             .to(
               cena,
@@ -1053,7 +1080,7 @@ export function Centro() {
                 duration: 1.6,
                 ease: E_MOLA,
               },
-              "produto+=0.15"
+              "produto+=0.15",
             );
 
           /* ── 5 · A PASSAGEM PARA OS PILARES ──
@@ -1091,17 +1118,17 @@ export function Centro() {
             .to(
               orbes,
               { autoAlpha: 0, duration: 0.8, ease: E_LUZ, stagger: 0.03 },
-              "passagem+=0.05"
+              "passagem+=0.05",
             )
             .to(
               coroaCaixa,
               { scale: ESCALA_HEX, duration: 1.7, ease: E_MOLA },
-              "passagem+=0.35"
+              "passagem+=0.35",
             )
             .to(
               coroa,
               { "--coroa-w": 0.45, duration: 1.7, ease: E_UI },
-              "passagem+=0.35"
+              "passagem+=0.35",
             )
             /* O morfo anda num objeto e não no elemento: `d` é atributo de
                caminho, não propriedade animável, e quem escreve o caminho a
@@ -1115,12 +1142,12 @@ export function Centro() {
                 ease: E_UI,
                 onUpdate: () => coroa.setAttribute("d", dCoroa(morfo.t)),
               },
-              "passagem+=0.35"
+              "passagem+=0.35",
             )
             .to(
               aura,
               { opacity: 0.72, scale: 1.12, duration: 1.4, ease: E_LUZ },
-              "passagem+=0.3"
+              "passagem+=0.3",
             );
 
           /* ── 6 · A CONSTELAÇÃO DOS PILARES ──
@@ -1176,17 +1203,54 @@ export function Centro() {
           const celular = window.matchMedia("(max-width: 900px)").matches;
           const naFatia = (i: number, fracao: number) =>
             (durT[i] ?? T_BATIDA) * fracao;
+          /* AS DUAS CONSTELAÇÕES SÃO A MESMA FATIA (ver a moldura única no
+             JSX), então os dois relógios contam do mesmo rótulo. Na tela larga
+             a fatia vale 220svh: a moldura assenta em +50svh (~1,5s) e solta em
+             +170svh (~5,2s). Os pilares vivem na primeira metade da janela
+             presa e a IA na segunda — os tempos dela são os antigos deslocados
+             1,75s, que é onde o texto dos pilares acabou de apagar. No celular
+             as frações são da fatia inteira: pilares até ~0,43, IA de 0,55 em
+             diante. */
           const tPil = (seg: number, frac: number) =>
             "pilares+=" + (celular ? naFatia(5, frac) : seg);
           const tIa = (seg: number, frac: number) =>
-            "motor+=" + (celular ? naFatia(6, frac) : seg);
+            "pilares+=" + (celular ? naFatia(5, frac) : seg + 1.75);
+
+          /* OS RAIOS ENCOSTAM NO ANEL DA MARCA, e o anel é medido, não escrito.
+
+             O selo tem `clamp(1.5rem, 6cqw, 2.4rem)` de largura e chega ao
+             centro escalado (`ESCALA_SELO_NO_CENTRO`): em cqw esse raio muda
+             de tela para tela, e um número fixo deixava a linha ou dentro do
+             glifo ou parada no ar a meio caminho. `offsetWidth` é a largura
+             SEM transform — por isso a escala entra na conta à mão, e a
+             medida não depende de o tween da descida já ter rodado.
+
+             Valores em função + `invalidateOnRefresh` no gatilho: a conta se
+             refaz a cada `refresh`, no giro do telefone e no redimensionar. O
+             `set` vai NA LINHA DO TEMPO, antes do traço, porque é lá que ele
+             é reavaliado; feito uma vez na montagem, valeria só para a
+             primeira medida. Os dois `<line>` de cada raio (fio e pulso)
+             partilham o ângulo — `PILARES[i >> 1]` — porque estão na ordem do
+             DOM: fio, pulso, fio, pulso... */
+          const raioDoAnel = () =>
+            ((selo.offsetWidth * ESCALA_SELO_NO_CENTRO) /
+              2 /
+              cena.offsetWidth) *
+            100;
+          const noAnel = (eixo: "cos" | "sin") => (i: number) =>
+            n3(50 + raioDoAnel() * Math[eixo](rad(PILARES[i >> 1].ang)));
 
           batida("pilares", 5);
           tl.to(
             cabPilares,
             { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
-            tPil(1.65, 0.1)
+            tPil(1.65, 0.05),
           )
+            .set(
+              q(".ctr-raio, .ctr-raio-pulso"),
+              { attr: { x1: noAnel("cos"), y1: noAnel("sin") } },
+              tPil(1.7, 0.06),
+            )
             .to(
               raios,
               {
@@ -1195,7 +1259,20 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.2,
               },
-              tPil(1.75, 0.13)
+              tPil(1.75, 0.065),
+            )
+            /* O PULSO ACENDE DEPOIS DE O ÚLTIMO FIO FECHAR (0,8 de traço + 0,4
+               de escalonamento), e não junto: primeiro a ligação existe, depois
+               ela passa a correr. É a mesma ordem do resto da cena — primeiro
+               o lugar, depois a luz.
+
+               OS TRÊS JUNTOS, sem `stagger`: os pilares já chegaram os três
+               numa batida só, e o pulso escalonado desfazia isso — parecia que
+               um estava ligado e os outros dois ainda não. */
+            .to(
+              pulsos,
+              { autoAlpha: 1, duration: 0.6, ease: E_UI },
+              tPil(2.95, 0.11),
             )
             .to(
               pilares,
@@ -1207,7 +1284,7 @@ export function Centro() {
                 ease: E_MOLA_SOLTA,
                 stagger: 0.2,
               },
-              tPil(1.95, 0.18)
+              tPil(1.95, 0.09),
             )
             /* O texto entra COM o nó — mesmo instante, mesmo intervalo. É o
                par que substitui a batida por item: o olho vê o vértice acender
@@ -1222,7 +1299,7 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.2,
               },
-              tPil(2, 0.2)
+              tPil(2, 0.1),
             )
             /* A aura fecha um degrau acima: o quadro tem mais desenho no meio
                do que qualquer outro, e sem isso o hexágono com três nós fica
@@ -1230,7 +1307,7 @@ export function Centro() {
             .to(
               aura,
               { opacity: 0.66, duration: 1.2, ease: E_LUZ },
-              tPil(1.7, 0.11)
+              tPil(1.7, 0.055),
             )
             /* E APAGA ANTES DE A MOLDURA SOLTAR. Enquanto ela está presa o
                texto fica parado nas faixas livres; solta, ele sobe — e subir
@@ -1240,7 +1317,7 @@ export function Centro() {
             .to(
               [cabPilares, ...txtPilares],
               { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
-              tPil(3.1, 0.86)
+              tPil(3.1, 0.43),
             );
 
           /* ── 7 · O HEXÁGONO FECHA: A MARCA ABRE E A IA OCUPA O RESTO ──
@@ -1267,40 +1344,38 @@ export function Centro() {
              tela em que ele foi calibrado — o selo nasce de um `clamp()`, e o
              clamp muda de perna conforme a cena.
 
-             A chapa do selo (o disco escuro e o anel) some junto: escalada doze
-             vezes, uma borda de 1px vira uma moldura de 12. */
-          batida("motor", 6);
+             O halo do selo some junto: escalado doze vezes, um brilho de 24px
+             vira uma mancha de meia cena. */
           tl.to(
-              selo,
-              {
-                scale: () => {
-                  const glifo = selo.querySelector("svg");
-                  const alto = glifo?.getBoundingClientRect().height ?? 1;
-                  const cheio = cena.getBoundingClientRect().height;
-                  /* `alto` já vem com a escala atual aplicada (1.9, da quarta
+            selo,
+            {
+              scale: () => {
+                const glifo = selo.querySelector("svg");
+                const alto = glifo?.getBoundingClientRect().height ?? 1;
+                const cheio = cena.getBoundingClientRect().height;
+                /* `alto` já vem com a escala atual aplicada (1.9, da quarta
                      batida), então a razão é sobre a caixa como ela está — e o
                      valor devolvido é a escala ABSOLUTA que o tween vai
                      escrever, não um acréscimo. */
-                  const atual = gsap.getProperty(selo, "scale") as number;
-                  const alvo = cheio * ((2 * R_HEX_CENA) / 100) * MARCA_NO_HEX;
-                  return (alvo / alto) * atual;
-                },
-                opacity: 0.38,
-                backgroundColor: "rgba(7, 13, 19, 0)",
-                boxShadow:
-                  "0 0 0 1px rgba(102, 205, 255, 0), 0 0 24px rgba(102, 205, 255, 0)",
-                duration: 1.5,
-                ease: E_MOLA,
+                const atual = gsap.getProperty(selo, "scale") as number;
+                const alvo = cheio * ((2 * R_HEX_CENA) / 100) * MARCA_NO_HEX;
+                return (alvo / alto) * atual;
               },
-              tIa(1.6, 0.1)
-            )
+              opacity: 0.38,
+              "--selo-luz": 0,
+              "--selo-anel": 0,
+              duration: 1.5,
+              ease: E_MOLA,
+            },
+            tIa(1.6, 0.55),
+          )
             /* Os raios saem de cena: eles ligavam três nós a um ponto no meio,
                e o meio virou uma área. Linha por baixo de uma marca chapada é
                linha que não se vê e ainda suja a borda dela. */
             .to(
-              raios,
+              [...raios, ...pulsos],
               { autoAlpha: 0, duration: 0.7, ease: E_UI },
-              tIa(1.6, 0.1)
+              tIa(1.6, 0.55),
             )
             .to(
               pilares,
@@ -1311,12 +1386,12 @@ export function Centro() {
                 duration: 0.8,
                 ease: E_UI,
               },
-              tIa(1.65, 0.11)
+              tIa(1.65, 0.555),
             )
             .to(
               cabIa,
               { autoAlpha: 1, y: 0, duration: 0.55, ease: E_UI },
-              tIa(1.7, 0.12)
+              tIa(1.7, 0.56),
             )
             .to(
               nosIa,
@@ -1329,7 +1404,7 @@ export function Centro() {
                 ease: E_MOLA_SOLTA,
                 stagger: 0.2,
               },
-              tIa(1.95, 0.18)
+              tIa(1.95, 0.59),
             )
             .to(
               txtIa,
@@ -1340,20 +1415,20 @@ export function Centro() {
                 ease: E_UI,
                 stagger: 0.18,
               },
-              tIa(1.95, 0.18)
+              tIa(1.95, 0.59),
             )
             /* E o quadro se limpa antes de a moldura soltar, como na batida
                anterior: o que fica na tela daqui em diante é a cena. */
             .to(
               [cabIa, ...txtIa],
               { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
-              tIa(3.1, 0.92)
+              tIa(3.1, 0.96),
             );
 
           /* A última fatia precisa existir inteira na linha do tempo, senão a
              duração acaba no último tween e a batida final consome menos
              rolagem do que a fatia dela mede. */
-          tl.to({}, { duration: durT[6] ?? T_BATIDA }, emT[6] ?? 6 * T_BATIDA);
+          tl.to({}, { duration: durT[5] ?? T_BATIDA }, emT[5] ?? 5 * T_BATIDA);
 
           /* ─────────────────────────────────────────────────────────────────
              O BLOCO QUE ESTÁ SENDO LIDO
@@ -1381,7 +1456,8 @@ export function Centro() {
              meia tela está dentro dela. Duas fatias vizinhas trocam no mesmo
              instante, e as duas transições de 180ms se cruzam — que é a
              dissolvência pedida. */
-          const noCelular = () => window.matchMedia("(max-width: 900px)").matches;
+          const noCelular = () =>
+            window.matchMedia("(max-width: 900px)").matches;
 
           blocos.forEach((el) => {
             ScrollTrigger.create({
@@ -1540,6 +1616,63 @@ export function Centro() {
                 </svg>
               </div>
 
+              {/* OS RAIOS DOS PILARES. Saem do centro — onde a marca está — e
+                  vão até os vértices do hexágono. Desenhados AQUI, logo depois
+                  do fio e ANTES de toda peça redonda da cena — o cliente, o
+                  selo da marca, os nós —, porque são o chão delas: o disco
+                  passa por cima da ponta do raio, e não o contrário. E NÃO
+                  PARTEM DO CENTRO EXATO: a marca não tem chapa atrás, então
+                  ordem na marcação não basta — a linha continuaria visível
+                  por dentro do glifo. Elas começam na BORDA DO ANEL da marca,
+                  medida pela linha do tempo (`raioDoAnel`); `R_RAIO_INICIO`
+                  é só o valor do servidor.
+
+                  Apagados de propósito: são relação, não conteúdo. Com o peso
+                  do hexágono, o desenho passaria a ter duas linhas dizendo
+                  coisas diferentes com a mesma força.
+
+                  CADA RAIO SÃO DUAS LINHAS NO MESMO TRAÇADO: a de baixo é o fio
+                  que a linha do tempo desenha, a de cima é o PULSO — um
+                  segmento curto e claro que corre do centro ao nó e volta, em
+                  CSS, sem parar. É o que diz que a ligação está VIVA: a marca
+                  e o pilar trocando alguma coisa, e não só um risco entre os
+                  dois. O pulso só acende depois de o fio estar inteiro (ver a
+                  batida dos pilares) e apaga com ele. */}
+              <svg
+                className="ctr-raios"
+                viewBox="0 0 100 100"
+                aria-hidden="true"
+              >
+                {PILARES.map((p) => {
+                  const c = Math.cos(rad(p.ang));
+                  const sn = Math.sin(rad(p.ang));
+                  const x1 = n3(50 + R_RAIO_INICIO * c);
+                  const y1 = n3(50 + R_RAIO_INICIO * sn);
+                  const x2 = n3(50 + R_HEX_CENA * c);
+                  const y2 = n3(50 + R_HEX_CENA * sn);
+                  return (
+                    <g key={p.id}>
+                      <line
+                        className="ctr-raio"
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        pathLength={1}
+                      />
+                      <line
+                        className="ctr-raio-pulso"
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        pathLength={1}
+                      />
+                    </g>
+                  );
+                })}
+              </svg>
+
               {/* O CLIENTE, no meio durante as três batidas da criação. Na
                   quarta ele sai com o produto e o meio passa para a marca. */}
               <div className="ctr-marco" style={{ left: "50%", top: "50%" }}>
@@ -1580,28 +1713,6 @@ export function Centro() {
                 </span>
               </div>
 
-              {/* OS RAIOS DOS PILARES. Saem do centro — onde a marca está — e
-                  vão até os vértices do hexágono. Desenhados ANTES dos nós na
-                  marcação porque são o chão deles: o nó passa por cima da ponta
-                  do raio, e não o contrário.
-
-                  Apagados de propósito: são relação, não conteúdo. Com o peso
-                  do hexágono, o desenho passaria a ter duas linhas dizendo
-                  coisas diferentes com a mesma força. */}
-              <svg className="ctr-raios" viewBox="0 0 100 100" aria-hidden="true">
-                {PILARES.map((p) => (
-                  <line
-                    className="ctr-raio"
-                    key={p.id}
-                    x1="50"
-                    y1="50"
-                    x2={n3(50 + R_HEX_CENA * Math.cos(rad(p.ang)))}
-                    y2={n3(50 + R_HEX_CENA * Math.sin(rad(p.ang)))}
-                    pathLength={1}
-                  />
-                ))}
-              </svg>
-
               {/* OS TRÊS PILARES, nos vértices — só o ícone. O nome e a
                   explicação estão no bloco de texto da batida de cada um, ao
                   lado da cena; escritos também aqui, apareceriam duas vezes no
@@ -1639,12 +1750,7 @@ export function Centro() {
                     {/* O halo fica ATRÁS da lâmpada e é o que dá o "acendeu":
                         o traço sozinho só troca de cor, e trocar de cor não é
                         acender — é a luz derramada em volta que diz isso. */}
-                    <circle
-                      className="ctr-balao-halo"
-                      cx="50"
-                      cy="38"
-                      r="17"
-                    />
+                    <circle className="ctr-balao-halo" cx="50" cy="38" r="17" />
 
                     {/* A LÂMPADA, no vocabulário de ícones da página: caixa de
                         24 e traço de 1.5, aqui posta em escala 1.25 e centrada
@@ -1692,7 +1798,11 @@ export function Centro() {
                mesmo `top`. Um grude só não tem esse problema: o que muda entre
                largo e estreito é o desenho interno da grade, e não o número de
                coisas presas na tela. Ver `.ctr-flancos` no `centro.css`. */
-              <li className="ctr-passo ctr-fatia" key={t.id} data-lugar={t.lugar}>
+              <li
+                className="ctr-passo ctr-fatia"
+                key={t.id}
+                data-lugar={t.lugar}
+              >
                 <div className="ctr-flancos">
                   <div className="ctr-bloco">
                     <h3 className="ctr-tit">{t.titulo}</h3>
@@ -1703,13 +1813,17 @@ export function Centro() {
                 </div>
               </li>
             ) : (
-              <li className="ctr-passo ctr-fatia" key={t.id} data-lugar={t.lugar}>
+              <li
+                className="ctr-passo ctr-fatia"
+                key={t.id}
+                data-lugar={t.lugar}
+              >
                 <div className="ctr-bloco">
                   <h3 className="ctr-tit">{t.titulo}</h3>
                   <p className="ctr-txt">{t.texto}</p>
                 </div>
               </li>
-            )
+            ),
           )}
         </ol>
 
@@ -1754,63 +1868,84 @@ export function Centro() {
 
             `id` fica no invólucro, que é onde a parte começa — é para cá que o
             menu e o rodapé apontam. */}
-        <div className="ctr-const ctr-fatia" data-fam="pilar" id="pilares">
+        <div className="ctr-const ctr-fatia" id="pilares">
+          {/* UMA MOLDURA SÓ PARA AS DUAS CONSTELAÇÕES, e não uma por grupo.
+
+              Eram duas fatias de 160svh, cada uma com a sua moldura grudada de
+              uma tela. Entre o texto dos pilares apagar e o da IA acender
+              passava UMA TELA INTEIRA de rolagem só com o hexágono parado: a
+              moldura dos pilares soltava (50svh antes do fim da fatia dela) e
+              a da IA precisava subir do pé da tela até assentar (50svh depois
+              do começo da dela). É a mecânica do grude — toda moldura de tela
+              cheia cobra uma tela para entrar —, e duas seguidas cobram duas.
+
+              Com uma moldura só, os dois grupos são camadas da mesma grade
+              (`.ctr-const-grupo`, um em cima do outro na mesma célula) e a
+              moldura fica presa por 120svh em vez de 60: os pilares ocupam a
+              primeira metade e a IA a segunda, e a troca entre os dois é só o
+              fade de um e o do outro — sem rolagem morta no meio. */}
           <div className="ctr-const-grade">
-            {/* O cabeçalho ocupa a faixa livre do ALTO. Os três pilares moram
+            <div className="ctr-const-grupo" data-fam="pilar">
+              {/* O cabeçalho ocupa a faixa livre do ALTO. Os três pilares moram
                 em 210°, −30° e 90° — esquerda-cima, direita-cima e baixo —,
                 então o topo é o único lugar da grade sem vértice para
                 disputar. */}
-            <div className="ctr-const-cab">
-              <h2 className="ctr-tit ctr-tit--cab">
-                Três pilares <mark>sustentam a empresa.</mark>
-              </h2>
-              <p className="ctr-txt">
-                Não são valores de parede: são o que precisa funcionar junto.
-              </p>
+              <div className="ctr-const-cab">
+                <h2 className="ctr-tit ctr-tit--cab">
+                  Três pilares <mark>sustentam a empresa.</mark>
+                </h2>
+                <p className="ctr-txt">
+                  Não são valores de parede: são o que precisa funcionar junto.
+                </p>
+              </div>
+
+              {/* Uma lista de verdade: os três são itens de igual peso, e isso
+                precisa existir na marcação e não só na tipografia. */}
+              <ul className="ctr-nos">
+                {PILARES.map((p) => (
+                  <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
+                    <h3 className="ctr-no-tit">{p.nome}</h3>
+                    <p className="ctr-txt">{p.texto}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Uma lista de verdade: os três são itens de igual peso, e isso
-                precisa existir na marcação e não só na tipografia. */}
-            <ul className="ctr-nos">
-              {PILARES.map((p) => (
-                <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
-                  <h3 className="ctr-no-tit">{p.nome}</h3>
-                  <p className="ctr-txt">{p.texto}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* A IA fecha a cena: a partir daqui não há canto vazio no hexágono
+            {/* A IA fecha a cena: a partir daqui não há canto vazio no hexágono
             nem seção nova para abrir.
 
-            O CABEÇALHO DELA VAI EMBAIXO, e não no alto como o dos pilares. Não
-            é variação: os três papéis da IA ocupam −90°, 30° e 150° — topo,
-            direita-baixo e esquerda-baixo —, e o topo é vértice ocupado. A
-            faixa livre é a de baixo, e a frase ali embaixo lê como o que ela
-            é: a assinatura do quadro completo, com a marca já aberta dentro do
-            polígono. Na ordem do documento ela continua vindo primeiro, que é
-            como o leitor de tela precisa receber. */}
-        <div className="ctr-const ctr-fatia" data-fam="ia" id="ia">
-          <div className="ctr-const-grade">
-            <div className="ctr-const-cab">
-              <h2 className="ctr-tit ctr-tit--cab">
-                Movidos por <mark>Inteligência Artificial.</mark>
-              </h2>
-              <p className="ctr-txt">
-                Da criação da arte ao atendimento, tudo passa por ela.
-              </p>
-            </div>
+            O TEXTO DELA FICA ONDE O DOS PILARES ESTAVA: cabeçalho em cima,
+            dois itens nas laterais altas, um embaixo. Já seguiu os vértices
+            dela (−90°, 30°, 150°: cabeçalho embaixo, itens nas metades
+            inferiores), e com os dois grupos na mesma moldura isso virava um
+            fade em que título e itens pulam de faixa — lia como layout
+            quebrando. Agora o texto troca no lugar e quem muda de figura é a
+            cena. `lugar` segue a ordem do processo (criação, produção,
+            atendimento) nas mesmas células dos pilares — e não o ângulo do nó,
+            que é o que vale para os pilares.
 
-            <ul className="ctr-nos">
-              {IA.map((p) => (
-                <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
-                  <h3 className="ctr-no-tit">{p.nome}</h3>
-                  <p className="ctr-txt">{p.texto}</p>
-                </li>
-              ))}
-            </ul>
+            `id="ia"` fica no GRUPO: ele mora a uma tela do topo da fatia na
+            ordem do fluxo, então o menu cai exatamente na troca — pilares
+            saindo, IA entrando. */}
+            <div className="ctr-const-grupo" data-fam="ia" id="ia">
+              <div className="ctr-const-cab">
+                <h2 className="ctr-tit ctr-tit--cab">
+                  Movidos por <mark>Inteligência Artificial.</mark>
+                </h2>
+                <p className="ctr-txt">
+                  Da criação da arte ao atendimento, tudo passa por ela.
+                </p>
+              </div>
+
+              <ul className="ctr-nos">
+                {IA.map((p) => (
+                  <li className="ctr-no" key={p.id} data-lugar={p.lugar}>
+                    <h3 className="ctr-no-tit">{p.nome}</h3>
+                    <p className="ctr-txt">{p.texto}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>

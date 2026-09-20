@@ -25,6 +25,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { RespostaLead } from "./lead";
+import { Brilho } from "./brilho";
 
 /* O FORMULÁRIO ABRAÇA O FECHAMENTO INTEIRO, e `children` é a coluna de texto
    que fica ao lado dele — a marca, a manchete e a linha de apoio.
@@ -112,7 +113,11 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
       <div className="form-fr-duo">
         {children}
 
-        <div className="form-fr-cartao">
+        <div className="form-fr-cartao brilho">
+          {/* O brilho que segue o ponteiro, o mesmo dos portais do fechamento
+              da home e da galeria: a classe `brilho` dá a camada, o componente
+              dá as variáveis. Ver `brilho.tsx`. */}
+          <Brilho />
           {/* O SUCESSO SUBSTITUI O FORMULÁRIO, e não é enfeite.
 
               Enquanto o envio abria o WhatsApp, fazia sentido o botão voltar
@@ -238,11 +243,6 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
                     {erro}
                   </p>
                 ) : null}
-
-                <p className="form-fr-aviso">
-                  Seus dados vão para quem opera a rede. Nada é publicado e não
-                  existe cadastro em lista.
-                </p>
               </div>
             </>
           )}

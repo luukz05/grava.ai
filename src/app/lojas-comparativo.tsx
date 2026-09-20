@@ -33,7 +33,7 @@
    para serem exibidos. */
 
 import { Ph } from "./ph";
-import { IcoShopping, IcoMercado, IcoAeroporto, IcoSim, IcoNao } from "./icons";
+import { IcoQuiosqueAberto, IcoQuiosqueFechado, IcoLojaCompacta, IcoSim, IcoNao } from "./icons";
 
 type Modelo = {
   id: string;
@@ -57,7 +57,7 @@ const MODELOS: Modelo[] = [
     resumo: "Ilha no corredor, atendimento pelos quatro lados.",
     investimento: "R$ 99.900",
     imagem: "Quiosque aberto no corredor",
-    Icone: IcoShopping,
+    Icone: IcoQuiosqueAberto,
   },
   {
     id: "fechado",
@@ -65,7 +65,7 @@ const MODELOS: Modelo[] = [
     resumo: "Cabine com vitrine, estoque e balcão próprios.",
     investimento: "R$ 139.900",
     imagem: "Quiosque fechado com vitrine",
-    Icone: IcoMercado,
+    Icone: IcoQuiosqueFechado,
   },
   {
     id: "compacta",
@@ -74,7 +74,7 @@ const MODELOS: Modelo[] = [
     resumo: "Ponto com porta, para praça de maior permanência.",
     investimento: "R$ 189.900",
     imagem: "Loja compacta com fachada",
-    Icone: IcoAeroporto,
+    Icone: IcoLojaCompacta,
   },
 ];
 

@@ -75,11 +75,12 @@ export function Casca({
 }) {
   /* O DESTINO DOS FIXOS DEPENDE DA ROTA, e a casca é quem sabe qual é.
 
-     Em três das quatro páginas o CTA desce até o formulário do fechamento. Na
-     home não existe formulário — ela encaminha para `/seja-franqueado` —, e
-     apontar os fixos para `#falar` ali levaria a pessoa até um fechamento sem
-     nada para preencher. Ver `destinoCta` em `./lead`. */
-  const cta = destinoCta(atual === "home");
+     Só em `/seja-franqueado` o CTA desce até o formulário do fechamento. Na
+     home e na galeria não existe formulário — as duas encaminham para
+     `/seja-franqueado` pelos portais —, e apontar os fixos para `#falar` ali
+     levaria a pessoa até um fechamento sem nada para preencher. Ver
+     `destinoCta` em `./lead`. */
+  const cta = destinoCta(atual === "franqueado");
 
   return (
     <div

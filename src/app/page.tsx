@@ -23,15 +23,14 @@
    a mesma regra do CONTENT.md. */
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./v5.css";
 import "./variacoes.css";
 import "./_marca/marca.css";
 import "./_marca/centro.css";
 import { Casca, Heroi } from "./casca";
 import { FundoFecho } from "./fundos";
-import { ROTA_FRANQUEADO } from "./lead";
 import { Centro } from "./_marca/centro";
+import { Portais, PORTAL_FRANQUEADO, PORTAL_GALERIA } from "./portais";
 import { Rodape } from "./rodape";
 /* Os ícones dos pilares e os da IA saíram junto com os cartões: os seis são
    agora os nós do hexágono, dentro da cena (ver `_marca/centro.tsx`). */
@@ -181,28 +180,26 @@ export default function Home() {
           e a razão é a mesma que tirou `#onde` acima: esta página existe para a
           busca pelo nome da marca, e pedir nome, e-mail e WhatsApp a quem
           chegou para saber o que a GRAVA.AI faz é cobrar dado antes de haver
-          intenção. O formulário continua inteiro em `/seja-franqueado`,
-          `/galeria` — onde quem lê já está avaliando a franquia.
+          intenção. O formulário continua inteiro em `/seja-franqueado` — onde
+          quem lê já está avaliando a franquia.
 
-          Um CTA só, e cheio. O par "principal + secundário" morreu junto com o
-          formulário: sem uma segunda ação para disputar, um botão `cta--out`
-          sozinho seria um botão apagado sem nada ao lado para justificar o
-          contraste menor. */}
+          Depois do formulário saiu também o botão que ficou no lugar dele: um
+          `cta--lg` sozinho embaixo de um `.sec-cab` era um fechamento apagado,
+          uma linha e uma pílula no fim de uma página que tinha acabado de
+          mostrar uma cena inteira. Agora são os dois portais — franquia e
+          galeria —, cartões de tipografia grande com o ícone da página de
+          destino em marca d'água. Ver `portais.tsx`. */}
       <footer className="hold close" id="falar">
         <div className="sec-cab">
           <h2>
             Leve a GRAVA.AI <mark>para a sua região.</mark>
           </h2>
           <p>
-            A franquia tem página própria: modelos, investimento, o que a rede
-            entrega e como pedir a apresentação.
+            A franquia tem página própria — e as peças que saem do totem
+            também.
           </p>
         </div>
-        <div className="row" style={{ marginTop: 0 }}>
-          <Link className="cta cta--lg" href={ROTA_FRANQUEADO}>
-            Seja um franqueado
-          </Link>
-        </div>
+        <Portais itens={[PORTAL_FRANQUEADO, PORTAL_GALERIA]} />
         <Rodape
           assinatura="Transformando ideias em produtos personalizados com Inteligência Artificial."
           links={[
