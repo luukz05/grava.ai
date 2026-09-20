@@ -56,7 +56,7 @@ export function Landing() {
                 {CTA_ROTULO}
               </a>
               <a className="cta cta--lg cta--out" href="#numeros">
-                Ver os números
+                Ver modelos de unidade
               </a>
             </div>
           </div>
