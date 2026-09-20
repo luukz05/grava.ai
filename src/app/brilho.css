@@ -1,0 +1,48 @@
+/* O brilho que segue o ponteiro — ver `brilho.tsx`.
+
+   A classe vai no elemento que recebe o `<Brilho />`. Ela dá três coisas: as
+   variáveis em repouso, o contexto de empilhamento e a camada que desenha. */
+
+.brilho {
+  /* Onde o brilho está. Escrito por `brilho.tsx` em pixels dentro da caixa;
+     `--g-on` liga e desliga, e começa em zero: se o script não rodar (toque,
+     movimento reduzido), nada acende. */
+  --gx: 50%;
+  --gy: 50%;
+  --g-on: 0;
+
+  position: relative;
+  /* `isolate` cria o contexto de empilhamento: é o que deixa o `::before` ir
+     para `z-index: -1` e ficar ABAIXO de todo filho — texto, campo, botão,
+     posicionado ou não — sem cair atrás do fundo da própria caixa. Sem isto,
+     cada filho estático precisaria de `position: relative` para pintar por
+     cima do brilho. */
+  isolation: isolate;
+  /* `clip` corta o degradê que sangra para fora da caixa e respeita o canto
+     arredondado, sem criar contêiner de rolagem — mesma razão do
+     `overflow-x: clip` do `.v5`. */
+  overflow: clip;
+}
+
+/* Um degradê radial centrado em `--gx/--gy`, do ciano da marca ao nada. Ele
+   NÃO anima a posição — segue o cursor no quadro, como a lanterna do herói — e
+   anima só a opacidade, na entrada e na saída, para não ligar e desligar como
+   interruptor.
+
+   Raio grande de propósito: brilho pequeno lê como cursor customizado, e a
+   caixa não está apontando o mouse — está respondendo a ele. */
+.brilho::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    22rem circle at var(--gx) var(--gy),
+    rgba(102, 205, 255, 0.16),
+    rgba(102, 205, 255, 0.05) 35%,
+    transparent 65%
+  );
+  opacity: var(--g-on);
+  pointer-events: none;
+  transition: opacity var(--t-estado) var(--e-ui);
+}
