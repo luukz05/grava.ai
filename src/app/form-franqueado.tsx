@@ -146,12 +146,15 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
             </div>
           ) : (
             <>
+              {/* O TÍTULO SOZINHO. Embaixo dele havia um parágrafo de duas
+                  frases ("Preencha e a apresentação vai para o seu e-mail. Em
+                  seguida, quem opera a rede chama no seu WhatsApp") — a
+                  primeira o botão já diz, a segunda a nota de sucesso já
+                  conta. Saiu a pedido; o rótulo do e-mail ("recebe a
+                  apresentação") e o do WhatsApp seguem explicando cada campo
+                  no lugar do campo. */}
               <div className="form-fr-head">
                 <h3>Receba a apresentação da franquia</h3>
-                <p>
-                  Preencha e a apresentação demonstrativa vai para o seu e-mail.
-                  Em seguida, quem opera a rede chama no seu WhatsApp.
-                </p>
               </div>
 
               {/* TRÊS CAMPOS, E SÓ.

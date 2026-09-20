@@ -1216,6 +1216,34 @@ export function Centro() {
           const tIa = (seg: number, frac: number) =>
             "pilares+=" + (celular ? naFatia(5, frac) : seg + 1.75);
 
+          /* QUANDO O TEXTO DA IA APAGA, NO CELULAR.
+
+             A fração de 0,96 vinha da tela larga, onde o texto mora dentro da
+             coluna e some antes de a moldura soltar. No telefone a moldura é
+             FIXA no pé da JANELA (ver `.ctr-vivo .ctr-const-grade` em
+             `centro.css`), e a linha do tempo só acaba quando o pé da coluna
+             chega ao MEIO da tela: aos 0,96 o pé da seção ainda estava a ~59%
+             da altura, e nos 41% de baixo o fechamento da página já tinha
+             entrado — "Movidos por Inteligência Artificial" impresso em cima
+             de "Leve a GRAVA.AI para a sua região" (visto no iPhone).
+
+             O instante certo é o pé da seção encostando no pé da janela: dali
+             em diante o bloco fixo cobriria o que vem depois. Na régua da
+             fatia isso é meia janela antes do fim, e o apagar de 0,3s começa
+             um pouco antes para já ter terminado nesse ponto. Medido em
+             `svh`/altura real, não em fração fixa: a fatia vale 220svh no
+             celular, mas o número entra pela altura lida do DOM e continua
+             certo se a fatia mudar. O `max` segura a conta numa fatia que
+             por algum motivo seja mais baixa que a janela. */
+          const altIa = alturas[5] ?? 1;
+          const durIa = durT[5] ?? T_BATIDA;
+          const saidaIa = celular
+            ? Math.max(
+                0.6,
+                1 - (window.innerHeight * 0.5) / altIa - 0.3 / durIa,
+              )
+            : 0.96;
+
           /* OS RAIOS ENCOSTAM NO ANEL DA MARCA, e o anel é medido, não escrito.
 
              O selo tem `clamp(1.5rem, 6cqw, 2.4rem)` de largura e chega ao
@@ -1418,11 +1446,13 @@ export function Centro() {
               tIa(1.95, 0.59),
             )
             /* E o quadro se limpa antes de a moldura soltar, como na batida
-               anterior: o que fica na tela daqui em diante é a cena. */
+               anterior: o que fica na tela daqui em diante é a cena.
+
+               NO CELULAR ELE SE LIMPA MAIS CEDO — ver `saidaIa` acima. */
             .to(
               [cabIa, ...txtIa],
               { autoAlpha: 0, y: -8, duration: 0.3, ease: E_UI },
-              tIa(3.1, 0.96),
+              tIa(3.1, saidaIa),
             );
 
           /* A última fatia precisa existir inteira na linha do tempo, senão a

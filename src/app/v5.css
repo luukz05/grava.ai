@@ -1706,6 +1706,8 @@
    que o contêiner — a página inteira se define por borda, e o formulário
    também. */
 .form-fr-cartao {
+  /* Contêiner de consulta: o título se mede pela largura do cartão (`cqi`). */
+  container-type: inline-size;
   border: 1px solid var(--hair);
   background: var(--bg-2);
   border-radius: var(--r-lg, 24px);
@@ -1722,25 +1724,33 @@
   align-content: start;
 }
 
-.form-fr-head h3 {
-  margin: 0 0 0.4rem;
-  font-family: var(--f-txt), system-ui, sans-serif;
-  font-size: clamp(1.25rem, 2.4vw, 1.625rem);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
+/* O TÍTULO É O CABEÇALHO INTEIRO. O parágrafo de apoio que vivia embaixo dele
+   saiu (ver `form-franqueado.tsx`), e o título herdou o papel de abrir o
+   cartão sozinho: peso de manchete e um respiro próprio embaixo, um pouco
+   maior que o `gap` do cartão — o espaço entre o título e o primeiro campo
+   separa dois ASSUNTOS (o convite, os dados), e tem de ler maior que o espaço
+   entre os campos.
 
+   NUMA LINHA SÓ, a pedido. O corpo é medido pela largura do cartão (`cqi`, com
+   o `container-type` declarado no `.form-fr-cartao`), e não pela viewport: a
+   frase tem 33 caracteres, e o que decide se ela cabe é o cartão — que no par
+   de colunas tem metade da página e, abaixo de 940px, a página inteira. Uma
+   medida em `vw` acertaria um dos dois casos e erraria o outro. 5,2% da
+   largura por caractere-médio de 0,55em dá folga de ~10% nas três larguras
+   (celular, coluna do par, coluna única). */
+.form-fr-head h3 {
+  margin: 0;
+  padding-bottom: clamp(0.25rem, 0.8vw, 0.5rem);
+  font-family: var(--f-txt), system-ui, sans-serif;
+  font-size: clamp(1.125rem, 5.2cqi, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
 /* No arredondado a display angular sai, como no resto da página. */
 .v5[data-forma="oblongo"] .form-fr-head h3 {
   font-family: var(--f-txt), system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
-.form-fr-head p {
-  margin: 0;
-  color: var(--fg-2);
-  font-size: 0.9375rem;
-  max-width: 46ch;
+  letter-spacing: -0.03em;
 }
 
 .form-fr-campos {
@@ -3793,7 +3803,7 @@
    linhas compridas. O que alinha os dois é o `margin-inline: auto` de cada um
    dentro do mesmo `.hold`, não uma caixa comum. */
 [data-leitura="centro"] .hero h1 {
-  max-width: 18ch;
+  max-width: 24ch;
   margin-inline: auto;
 }
 
@@ -3825,7 +3835,7 @@
 }
 
 .hero--curto h1 {
-  max-width: 18ch;
+  max-width: 24ch;
 }
 
 .herowrap:has(.hero--curto) {
