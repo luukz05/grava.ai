@@ -1,30 +1,42 @@
 /* Rodapé das três páginas.
 
-   Três andares, como um rodapé de produto e não como uma linha de créditos:
+   Estrutura do bloco `footer-section` do 21st.dev, adaptada ao sistema desta
+   página: quatro colunas numa grade — a chamada com um mini-formulário de
+   e-mail, os links de navegação, os contatos e os canais em botões redondos —
+   e embaixo, depois de um fio, a linha institucional com o © de um lado e os
+   links legais do outro.
 
-   1. a marca com a assinatura, à esquerda, e duas colunas de links à direita
-      — "Navegar" (as páginas e âncoras que cada rota passa por `links`) e
-      "Fale com a gente" (WhatsApp e Instagram, com o número e o @ visíveis, e
-      não só o ícone: quem chega aqui já rolou a página inteira e quer o dado,
-      não uma charada);
-   2. um fio;
-   3. a linha institucional: © de um lado, links legais do outro.
+   O que mudou na adaptação, e por quê:
 
-   A versão anterior era o bloco `footer` do 21st.dev adaptado: marca de 26px,
-   dois círculos com ícone e os links numa fileira única empurrada para a
-   direita. Em 1400px de largura sobrava um vazio no meio, a marca sumia em
-   cima do fundo topográfico e os cinco links liam como uma frase, não como um
-   menu. No celular a fileira quebrava em duas linhas desiguais.
+   — sem Tailwind, sem shadcn, sem `class-variance-authority` e sem os quatro
+     pacotes Radix (slot, label, switch, tooltip): nenhum deles existe neste
+     projeto, e trazer o conjunto para um rodapé reescreveria o sistema visual
+     da página. O que os componentes faziam, o CSS de `.rodape*` faz;
+   — o formulário de "newsletter" virou a porta do FORMULÁRIO DE VERDADE: a
+     rede não tem newsletter, e uma caixa de e-mail que não leva a nada é
+     promessa vazia. Aqui o e-mail vai por GET para `/seja-franqueado#falar`, e
+     o formulário de lá já nasce com ele preenchido (ver `form-franqueado.tsx`).
+     É um `<form>` puro, sem script: funciona antes de o JS carregar;
+   — a coluna de contato não inventa endereço: a rede publicou WhatsApp e
+     Instagram, e é isso que aparece, com o número e o @ visíveis — quem chega
+     aqui já rolou a página inteira e quer o dado, não uma charada;
+   — os botões redondos de "Siga a gente" têm os DOIS canais da rede, e não os
+     quatro do original (Facebook, Twitter, LinkedIn não existem);
+   — a dica de cada botão é o `title` nativo, e não um Tooltip do Radix: é
+     texto de apoio a um ícone rotulado por `aria-label`, não conteúdo;
+   — a chave de tema claro/escuro SAIU: o site é escuro por decisão de marca
+     (ver `fsk-design-system.md`), e uma chave que não muda nada é pior que
+     nenhuma;
+   — os ícones são do pacote da página, no traço 1.5 do resto, e não Lucide;
+   — `rel="noopener noreferrer"` nos links externos, que o original esquece ao
+     usar `target="_blank"`.
 
-   O que continua: sem Tailwind, sem shadcn; os ícones são autorais no traço
-   1.5 do resto da página; `rel="noopener noreferrer"` em tudo que abre em
-   nova aba. A fileira de links legais só renderiza quando há o que colocar
-   nela — a rede não tem política de privacidade nem termos publicados, e
-   apontar para uma página que não existe é pior do que não ter a linha. */
+   A fileira de links legais só renderiza quando há o que colocar nela — a rede
+   não tem política de privacidade nem termos publicados, e apontar para uma
+   página que não existe é pior do que não ter a linha. */
 
-import Image from "next/image";
 import Link from "next/link";
-import { IcoWhatsApp, IcoInstagram } from "./icons";
+import { IcoEnviar, IcoInstagram, IcoWhatsApp } from "./icons";
 
 export type LinkRodape = { href: string; rotulo: string };
 
@@ -33,12 +45,14 @@ const CONTATO = [
     href: "https://wa.me/5515996610916",
     rotulo: "WhatsApp",
     valor: "(15) 99661-0916",
+    dica: "Chamar no WhatsApp",
     Icone: IcoWhatsApp,
   },
   {
     href: "https://instagram.com/gravaaioficial",
     rotulo: "Instagram",
     valor: "@gravaaioficial",
+    dica: "Seguir no Instagram",
     Icone: IcoInstagram,
   },
 ];
@@ -46,32 +60,45 @@ const CONTATO = [
 export function Rodape({
   links,
   legais = [],
-  assinatura = "Transformando ideias em produtos personalizados.",
+  assinatura = "Deixe o e-mail e receba a apresentação da franquia.",
 }: {
   links: LinkRodape[];
   legais?: LinkRodape[];
+  /* O parágrafo embaixo da chamada. */
   assinatura?: string;
 }) {
   return (
     <div className="rodape">
       <div className="rodape-grade">
-        <div className="rodape-marca-col">
-          <Link className="rodape-marca" href="/" aria-label="GRAVA.AI, início">
-            <Image
-              src="/brand/grava-horizontal.png"
-              alt=""
-              width={420}
-              height={96}
+        {/* A CHAMADA. O título grande, o apoio e a caixa de e-mail — que é a
+            entrada do formulário da landing, não uma newsletter. O brilho
+            desfocado no canto é o `::after` da coluna. */}
+        <div className="rodape-col rodape-col--chamada">
+          <h2 className="rodape-chamada">Leve a GRAVA.AI para a sua região.</h2>
+          <p className="rodape-apoio">{assinatura}</p>
+          <form className="rodape-form" action="/seja-franqueado#falar" method="get">
+            <label htmlFor="rodape-email" className="sr">
+              Seu e-mail
+            </label>
+            <input
+              id="rodape-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="Seu e-mail"
+              required
             />
-          </Link>
-          <p className="rodape-assinatura">{assinatura}</p>
+            <button type="submit" className="rodape-enviar" aria-label="Continuar">
+              <IcoEnviar />
+            </button>
+          </form>
         </div>
 
         <nav className="rodape-col" aria-labelledby="rodape-nav-titulo">
-          <h2 id="rodape-nav-titulo" className="rodape-titulo mono">
+          <h3 id="rodape-nav-titulo" className="rodape-titulo">
             Navegar
-          </h2>
-          <ul>
+          </h3>
+          <ul className="rodape-lista">
             {links.map((l) => (
               <li key={l.href}>
                 {l.href.startsWith("#") ? (
@@ -84,24 +111,34 @@ export function Rodape({
           </ul>
         </nav>
 
-        <div className="rodape-col" aria-labelledby="rodape-contato-titulo">
-          <h2 id="rodape-contato-titulo" className="rodape-titulo mono">
-            Fale com a gente
-          </h2>
-          <ul>
+        <div className="rodape-col">
+          <h3 className="rodape-titulo">Fale com a gente</h3>
+          <address className="rodape-lista rodape-endereco">
+            {CONTATO.map((c) => (
+              <p key={c.href}>
+                <span className="rodape-endereco-rotulo">{c.rotulo}: </span>
+                <a href={c.href} target="_blank" rel="noopener noreferrer">
+                  {c.valor}
+                </a>
+              </p>
+            ))}
+          </address>
+        </div>
+
+        <div className="rodape-col rodape-col--redes">
+          <h3 className="rodape-titulo">Siga a gente</h3>
+          <ul className="rodape-redes">
             {CONTATO.map((c) => (
               <li key={c.href}>
                 <a
-                  className="rodape-contato"
+                  className="rodape-rede"
                   href={c.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={c.rotulo}
+                  title={c.dica}
                 >
                   <c.Icone />
-                  <span>
-                    <span className="rodape-contato-rotulo">{c.rotulo}</span>
-                    <span className="rodape-contato-valor">{c.valor}</span>
-                  </span>
                 </a>
               </li>
             ))}
@@ -115,13 +152,13 @@ export function Rodape({
         </p>
 
         {legais.length > 0 ? (
-          <ul className="rodape-legais">
+          <nav className="rodape-legais" aria-label="Legal">
             {legais.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href}>{l.rotulo}</Link>
-              </li>
+              <Link key={l.href} href={l.href}>
+                {l.rotulo}
+              </Link>
             ))}
-          </ul>
+          </nav>
         ) : null}
       </div>
     </div>

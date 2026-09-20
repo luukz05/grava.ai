@@ -201,7 +201,6 @@ export default function Home() {
         </div>
         <Portais itens={[PORTAL_FRANQUEADO, PORTAL_GALERIA]} />
         <Rodape
-          assinatura="Transformando ideias em produtos personalizados com Inteligência Artificial."
           links={[
             { href: "#marca", rotulo: "Quem somos" },
             { href: "#pilares", rotulo: "Os pilares" },

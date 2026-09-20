@@ -136,3 +136,7 @@ export const IcoRentabilidade = pack(N.TrendingUp);
 export const IcoArte = pack(N.Sparkles); /* o símbolo que virou "gerado por IA" */
 export const IcoTempo = pack(N.Zap); /* do conceito ao produto gravado em minutos */
 export const IcoJornada = pack(N.Headphones); /* atendimento; o balão já é o da ideia na cena */
+
+/* O botão de envio do mini-formulário do rodapé (`rodape.tsx`): o avião de
+   papel, e não o envelope do CTA — aqui o gesto é "mandar", não "receber". */
+export const IcoEnviar = pack(N.Send);

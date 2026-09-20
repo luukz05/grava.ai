@@ -50,6 +50,21 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
   const abortar = useRef<AbortController | null>(null);
   useEffect(() => () => abortar.current?.abort(), []);
 
+  /* O E-MAIL PODE CHEGAR PELA URL. O mini-formulário do rodapé
+     (`rodape.tsx`) manda `?email=` por GET para cá, e a pessoa que já
+     digitou o e-mail lá não deveria digitar de novo aqui. Lido de
+     `window.location` num efeito, e não por `useSearchParams`: o hook
+     exigiria um limite de Suspense em volta do formulário nas três rotas
+     por causa de UM parâmetro opcional. Escrito no campo por `ref`, e só se
+     o campo ainda estiver vazio — o autofill do navegador pode ter chegado
+     antes, e o que a pessoa (ou o navegador dela) escreveu vence a URL. */
+  const campoEmail = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const email = new URLSearchParams(window.location.search).get("email");
+    const campo = campoEmail.current;
+    if (email && campo && !campo.value) campo.value = email;
+  }, []);
+
   /* Qual das quatro páginas converteu. Vai junto no corpo do POST porque as
      quatro têm o mesmo formulário no fechamento e, sem isto, não há como
      saber qual delas trouxe o lead. */
@@ -207,6 +222,7 @@ export function FormFranqueado({ children }: { children?: React.ReactNode }) {
                     required
                     autoComplete="email"
                     placeholder="voce@empresa.com.br"
+                    ref={campoEmail}
                   />
                 </label>
               </div>
