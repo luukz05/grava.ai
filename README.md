@@ -112,10 +112,3 @@ desqualifica o sitemap inteiro.
 
 Vercel. Definir `NEXT_PUBLIC_SITE_URL` no projeto antes do primeiro deploy de
 produção.
-
-## Documentação
-
-`AGENTS.md` avisa o essencial sobre esta versão do Next.js. O `CLAUDE.md` e a
-pasta `docs/` (proposta comercial, análise de concorrência, SEO, tracking,
-objeções) saíram do repositório no commit `94c6514`; para consultar, use
-`git show 94c6514^:<caminho>`.
